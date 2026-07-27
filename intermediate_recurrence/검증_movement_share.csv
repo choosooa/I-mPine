@@ -1,0 +1,12 @@
+﻿항목,값,비고
+변수수_변경전,25,
+변수수_변경후,25,"동일해야 함(25->25, direct 제거+share 추가)"
+movement_share_direct_제거여부,True,
+movement_share_related_rename_broad_budget_여부,True,
+movement_share_included_budget_생성여부,True,
+movement_share_included_budget_결측행수,448,
+movement_share_included_budget_유효행수,1552,
+movement_share_included_budget_최소값,0.0,
+movement_share_included_budget_최대값,0.9810963676638207,
+movement_share_included_budget_범위이탈행수,0,0이어야 함
+budget_observed0_행수_movement_share_included_budget_NA,290,전부 NA여야 함

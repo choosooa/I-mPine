@@ -25,7 +25,9 @@ DATA_DIR = os.path.join(PROJECT_ROOT, "data", "CH2", "1. 환경", "인위적 확
 IN_FEATURES = os.path.join(DATA_DIR, "sigungu_year_panel_2016_2023_features.csv")
 IN_EDA = os.path.join(DATA_DIR, "sigungu_year_panel_2016_2023_eda_features.csv")
 PEST_DIR = os.path.join(PROJECT_ROOT, "data", "CH1", "산림청_산림병해충방제 병해충발생관리정보_20250902")
-OUTDIR = os.path.join(BASE, "output_인위적확산")
+# 산출물은 EDA/CH2가 아니라 data 폴더 쪽(인위적 확산 챕터 바로 밑)을 정본으로 사용 - 다른 CH2
+# 카테고리(노출도 등)와 최종 결과물을 합칠 때 이 위치에서 바로 참조하기 위함.
+OUTDIR = os.path.join(PROJECT_ROOT, "data", "CH2", "1. 환경", "인위적 확산", "output_인위적확산")
 os.makedirs(OUTDIR, exist_ok=True)
 
 figs = {}
@@ -47,7 +49,8 @@ df1["sigungu_cd"] = df1["sigungu_cd"].str.zfill(5)
 df2["sigungu_cd"] = df2["sigungu_cd"].str.zfill(5)
 
 merged = df1.merge(
-    df2[["year", "sigungu_cd", "n_new_infected", "gukyurim_forestroad_density"]],
+    df2[["year", "sigungu_cd", "n_new_infected", "gukyurim_forestroad_density",
+         "median_dist_road_m", "median_dist_forestroad_m", "median_dist_resid_m"]],
     on=["year", "sigungu_cd"], how="inner",
 )
 merged["log_n_new_infected"] = np.log1p(merged["n_new_infected"])
@@ -243,13 +246,19 @@ except FileNotFoundError:
 # 6단계 - 최종 변수셋 확정 + VIF 종합 진단
 # ---------------------------------------------------------------
 # 5단계 결론 반영: gukyurim -> 이진 더미로 교체, sgg_area_km2 -> pine_ha와 collinearity로 제외
+# FINAL_FEATURES(pine_ha, n_new_infected 포함)는 이 챕터 내부 진단(VIF/상관/부분상관)에만 씀.
+# CH2 전체에 넘기는 산출물(final_variable_set.csv)에는 n_new_infected(=CH2 종속변수 후보이자
+# 이 로컬 회귀의 Y였던 값)와 pine_ha(노출도 카테고리에 이미 존재)를 제외한
+# "인위적확산 챕터가 실제로 기여하는 4개 설명변수"만 남긴다.
 FINAL_FEATURES = [
     SELECTED_ROAD, SELECTED_RESID, "has_gukyurim_forestroad",
     "road_density_km_per_km2", "pine_ha", "n_new_infected",
 ]
-final_df = merged[["year", "sigungu_cd", "sido", "sigungu_nm", "log_n_new_infected"] + FINAL_FEATURES].copy()
+CARRY_FORWARD_FEATURES = [SELECTED_ROAD, SELECTED_RESID, "has_gukyurim_forestroad", "road_density_km_per_km2"]
+final_df = merged[["year", "sigungu_cd", "sido", "sigungu_nm"] + CARRY_FORWARD_FEATURES].copy()
 final_df.to_csv(f"{OUTDIR}/final_variable_set.csv", index=False, encoding="utf-8-sig")
 report["final_features"] = FINAL_FEATURES
+report["carry_forward_features"] = CARRY_FORWARD_FEATURES
 
 def vif_table(df, cols):
     X = df[cols].dropna()
@@ -543,6 +552,71 @@ plt.title(f"시계열 자기상관: t-1 vs t (r={r_lag:.3f})")
 plt.xlabel("log1p(n_new_infected), t-1년"); plt.ylabel("log1p(n_new_infected), t년")
 plt.tight_layout()
 save_fig("temporal_lag_scatter")
+
+# ---------------------------------------------------------------
+# 12단계 - 감염목 최근접거리(median_dist_*) 재계산 반영 [신규]
+# 병해충발생정보관리 좌표(EPSG:5186 확인)로 2016~2023 전체 재계산 완료.
+# 주의: 같은 연도 감염목 포인트에서 파생된 값이므로 EDA/가설검증 전용,
+# 최종 회귀모형의 n_new_infected 설명변수로는 쓰지 않음(데이터 누수).
+# ---------------------------------------------------------------
+DIST_COLS = ["median_dist_road_m", "median_dist_forestroad_m", "median_dist_resid_m"]
+dist_coverage = merged.groupby("year")[DIST_COLS].apply(lambda g: g.notna().sum())
+report["dist_coverage_by_year"] = dist_coverage.to_dict("index")
+
+fig, axes = plt.subplots(1, 3, figsize=(14, 4.3))
+for ax, col in zip(axes, DIST_COLS):
+    vals = merged[col].dropna()
+    ax.hist(vals, bins=30, color="#2f5d3a", edgecolor="white")
+    ax.set_title(col)
+plt.tight_layout()
+save_fig("hist_median_dist")
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 4.6))
+for ax, col in zip(axes, DIST_COLS):
+    data_by_year = [merged.loc[merged["year"] == y, col].dropna().values for y in years_sorted]
+    ax.boxplot(data_by_year, tick_labels=years_sorted)
+    ax.set_yscale("log")
+    ax.set_title(col)
+    ax.tick_params(axis="x", rotation=45)
+plt.tight_layout()
+save_fig("box_year_median_dist")
+
+# 구조적 지표(road/resid_pine_ratio) vs 직접관측 거리(median_dist_*) 일관성 확인
+consist_rows = []
+for dist_col, ratio_col in [("median_dist_road_m", SELECTED_ROAD), ("median_dist_resid_m", SELECTED_RESID)]:
+    sub = merged[[dist_col, ratio_col]].dropna()
+    r, p = stats.pearsonr(sub[dist_col], sub[ratio_col])
+    consist_rows.append({"거리변수": dist_col, "구조변수": ratio_col, "r": round(float(r), 4), "p": float(p), "n": int(len(sub))})
+report["dist_vs_ratio_consistency"] = consist_rows
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.6))
+for ax, (dist_col, ratio_col) in zip(axes, [("median_dist_road_m", SELECTED_ROAD), ("median_dist_resid_m", SELECTED_RESID)]):
+    sub = merged[[dist_col, ratio_col]].dropna()
+    ax.scatter(sub[ratio_col], sub[dist_col], s=8, alpha=0.4, color="#2f5d3a")
+    r = [c for c in consist_rows if c["거리변수"] == dist_col][0]["r"]
+    ax.set_yscale("log")
+    ax.set_xlabel(ratio_col); ax.set_ylabel(f"{dist_col} (log)")
+    ax.set_title(f"r={r:.2f}")
+plt.tight_layout()
+save_fig("dist_vs_ratio_scatter")
+
+# 참고용 상관(예측변수로 쓰지 않음을 report에도 명시)
+ref_corr_rows = []
+for col in DIST_COLS:
+    sub = merged[[col, "log_n_new_infected"]].dropna()
+    r, p = stats.pearsonr(sub[col], sub["log_n_new_infected"])
+    ref_corr_rows.append({"변수": col, "r_vs_log_n_new_infected": round(float(r), 4), "n": int(len(sub))})
+report["dist_vs_target_reference_only"] = ref_corr_rows
+
+plt.figure(figsize=(10, 5.5))
+data_by_sido_dist = [merged.loc[merged["sido"] == s, "median_dist_road_m"].dropna().values for s in sido_order]
+plt.boxplot(data_by_sido_dist, tick_labels=sido_order)
+plt.yscale("log")
+plt.xticks(rotation=40, ha="right")
+plt.title("시도별 median_dist_road_m 분포 (감염목→최근접 도로, log축)")
+plt.ylabel("median_dist_road_m (log)")
+plt.tight_layout()
+save_fig("box_sido_dist_road")
 
 # ---------------------------------------------------------------
 # 저장
