@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CH2 전체변수 병합·EDA·외적 타당성 검토표 - 지자체 메인+확장</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --paper: #ffffff;
+      --ink: #172033;
+      --muted: #657187;
+      --line: #d9e0ea;
+      --head: #edf3f8;
+      --accent: #0f766e;
+      --accent-soft: #e6f3f1;
+      --warn: #b45309;
+      --warn-soft: #fff7ed;
+      --danger: #b91c1c;
+      --danger-soft: #fef2f2;
+      --ok: #166534;
+      --ok-soft: #f0fdf4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.56;
+      letter-spacing: 0;
+    }
+    main {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 56px;
+    }
+    header, section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 24px rgba(23, 32, 51, 0.06);
+    }
+    header {
+      border-top: 6px solid var(--accent);
+      padding: 28px 30px;
+    }
+    section {
+      margin-top: 22px;
+      padding: 24px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 0 0 14px;
+      font-size: 21px;
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+    h3 {
+      margin: 20px 0 10px;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+    p { margin: 0 0 12px; }
+    .subtitle {
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 8px;
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .toc a {
+      display: block;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      background: #fbfcfe;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .note, .warning, .danger {
+      margin: 14px 0;
+      padding: 13px 15px;
+      border-left: 4px solid var(--accent);
+      background: var(--accent-soft);
+      color: #134e4a;
+      font-weight: 700;
+    }
+    .warning {
+      border-left-color: var(--warn);
+      background: var(--warn-soft);
+      color: #7c2d12;
+    }
+    .danger {
+      border-left-color: var(--danger);
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      background: white;
+      margin: 12px 0 18px;
+    }
+    table {
+      width: 100%;
+      min-width: 900px;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+    th {
+      background: var(--head);
+      color: #243044;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    tr:last-child td { border-bottom: 0; }
+    th:last-child, td:last-child { border-right: 0; }
+    code {
+      padding: 1px 5px;
+      background: #eef2f7;
+      border: 1px solid #dce3ee;
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 0.92em;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      color: #364153;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .tag.warn { border-color: #fed7aa; background: var(--warn-soft); color: var(--warn); }
+    .tag.danger { border-color: #fecaca; background: var(--danger-soft); color: var(--danger); }
+    .tag.ok { border-color: #bbf7d0; background: var(--ok-soft); color: var(--ok); }
+    li { margin: 7px 0; }
+    @media print {
+      body { background: white; }
+      main { width: 100%; padding: 0; }
+      header, section { box-shadow: none; break-inside: avoid; }
+      .toc { display: none; }
+      table { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>CH2 전체변수 병합·EDA·외적 타당성 검토표</h1>
+    <p class="subtitle">대체 버전: <code>CH2_지자체대응역량_최종변수선정.csv</code> 대신 <code>CH2_지자체대응역량_메인+확장.csv</code> 사용.</p>
+    <p class="subtitle">기준 폴더: <code>C:\Users\SAMSUNG\OneDrive\바탕 화면\공모전\Final_file\I-m_Pine\CH2 data</code> 및 <code>CH2 data\CH2 전체변수</code></p>
+    <ul class="toc">
+      <li><a href="#summary">0. 파일 구조 요약</a></li>
+      <li><a href="#merge">1. 병합 전 필수 검토</a></li>
+      <li><a href="#local">2. 지자체 메인+확장 변수 검토</a></li>
+      <li><a href="#integrated">3. 통합 변수 검토 포인트</a></li>
+      <li><a href="#validity">4. 외적 타당성 검정</a></li>
+      <li><a href="#final">5. 최종 투입 전 체크</a></li>
+    </ul>
+  </header>
+
+  <section id="summary">
+    <h2>0. 파일 구조 요약</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>블록</th><th>사용 파일</th><th>행 x 열</th><th>확인된 고유키</th><th>주요 결측</th><th>판정</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>국가대응수준</td><td><code>CH2 전체변수\CH2_국가대응수준_최종변수선정.csv</code></td><td>1832 x 15</td><td><code>연도+시도+시군구</code></td><td>예산계열 86.5-88.8%</td><td><span class="tag danger">강한 주의</span> 결측 의미 분리 필수</td></tr>
+          <tr><td>기후위험도</td><td><code>CH2 전체변수\CH2_기후위험도_최종변수선정.csv</code></td><td>2000 x 16</td><td><code>연도+sigungu_cd</code>, <code>연도+시도+시군구</code></td><td>기후 변수 1.4-1.5%</td><td><span class="tag ok">양호</span></td></tr>
+          <tr><td>노출도</td><td><code>CH2 전체변수\CH2_노출도_최종변수선정.csv</code></td><td>1832 x 12</td><td><code>연도+시도+시군구</code></td><td>0%</td><td><span class="tag warn">주의</span> 1832행 표본 차이 확인</td></tr>
+          <tr><td>인위적확산</td><td><code>CH2 전체변수\CH2_인위적확산_최종변수선정.csv</code></td><td>2000 x 7</td><td><code>연도+시군구코드</code>, <code>연도+시도+시군구명</code></td><td>도로/주거지 1.2%</td><td><span class="tag ok">양호</span></td></tr>
+          <tr><td>지자체대응역량</td><td><code>CH2_지자체대응역량_메인+확장.csv</code></td><td>2000 x 15</td><td><code>연도+시군구코드</code>, <code>연도+시도+시군구</code></td><td>법인수 25.9%, 반출금지구역 22.7-23.4%, 예산비중 22.4%, 예산로그 15.7%</td><td><span class="tag warn">확장 주의</span> 품질 flag 동반 필수</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="danger">핵심 원칙: 최종 병합은 <code>연도+시군구코드</code> 기준. 코드가 없는 국가대응수준·노출도는 <code>시도+시군구</code>로 코드 부여 후 검산한다. <code>연도+시군구</code> 단독 병합은 금지.</p>
+  </section>
+
+  <section id="merge">
+    <h2>1. 병합 전 필수 검토</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>검토 항목</th><th>엄격 기준</th><th>필수 산출물</th><th>실패 시 처리</th></tr></thead>
+        <tbody>
+          <tr><td>대체 파일 적용 확인</td><td>최종 마스터에서 지자체 파일은 메인+확장 버전 하나만 사용</td><td>입력 파일 목록, 해시 또는 수정일</td><td>두 지자체 파일 동시 병합 금지</td></tr>
+          <tr><td>코드키 통일</td><td><code>시군구코드</code>와 <code>sigungu_cd</code> 값 체계 일치</td><td>crosswalk 및 미매칭 목록</td><td>코드 불일치 행 분석 보류</td></tr>
+          <tr><td>행 수 검산</td><td>2000행 지자체 파일이 병합 후 행 증식을 만들지 않음</td><td>단계별 row count</td><td>many-to-many 원인 제거</td></tr>
+          <tr><td>1832행 블록 처리</td><td>국가대응수준·노출도 누락 시군구-연도 설명 가능</td><td>누락 목록과 시도/연도 분포</td><td>inner join 결과만 사용 금지</td></tr>
+          <tr><td>확장 변수 결측</td><td>법인·반출금지구역·예산비중 결측 사유 분리</td><td>변수별 결측 사유표</td><td>무조건 0 대체 금지</td></tr>
+          <tr><td>예산 비중 변수 범위</td><td><code>예찰진단예산비중</code>, <code>이동통제예산비중</code>은 0-1 또는 0-100 단위 확정</td><td>min/max와 단위 메모</td><td>단위 확정 전 모델 투입 금지</td></tr>
+          <tr><td>품질 flag 동반</td><td><code>예산자료_사용가능여부</code>, <code>법인자료_연도완전여부</code>, <code>법인자료_최신성주의플래그</code>를 진단에 포함</td><td>flag별 표본 수와 결과 비교</td><td>확장 변수 단독 해석 금지</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="local">
+    <h2>2. 지자체 메인+확장 변수 검토</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>변수</th><th>결측</th><th>EDA 검토</th><th>외적 타당성 검정</th><th>엄격 주의</th></tr></thead>
+        <tbody>
+          <tr><td><code>대응자원투입예산_소나무림ha당_log</code></td><td>314/2000 (15.7%)</td><td>연도별·시도별 결측 집중, 극단값, 예찰/이동통제 예산과 상관</td><td>피해 t-1이 예산 t를 설명하는지, 예산 t가 피해 t+1과 관련 있는지 비교</td><td>역인과 가능성 큼. 인과 해석 금지</td></tr>
+          <tr><td><code>예찰진단예산_소나무림ha당_log</code></td><td>314/2000 (15.7%)</td><td>총 대응예산과 상관, 탐지 강화 지역 분포</td><td>발생 여부·신규 감염 탐지와의 관계</td><td>감시가 많아 발생이 더 관측되는 탐지편향 주의</td></tr>
+          <tr><td><code>방제법인수_소나무림1만ha당_log</code></td><td>518/2000 (25.9%)</td><td>결측 사유, 최신성 flag별 분포, 예산 변수와 공선성</td><td>방제 인프라 수준과 t+1 피해/발생 관계</td><td>법인자료 완전성·최신성 flag 없이 단독 사용 금지</td></tr>
+          <tr><td><code>이동통제예산_소나무림ha당_log</code></td><td>314/2000 (15.7%)</td><td>0/NA 구분, 이동통제예산비중과 정합성</td><td>인위적확산 변수와 상호작용 가능성 검정</td><td>인위적확산 위험 높은 곳에 배정되는 대응 예산일 수 있음</td></tr>
+          <tr><td><code>예찰진단예산비중</code></td><td>448/2000 (22.4%)</td><td>0-1/0-100 단위, 분모 0 여부, 로그 예산과 관계</td><td>탐지 중심 대응구조와 신규 발생 관측의 관계</td><td>분모가 총예산인지 대응자원투입예산인지 명시</td></tr>
+          <tr><td><code>이동통제예산비중</code></td><td>448/2000 (22.4%)</td><td>단위 범위, 예찰진단예산비중과 합계 관계</td><td>이동통제 중심 대응과 확산 억제 관계</td><td>비중 합계가 1 또는 100을 초과하는지 검산</td></tr>
+          <tr><td><code>반출금지구역_지정여부</code></td><td>453/2000 (22.7%)</td><td>0/1 분포, 연도별 지정률, 피해지역 집중 여부</td><td>지정 지역의 t+1 피해 변화, 지정 전후 비교</td><td>지정은 위험의 원인보다 결과/대응일 가능성 큼</td></tr>
+          <tr><td><code>반출금지구역면적비율</code></td><td>468/2000 (23.4%)</td><td>0-1/0-100 범위, 지정여부와 정합성</td><td>면적비율 분위별 다음 해 확산 차이</td><td>지정여부 0인데 면적비율 양수인 모순 행 확인</td></tr>
+          <tr><td><code>예산자료_사용가능여부</code></td><td>0/2000 (0.0%)</td><td>사용가능/불가능별 행 수와 지역 분포</td><td>예산 결측 선택편향 검정</td><td>예산 변수 결측 대체/제외 결정의 핵심 flag</td></tr>
+          <tr><td><code>법인자료_연도완전여부</code></td><td>0/2000 (0.0%)</td><td>연도완전 여부별 법인수 분포</td><td>법인수 변수 민감도 분석</td><td>불완전 연도 포함/제외 결과 비교 필수</td></tr>
+          <tr><td><code>법인자료_최신성주의플래그</code></td><td>0/2000 (0.0%)</td><td>최신성주의 행 분포, 특정 연도 집중 여부</td><td>법인수 결과가 최신성주의 행에 의해 바뀌는지 확인</td><td>최신성주의 행은 본문 한계에 명시</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="warning">메인+확장 파일은 변수 폭이 좋아졌지만, 확장 변수는 결측이 꽤 큽니다. 특히 <code>방제법인수</code>, <code>반출금지구역</code>, <code>예산비중</code>은 flag별 민감도 없이 바로 쓰면 위험합니다.</p>
+  </section>
+
+  <section id="integrated">
+    <h2>3. 통합 변수 검토 포인트</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>영역</th><th>검토할 변수군</th><th>봐야 할 것</th><th>엄격 판정</th></tr></thead>
+        <tbody>
+          <tr><td>예산 대응</td><td>국비지원액, 대응자원투입예산, 예찰진단예산, 이동통제예산</td><td>서로 중복 설명인지, 국비/지자체 예산이 같은 사업을 중복 반영하는지</td><td>상관 |r| 0.8 이상이면 대표 변수만 사용</td></tr>
+          <tr><td>예찰·탐지</td><td>예찰진단예산, 예찰진단예산비중, 국비 예찰진단</td><td>발생 증가가 실제 위험인지 탐지 강화인지</td><td>탐지편향 가능성을 해석에 명시</td></tr>
+          <tr><td>이동통제</td><td>이동통제예산, 이동통제예산비중, 반출금지구역 지정/면적, 인위적확산 변수</td><td>위험 높은 곳에 사후 지정되는지, 확산 억제 효과가 있는지</td><td>t-1 피해 통제 후에도 관계 유지되는지 확인</td></tr>
+          <tr><td>방제 인프라</td><td>방제법인수, 법인자료 flag</td><td>자료 완전성/최신성에 따른 분포 차이</td><td>flag 제외 민감도에서 결론 유지 필요</td></tr>
+          <tr><td>위험-대응 역인과</td><td>기후·노출·인위확산 위험 + 예산/반출금지구역</td><td>위험이 큰 지역에 대응이 집중되는 구조</td><td>대응역량 변수는 원인보다 대응수준으로 해석</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="validity">
+    <h2>4. 외적 타당성 검정</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>검정</th><th>목적</th><th>권장 방식</th><th>통과 기준</th></tr></thead>
+        <tbody>
+          <tr><td>기본 상관</td><td>방향성 확인</td><td>t 설명변수와 t+1 피해/발생의 Pearson, Spearman</td><td>노출·기후·인위확산은 이론 방향과 대체로 일치</td></tr>
+          <tr><td>대응 변수 역인과 검정</td><td>피해가 대응을 유발했는지 확인</td><td>피해 t-1 → 예산/반출금지구역 t 회귀</td><td>역인과 강하면 인과 표현 금지</td></tr>
+          <tr><td>분위별 차이</td><td>고위험/고대응 지역 차이 확인</td><td>변수 분위별 t+1 피해밀도, 발생률</td><td>상위 분위 패턴이 안정적</td></tr>
+          <tr><td>패널 회귀</td><td>지역·연도 공통요인 통제</td><td>시군구 FE, 연도 FE, cluster SE</td><td>핵심 변수 부호와 크기가 민감도에서 유지</td></tr>
+          <tr><td>상호작용</td><td>대응역량이 위험을 완충하는지 확인</td><td>위험변수 x 대응변수 상호작용</td><td>완충효과는 신중히, 표본 크기와 공선성 확인</td></tr>
+          <tr><td>holdout</td><td>일반화 성능 확인</td><td>연도 holdout, 시도 holdout</td><td>train/test 성능 급락 없음</td></tr>
+          <tr><td>flag 민감도</td><td>자료 품질 영향 확인</td><td>예산자료 사용가능, 법인자료 완전, 최신성주의 제외/포함 비교</td><td>결론 방향 유지 또는 차이를 명확히 설명</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="final">
+    <h2>5. 최종 분석 투입 전 체크</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>번호</th><th>체크</th><th>상태</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>지자체 파일은 <code>CH2_지자체대응역량_메인+확장.csv</code>만 사용한다</td><td><span class="tag danger">미확인</span></td></tr>
+          <tr><td>2</td><td>5개 블록 모두 <code>연도+시군구코드</code> 기준으로 병합 가능하다</td><td><span class="tag danger">미확인</span></td></tr>
+          <tr><td>3</td><td>법인수, 반출금지구역, 예산비중 결측 사유가 분리되어 있다</td><td><span class="tag danger">미확인</span></td></tr>
+          <tr><td>4</td><td>비중 변수의 단위가 0-1인지 0-100인지 확정되었다</td><td><span class="tag danger">미확인</span></td></tr>
+          <tr><td>5</td><td>반출금지구역 지정여부와 면적비율의 모순 행이 없다</td><td><span class="tag danger">미확인</span></td></tr>
+          <tr><td>6</td><td>예산·법인·반출금지구역 변수는 flag 민감도 분석을 통과했다</td><td><span class="tag danger">미확인</span></td></tr>
+          <tr><td>7</td><td>대응역량 변수 해석은 인과가 아니라 대응수준/연관으로 제한한다</td><td><span class="tag danger">미확인</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+</body>
+</html>

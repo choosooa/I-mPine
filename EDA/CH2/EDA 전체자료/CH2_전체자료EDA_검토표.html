@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CH2 전체변수 병합·EDA·외적 타당성 검토표</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --paper: #ffffff;
+      --ink: #172033;
+      --muted: #657187;
+      --line: #d9e0ea;
+      --head: #edf3f8;
+      --accent: #0f766e;
+      --accent-soft: #e6f3f1;
+      --warn: #b45309;
+      --warn-soft: #fff7ed;
+      --danger: #b91c1c;
+      --danger-soft: #fef2f2;
+      --ok: #166534;
+      --ok-soft: #f0fdf4;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.56;
+      letter-spacing: 0;
+    }
+
+    main {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 56px;
+    }
+
+    header, section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 24px rgba(23, 32, 51, 0.06);
+    }
+
+    header {
+      border-top: 6px solid var(--accent);
+      padding: 28px 30px;
+    }
+
+    section {
+      margin-top: 22px;
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 21px;
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 20px 0 10px;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    p { margin: 0 0 12px; }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 8px;
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .toc a {
+      display: block;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      background: #fbfcfe;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .note, .warning, .danger {
+      margin: 14px 0;
+      padding: 13px 15px;
+      border-left: 4px solid var(--accent);
+      background: var(--accent-soft);
+      color: #134e4a;
+      font-weight: 700;
+    }
+
+    .warning {
+      border-left-color: var(--warn);
+      background: var(--warn-soft);
+      color: #7c2d12;
+    }
+
+    .danger {
+      border-left-color: var(--danger);
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      background: white;
+      margin: 12px 0 18px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 900px;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: var(--head);
+      color: #243044;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+    th:last-child, td:last-child { border-right: 0; }
+
+    code {
+      padding: 1px 5px;
+      background: #eef2f7;
+      border: 1px solid #dce3ee;
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 0.92em;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      color: #364153;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .tag.warn {
+      border-color: #fed7aa;
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+
+    .tag.danger {
+      border-color: #fecaca;
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .tag.ok {
+      border-color: #bbf7d0;
+      background: var(--ok-soft);
+      color: var(--ok);
+    }
+
+    ol, ul { margin-top: 8px; }
+    li { margin: 7px 0; }
+
+    @media print {
+      body { background: white; }
+      main { width: 100%; padding: 0; }
+      header, section { box-shadow: none; break-inside: avoid; }
+      .toc { display: none; }
+      table { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>CH2 전체변수 병합·EDA·외적 타당성 검토표</h1>
+    <p class="subtitle">기준 폴더: <code>C:\Users\SAMSUNG\OneDrive\바탕 화면\공모전\Final_file\I-m_Pine\CH2 data\CH2 전체변수</code></p>
+    <p class="subtitle">작성 기준: 폴더 내 5개 CSV의 실제 컬럼명, 행 수, 키 중복, 결측률 1차 진단 결과.</p>
+    <ul class="toc">
+      <li><a href="#summary">0. 파일 구조 요약</a></li>
+      <li><a href="#merge">1. 병합 전 필수 검토</a></li>
+      <li><a href="#variable">2. 변수별 검토표</a></li>
+      <li><a href="#eda">3. 전체 EDA 체크</a></li>
+      <li><a href="#validity">4. 외적 타당성 검정</a></li>
+      <li><a href="#rules">5. 엄격 판정 규칙</a></li>
+      <li><a href="#final">6. 최종 투입 전 체크</a></li>
+    </ul>
+  </header>
+
+  <section id="summary">
+    <h2>0. 파일 구조 요약</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>블록</th>
+            <th>파일명</th>
+            <th>행 x 열</th>
+            <th>확인된 고유키</th>
+            <th>주요 결측</th>
+            <th>즉시 판정</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>국가대응수준</td>
+            <td><code>CH2_국가대응수준_최종변수선정.csv</code></td>
+            <td>1832 x 15</td>
+            <td><code>연도+시도+시군구</code> 중복 0</td>
+            <td>예산계열 86.5-88.8%</td>
+            <td><span class="tag danger">강한 주의</span> 코드키 없음, 결측 의미 분리 필수</td>
+          </tr>
+          <tr>
+            <td>기후위험도</td>
+            <td><code>CH2_기후위험도_최종변수선정.csv</code></td>
+            <td>2000 x 16</td>
+            <td><code>연도+sigungu_cd</code>, <code>연도+시도+시군구</code> 중복 0</td>
+            <td>기후 변수 1.4-1.5%</td>
+            <td><span class="tag ok">양호</span> 관측소 거리/완전성으로 품질 가중 검토</td>
+          </tr>
+          <tr>
+            <td>노출도</td>
+            <td><code>CH2_노출도_최종변수선정.csv</code></td>
+            <td>1832 x 12</td>
+            <td><code>연도+시도+시군구</code> 중복 0</td>
+            <td>0%</td>
+            <td><span class="tag warn">주의</span> 2000행 패널 대비 제외 단위 확인</td>
+          </tr>
+          <tr>
+            <td>인위적확산</td>
+            <td><code>CH2_인위적확산_최종변수선정.csv</code></td>
+            <td>2000 x 7</td>
+            <td><code>연도+시군구코드</code>, <code>연도+시도+시군구명</code> 중복 0</td>
+            <td>도로/주거지 변수 1.2%</td>
+            <td><span class="tag ok">양호</span> <code>시군구명</code>을 <code>시군구</code>로 표준화</td>
+          </tr>
+          <tr>
+            <td>지자체대응역량</td>
+            <td><code>CH2_지자체대응역량_최종변수선정.csv</code></td>
+            <td>2000 x 7</td>
+            <td><code>연도+시군구코드</code>, <code>연도+시도+시군구</code> 중복 0</td>
+            <td>예산 로그 변수 15.7%</td>
+            <td><span class="tag warn">주의</span> 예산자료 사용가능 여부와 같이 투입</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="danger">가장 중요한 병합 원칙: <code>연도+시군구</code> 단독 병합 금지. 최종 마스터는 <code>연도+시군구코드</code>를 기준으로 두고, 코드가 없는 국가대응수준·노출도는 반드시 crosswalk로 코드 부여 후 검산한다.</p>
+  </section>
+
+  <section id="merge">
+    <h2>1. 병합 전 필수 검토</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>검토 항목</th><th>엄격 기준</th><th>필수 산출물</th><th>실패 시 처리</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>행정구역 코드 부여</td><td>모든 파일에 최종 <code>시군구코드</code> 존재</td><td>코드 부여 전후 매칭률, 미매칭 목록</td><td>코드 없는 행은 분석 투입 보류</td></tr>
+          <tr><td>컬럼명 표준화</td><td><code>시군구명</code>은 <code>시군구</code>로 통일</td><td>rename map</td><td>원본 컬럼과 표준 컬럼 모두 기록</td></tr>
+          <tr><td>패널 범위</td><td>기준 패널은 2016-2023, 8개 연도</td><td>연도별 행 수 표</td><td>보간 금지, 누락으로 명시</td></tr>
+          <tr><td>1832 vs 2000 차이</td><td>빠진 시군구-연도 목록을 설명 가능</td><td>국가대응수준/노출도의 제외 단위 목록</td><td>분석 표본 편향 검정 전까지 보류</td></tr>
+          <tr><td>중복키</td><td>파일별 최종 병합키 중복 0</td><td>중복키 검사 로그</td><td>중복 행 원인 분해 후 집계 또는 제거</td></tr>
+          <tr><td>행 증식 방지</td><td>병합 후 행 수가 기준 패널 이상으로 증가하지 않음</td><td>단계별 row count</td><td>many-to-many 병합 원인 제거</td></tr>
+          <tr><td>결측 의미 분리</td><td>0, 미관측, 비해당, 자료원 한계를 구분</td><td>변수별 결측 사유표</td><td>일괄 0 대체 금지</td></tr>
+          <tr><td>시차 구조</td><td>외적 타당성은 설명변수 t, 결과변수 t+1 우선</td><td>lag 생성 규칙표</td><td>동시점 결과만으로 타당성 주장 금지</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="variable">
+    <h2>2. 변수별 검토표</h2>
+
+    <h3>2-1. 키·식별 변수</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>변수</th><th>등장 파일</th><th>EDA 검토</th><th>병합 검토</th><th>엄격 주의</th></tr></thead>
+        <tbody>
+          <tr><td><code>연도</code></td><td>5개 전체</td><td>2016-2023만 존재하는지, 연도별 행 수 균형</td><td>최종 병합키 구성</td><td>문자/숫자 타입 혼재 금지</td></tr>
+          <tr><td><code>시도</code></td><td>5개 전체</td><td>광역명 표기 통일, 연도별 시도 수</td><td>코드 없는 파일의 보조키</td><td>서울/서울특별시 같은 표기 차이 제거</td></tr>
+          <tr><td><code>시군구</code></td><td>국가, 기후, 노출, 지자체</td><td>동명이군 목록 확인</td><td><code>시도+시군구</code>로만 임시 사용</td><td>단독 병합 금지</td></tr>
+          <tr><td><code>시군구명</code></td><td>인위적확산</td><td><code>시군구</code>와 값 체계 비교</td><td><code>시군구</code>로 표준화</td><td>이름 변경 후 원본 보존</td></tr>
+          <tr><td><code>시군구코드</code></td><td>인위적확산, 지자체</td><td>자릿수, 앞자리 0 유실 여부</td><td>최종 병합키</td><td>숫자형 변환으로 앞자리 손실 여부 확인</td></tr>
+          <tr><td><code>sigungu_cd</code></td><td>기후위험도</td><td><code>시군구코드</code>와 crosswalk 가능 여부</td><td>최종 코드키로 표준화</td><td>컬럼명만 다르고 값 체계가 같은지 검산</td></tr>
+          <tr><td><code>stnId</code></td><td>기후위험도</td><td>시군구별 대표 관측소 분포</td><td>병합키로 사용하지 않음</td><td>관측소 변경이 연도 단절을 만들 수 있음</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>2-2. 국가대응수준 변수</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>변수</th><th>EDA 검토</th><th>외적 타당성 검정</th><th>엄격 주의</th></tr></thead>
+        <tbody>
+          <tr><td><code>국비지원액_최종_원</code></td><td>결측률 86.5%, 0/NA 구분, 극단값</td><td>t+1 피해와 상관·회귀. 단, 예산은 사후 대응 가능성 큼</td><td>인과 해석 금지, 결측 flag와 동시 사용</td></tr>
+          <tr><td><code>log_국비지원액_최종_원</code></td><td>raw 대비 로그 분포 안정화 확인</td><td>피해/발생 규모와 방향성 비교</td><td>raw와 동시 투입 금지</td></tr>
+          <tr><td><code>산림면적당_국비지원액_최종(원per ha)</code></td><td>면적 분모 0/결측 검산, 결측률 86.9%</td><td>면적 보정 후 피해위험 지역 지원 집중 여부</td><td>분모 산림면적 출처 확인</td></tr>
+          <tr><td><code>log_국비지원액_최종_per_ha</code></td><td>per ha 로그 변환 전후 순위 변화</td><td>표준화 위험지수와 상관</td><td>per ha raw와 택1</td></tr>
+          <tr><td><code>log_국비지원액_직접방제_원</code></td><td>직접방제 예산 분포, 결측률 86.5%</td><td>발생 이후 대응 강도와 양의 관계 예상</td><td>방제 효과로 음의 관계가 나와도 해석 조심</td></tr>
+          <tr><td><code>log_국비지원액_예찰진단_원</code></td><td>예찰진단 예산 분포, 직접방제와 상관</td><td>조기 탐지/신규 발생 발견과 관계 확인</td><td>감시가 많아 발생이 더 관측되는 탐지편향 주의</td></tr>
+          <tr><td><code>예찰진단_예산비중</code></td><td>결측률 88.8%, 0-1 또는 0-100 단위 확인</td><td>발생 규모보다 탐지/예방 성격 지표로 검정</td><td>분모가 0인 경우 처리 방식 확인</td></tr>
+          <tr><td><code>국비비율_최종(%)</code></td><td>결측률 88.5%, 0-100 범위</td><td>국가 관여 수준과 피해/위험의 관계</td><td>% 단위이므로 100 초과 즉시 오류 의심</td></tr>
+          <tr><td><code>국비비율_결측_flag</code></td><td>flag 값 분포</td><td>결측 자체가 특정 지역/연도에 몰리는지 검정</td><td>통제변수 또는 결측 진단용</td></tr>
+          <tr><td><code>매칭사업수_최종</code></td><td>결측률 86.5%, count 분포</td><td>사업 수와 피해/위험의 관계</td><td>지원액과 공선성 확인</td></tr>
+          <tr><td><code>매칭사업_없음_flag</code></td><td>지원 없음과 결측의 구분</td><td>지원 없음 지역의 피해 차이</td><td>NA를 없음으로 오인하지 말 것</td></tr>
+          <tr><td><code>index_eligible</code></td><td>분석 가능 표본 표시 여부</td><td>eligible 표본과 전체 표본 결과 비교</td><td>표본 선택 편향 진단 필수</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>2-3. 기후위험도 변수</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>변수</th><th>EDA 검토</th><th>외적 타당성 검정</th><th>엄격 주의</th></tr></thead>
+        <tbody>
+          <tr><td><code>거리_km</code></td><td>관측소-시군구 거리 분포, 상위 이상치</td><td>품질 가중 또는 민감도 분석</td><td>거리가 먼 지역의 기후값 신뢰도 낮음</td></tr>
+          <tr><td><code>겨울철_평균최저기온</code></td><td>결측 1.5%, 연도/시도별 분포</td><td>월동 생존 가능성과 피해의 관계</td><td>높을수록 위험 증가인지 방향 가설 명시</td></tr>
+          <tr><td><code>여름철_평균기온</code></td><td>결측 1.4%, 극단 고온 연도</td><td>매개충 활동성과 피해의 관계</td><td>비선형 가능성 확인</td></tr>
+          <tr><td><code>연강수량_mm</code></td><td>결측 1.4%, 이상 강수 연도</td><td>건조/습윤 조건과 피해 관계</td><td>단독보다 SPI와 같이 해석</td></tr>
+          <tr><td><code>평균풍속_ms</code></td><td>결측 1.4%, 관측소별 극단값</td><td>확산/건조 조건 proxy 검정</td><td>시군구 대표성 약할 수 있음</td></tr>
+          <tr><td><code>GDD_솔수염하늘소_base11.9</code></td><td>결측 1.4%, 기온 변수와 상관</td><td>매개충 발육 가능성과 t+1 피해</td><td>여름철 평균기온과 공선성 확인</td></tr>
+          <tr><td><code>GDD_북방수염하늘소_base8.3</code></td><td>결측 1.4%, GDD 간 상관</td><td>북방 매개충 가능성 proxy</td><td>두 GDD 동시 투입 시 VIF 확인</td></tr>
+          <tr><td><code>SPI3_최저월(최심가뭄)</code></td><td>결측 1.5%, 낮은 값 극단치</td><td>가뭄 스트레스와 피해 양의 관계 예상</td><td>값이 낮을수록 가뭄 심화이므로 방향 해석 주의</td></tr>
+          <tr><td><code>SPI3_유효월수</code></td><td>결측 1.5%, 유효월수 부족 지역</td><td>자료 품질 통제</td><td>유효월수 낮은 행 제외 민감도</td></tr>
+          <tr><td><code>연간관측일수</code></td><td>관측일수 부족 행</td><td>품질 필터</td><td>기후변수 결측 사유와 연결</td></tr>
+          <tr><td><code>겨울철_자료완전성</code></td><td>완전성 flag/비율 분포</td><td>품질 가중·제외 기준</td><td>겨울철 평균최저기온과 함께 사용</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>2-4. 노출도 변수</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>변수</th><th>EDA 검토</th><th>외적 타당성 검정</th><th>엄격 주의</th></tr></thead>
+        <tbody>
+          <tr><td><code>log_피해밀도_본per_ha</code></td><td>분포, 0 처리 방식, 연도별 단절</td><td>t+1 신규 발생/피해 예측력 핵심</td><td>결과변수와 같은 시점 누수 주의</td></tr>
+          <tr><td><code>log_인접시군_피해밀도_본per_ha</code></td><td>자기 피해밀도와 상관, 공간 분포</td><td>인접 확산 외적 타당성 핵심</td><td>인접 정의와 경계 변경 확인</td></tr>
+          <tr><td><code>연속발생연수</code></td><td>0 포함 count 분포, 상위 지역</td><td>지속 발생 지역의 다음 해 발생 가능성</td><td>연도 초반 censoring 주의</td></tr>
+          <tr><td><code>집단발생여부</code></td><td>0/1 비율, 연도별 변화</td><td>다음 해 피해 위험 차이, ROC-AUC</td><td>정의 기준 문서화</td></tr>
+          <tr><td><code>소나무류_면적비율(%)</code></td><td>0-100 범위, 극단값</td><td>숙주 노출도와 피해 위험 관계</td><td>% 단위 오류 즉시 확인</td></tr>
+          <tr><td><code>최근감염목과의_거리_km</code></td><td>거리 분포, 0/극단값</td><td>거리가 가까울수록 발생 위험 증가 예상</td><td>방향은 음의 관계가 정상일 수 있음</td></tr>
+          <tr><td><code>데이터유형</code></td><td>유형별 행 수, 연도별 구성</td><td>유형별 결과 민감도</td><td>자료원 혼합으로 생긴 단절 확인</td></tr>
+          <tr><td><code>인접시군_산정방식</code></td><td>방식별 행 수</td><td>방식별 결과 재현성</td><td>방식 차이가 지표 차이를 만들 수 있음</td></tr>
+          <tr><td><code>임상도_기준판</code></td><td>기준판별 행 수와 연도 매칭</td><td>기준판 변경 전후 민감도</td><td>기준판 변화로 면적비율 단절 가능</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>2-5. 인위적확산 변수</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>변수</th><th>EDA 검토</th><th>외적 타당성 검정</th><th>엄격 주의</th></tr></thead>
+        <tbody>
+          <tr><td><code>도로소나무비율_500m</code></td><td>결측 1.2%, 0-100 또는 0-1 단위 확인</td><td>인위적 이동축과 다음 해 피해 관계</td><td>단위 범위 확인 전 표준화 금지</td></tr>
+          <tr><td><code>주거지소나무비율_300m</code></td><td>결측 1.2%, 도로 변수와 상관</td><td>주거지 접촉 가능성과 피해 관계</td><td>도로 변수와 공선성 확인</td></tr>
+          <tr><td><code>log1p_원목생산업체수</code></td><td>0 많은 count 로그 분포</td><td>목재 이동 proxy와 발생 위험</td><td>최신성/연도별 실제 변동 여부 확인</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>2-6. 지자체대응역량 변수</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>변수</th><th>EDA 검토</th><th>외적 타당성 검정</th><th>엄격 주의</th></tr></thead>
+        <tbody>
+          <tr><td><code>대응자원투입예산_소나무림ha당_log</code></td><td>결측 15.7%, 연도별/시도별 결측 집중</td><td>위험 높은 곳에 예산이 투입되는지, t+1 피해와 관계</td><td>역인과 가능성 큼. 인과 해석 금지</td></tr>
+          <tr><td><code>예찰진단예산_소나무림ha당_log</code></td><td>결측 15.7%, 총투입예산과 상관</td><td>탐지 증가와 발생 관측 증가 가능성 확인</td><td>감시 강화로 발생이 더 많이 잡히는 탐지편향 주의</td></tr>
+          <tr><td><code>예산자료_사용가능여부</code></td><td>0/1 또는 범주 분포</td><td>결측 선택편향 진단</td><td>예산 로그 변수 결측 처리에 반드시 동반</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="eda">
+    <h2>3. 전체 EDA 체크</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>분석</th><th>필수 산출물</th><th>엄격 기준</th></tr></thead>
+        <tbody>
+          <tr><td>기술통계</td><td>변수별 n, mean, sd, min, p1, p25, median, p75, p99, max</td><td>물리적으로 불가능한 값 0건</td></tr>
+          <tr><td>결측 구조</td><td>변수별·연도별·시도별 결측률 heatmap</td><td>결측률 높은 변수는 사유 flag 또는 제외 기준 명시</td></tr>
+          <tr><td>분포 점검</td><td>히스토그램, boxplot, 로그 전후 비교</td><td>극단값이 모델 결과를 지배하지 않아야 함</td></tr>
+          <tr><td>상관 분석</td><td>Pearson, Spearman 상관행렬</td><td>|r| 0.8 이상 변수군은 동시 투입 제한</td></tr>
+          <tr><td>다중공선성</td><td>VIF, condition number</td><td>VIF 5 이상 주의, 10 이상 강한 경고</td></tr>
+          <tr><td>연도 단절</td><td>변수별 연도 평균 추세선</td><td>2019/2020 등 자료원 변경 의심 단절 표시</td></tr>
+          <tr><td>공간 구조</td><td>시도별 평균/결측률, Moran's I 가능 시 산출</td><td>잔차 공간상관 유의 시 공간모형 또는 cluster SE 고려</td></tr>
+          <tr><td>표본 차이</td><td>1832행 표본 vs 2000행 표본의 시도/연도 분포 비교</td><td>탈락 표본이 특정 지역·연도에 집중되면 본문에 한계 명시</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="validity">
+    <h2>4. 외적 타당성 검정</h2>
+    <p class="note">권장 결과변수는 가능하면 CH1 또는 발생자료에서 만든 <code>t+1 신규 발생 여부</code>, <code>t+1 피해밀도</code>, <code>t+1 감염목 수</code>입니다. 동시점 피해만으로 타당성을 주장하면 엄격 심사에서 약합니다.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>검정</th><th>목적</th><th>권장 방식</th><th>통과 기준</th></tr></thead>
+        <tbody>
+          <tr><td>방향성 상관</td><td>변수와 실제 피해의 이론적 방향 확인</td><td>Pearson/Spearman, t와 t+1 비교</td><td>핵심 위험 변수는 기대 방향과 대체로 일치</td></tr>
+          <tr><td>분위별 차이</td><td>고위험 분위가 실제 피해도 높은지 확인</td><td>Q1-Q5별 다음 해 피해 평균/중앙값, Kruskal-Wallis</td><td>상위 분위 피해가 하위 분위보다 명확히 큼</td></tr>
+          <tr><td>발생 예측력</td><td>발생/비발생 구분력 확인</td><td>ROC-AUC, PR-AUC, calibration</td><td>AUC 0.6 이상 약한 타당성, 0.7 이상 양호</td></tr>
+          <tr><td>패널 회귀</td><td>연도·지역 고정요인 통제</td><td>시군구 FE, 연도 FE, cluster SE</td><td>부호가 이론과 맞고 민감도에서 유지</td></tr>
+          <tr><td>count 모델</td><td>감염목 수 같은 count형 결과 설명</td><td>Poisson/Negative Binomial, overdispersion 검정</td><td>과산포 있으면 음이항 우선</td></tr>
+          <tr><td>holdout 검정</td><td>표본 외 일반화 확인</td><td>연도 holdout 또는 지역 holdout</td><td>train/test 성능 급락 없음</td></tr>
+          <tr><td>민감도 분석</td><td>결과 안정성 확인</td><td>결측 처리, 표준화 방식, 1832/2000 표본 비교</td><td>핵심 결론의 방향 유지</td></tr>
+          <tr><td>예산 변수 역인과 점검</td><td>예산이 원인인지 대응인지 구분</td><td>피해 t-1 → 예산 t, 예산 t → 피해 t+1 비교</td><td>인과 주장은 보류, 연관/대응 수준으로 해석</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="rules">
+    <h2>5. 엄격 판정 규칙</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>판정</th><th>조건</th><th>처리</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag ok">사용 가능</span></td><td>키 중복 0, 결측 사유 명확, 값 범위 정상, 외적 타당성 방향 양호</td><td>최종 분석 후보</td></tr>
+          <tr><td><span class="tag warn">조건부 사용</span></td><td>결측 크거나 공선성 높지만 이론적으로 중요</td><td>flag, 민감도, 대체모형과 함께 사용</td></tr>
+          <tr><td><span class="tag danger">보류</span></td><td>병합 실패, 값 범위 오류, 미래정보 누수, 결측 의미 불명</td><td>원자료 추적 후 재생성</td></tr>
+          <tr><td><span class="tag danger">제외</span></td><td>타 변수와 거의 중복, 외적 타당성 반대, 자료원 오류 설명 불가</td><td>분석 제외 사유 기록</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="warning">예산계열 변수는 결측이 크고 역인과 가능성이 강합니다. “대응역량이 높아서 피해가 줄었다”는 식의 인과 문장은 별도 식별전략 없이는 쓰면 안 됩니다.</p>
+  </section>
+
+  <section id="final">
+    <h2>6. 최종 분석 투입 전 체크</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>번호</th><th>체크</th><th>상태</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>5개 파일 모두 <code>연도+시군구코드</code> 기준으로 병합 가능하다</td><td><span class="tag danger">미확인</span></td></tr>
+          <tr><td>2</td><td>국가대응수준·노출도 1832행과 2000행 기준 패널의 차이가 설명되었다</td><td><span class="tag danger">미확인</span></td></tr>
+          <tr><td>3</td><td>병합 후 행 증식과 중복키가 0이다</td><td><span class="tag danger">미확인</span></td></tr>
+          <tr><td>4</td><td>변수별 결측은 0, 미관측, 비해당, 자료원 한계로 구분되었다</td><td><span class="tag danger">미확인</span></td></tr>
+          <tr><td>5</td><td>비율 변수의 단위가 0-1인지 0-100인지 확정되었다</td><td><span class="tag danger">미확인</span></td></tr>
+          <tr><td>6</td><td>상관/VIF로 동시 투입 금지 변수군을 정했다</td><td><span class="tag danger">미확인</span></td></tr>
+          <tr><td>7</td><td>외적 타당성은 최소 상관, 분위별 차이, 회귀, holdout을 포함한다</td><td><span class="tag danger">미확인</span></td></tr>
+          <tr><td>8</td><td>예산변수 해석은 인과가 아니라 대응수준/연관으로 제한한다</td><td><span class="tag danger">미확인</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+</body>
+</html>
