@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CH2 우선순위 체크리스트 v2 · 최종 변수 리스트</title>
+<style>
+  :root{
+    --bg:#EDEFE4; --bg-panel:#E1E5D4; --bg-panel-2:#D6DBC6;
+    --ink:#1E2E22; --ink-soft:#4E5B48; --ink-faint:#7C8570; --line:#C4C9AF;
+    --bark:#6B4A32; --bark-soft:#8A6B4E;
+    --danger:#B23A1D; --warn:#B4791E; --hold:#75786A; --good:#3E6E52;
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Apple SD Gothic Neo', 'Segoe UI', sans-serif;
+    --mono: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, 'Liberation Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.65; font-size:15.5px; -webkit-font-smoothing:antialiased; }
+  a{color:var(--bark); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .topnav{ position:sticky; top:0; z-index:50; background:rgba(237,239,228,0.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); }
+  .topnav-inner{ max-width:1080px; margin:0 auto; padding:10px 24px; display:flex; gap:4px; overflow-x:auto; scrollbar-width:none; }
+  .topnav-inner::-webkit-scrollbar{display:none;}
+  .topnav a{ flex:0 0 auto; font-size:12.5px; color:var(--ink-soft); padding:7px 12px; border-radius:999px; white-space:nowrap; border:1px solid transparent; }
+  .topnav a:hover{ text-decoration:none; border-color:var(--line); background:var(--bg-panel); }
+  .topnav a.stage-tag{ font-family:var(--mono); font-weight:600; color:var(--bark); margin-right:2px; }
+
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+
+  header.hero{ padding:52px 0 32px; border-bottom:1px solid var(--line); }
+  .eyebrow{ font-family:var(--mono); font-size:12px; letter-spacing:.08em; color:var(--bark); text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+  .eyebrow::before{ content:''; width:26px; height:1px; background:var(--bark-soft); display:inline-block; }
+  h1{ font-family:var(--serif); font-weight:400; font-size:38px; line-height:1.16; margin:0 0 14px; letter-spacing:-0.01em; }
+  .hero-sub{ font-size:15.5px; color:var(--ink-soft); max-width:680px; margin:0 0 18px; }
+  .updatebar{ display:flex; align-items:center; gap:10px; font-size:13px; color:var(--good); background:#E4EEE7; border:1px solid #BFD6C7; padding:9px 14px; border-radius:6px; margin-top:8px; }
+  .updatebar b{ font-weight:700; }
+
+  .stats{ display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin:28px 0 8px; }
+  .stat{ background:var(--bg); padding:18px 16px; }
+  .stat .num{ font-family:var(--serif); font-size:29px; color:var(--bark); line-height:1; }
+  .stat .num.g{ color:var(--good); }
+  .stat .lbl{ font-size:11.5px; color:var(--ink-soft); margin-top:7px; line-height:1.35; }
+
+  .note{ margin:28px 0 8px; padding:16px 18px; background:var(--bg-panel); border-left:3px solid var(--bark); font-size:14px; color:var(--ink-soft); border-radius:0 4px 4px 0; }
+  .note b{color:var(--ink);}
+
+  section{ padding:48px 0 8px; border-bottom:1px solid var(--line); }
+  section:last-of-type{ border-bottom:none; }
+  .stage-head{ display:flex; align-items:center; gap:16px; margin-bottom:8px; }
+  .ring-big{ width:50px; height:50px; border-radius:50%; flex:0 0 auto; display:grid; place-items:center; position:relative; background: conic-gradient(var(--bark) calc(var(--fill,0%)), var(--bg-panel-2) 0); }
+  .ring-big::after{ content:''; position:absolute; width:36px; height:36px; border-radius:50%; background:var(--bg); }
+  .ring-big span{ position:relative; z-index:1; font-family:var(--serif); font-size:18px; }
+  .stage-title h2{ font-family:var(--serif); font-weight:400; font-size:23px; margin:0; }
+  .stage-title p{ margin:3px 0 0; font-size:13px; color:var(--ink-faint); }
+
+  .decisions{ display:grid; gap:16px; margin-top:22px; grid-template-columns:1fr; }
+  .decision{ border:1px solid var(--line); border-radius:6px; padding:18px 20px; background:var(--bg-panel); }
+  .decision.new{ border-color:var(--bark-soft); background:#EAE3D8; }
+  .decision .dtag{ font-family:var(--mono); font-size:11px; color:#fff; background:var(--danger); padding:2px 8px; border-radius:4px; }
+  .decision.new .dtag{ background:var(--bark); }
+  .decision .newflag{ font-family:var(--mono); font-size:10.5px; color:var(--bark); border:1px solid var(--bark-soft); padding:2px 7px; border-radius:4px; margin-left:6px; }
+  .decision h3{ font-family:var(--serif); font-weight:400; font-size:18px; margin:9px 0 7px; }
+  .decision .opts{ display:flex; flex-wrap:wrap; gap:8px; margin:9px 0 4px; }
+  .opt{ font-size:12.5px; padding:5px 10px; border-radius:5px; border:1px solid var(--line); color:var(--ink-faint); background:var(--bg); }
+  .opt.rec{ border-color:var(--good); color:var(--good); background:#E4EEE7; font-weight:600; }
+  .opt.rec::before{ content:'✓ '; }
+  .decision .why{ font-size:13px; color:var(--ink-soft); margin-top:7px; }
+
+  table.items{ width:100%; border-collapse:collapse; margin:20px 0 12px; }
+  table.items th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); font-weight:600; padding:0 10px 10px; border-bottom:1px solid var(--line); }
+  table.items td{ padding:13px 10px; border-bottom:1px solid var(--line); vertical-align:top; font-size:13.7px; }
+  table.items tr:last-child td{ border-bottom:none; }
+  tr.resolved{ opacity:.68; }
+  tr.resolved td.item-col b{ text-decoration: none; }
+  td.num-col{ width:24px; font-family:var(--mono); color:var(--ink-faint); font-size:12px; padding-top:15px;}
+  td.item-col b{ display:block; color:var(--ink); margin-bottom:4px; font-size:14px; }
+  td.item-col .evi{ font-size:12.5px; color:var(--ink-soft); }
+  td.item-col .evi code{ font-family:var(--mono); font-size:11.5px; background:var(--bg-panel); padding:1px 5px; border-radius:3px; }
+  td.badge-col{ width:60px; text-align:center; white-space:nowrap; }
+
+  .ring-sm{ width:28px; height:28px; border-radius:50%; display:inline-grid; place-items:center; position:relative; background: conic-gradient(var(--bark-soft) calc(var(--fill,33%)), var(--bg-panel-2) 0); }
+  .ring-sm::after{ content:''; position:absolute; width:18px; height:18px; border-radius:50%; background:var(--bg); }
+  .ring-sm span{ position:relative; z-index:1; font-family:var(--mono); font-size:9.5px; color:var(--ink); font-weight:700; }
+
+  .stamp{ display:inline-flex; align-items:center; justify-content:center; width:42px; height:42px; border-radius:50%; color:#fff; font-family:var(--mono); font-size:10.5px; font-weight:700; letter-spacing:-.02em; border:3px solid rgba(255,255,255,.35); }
+  .stamp.necessary{ background:var(--danger); }
+  .stamp.recommend{ background:var(--warn); }
+  .stamp.hold{ background:var(--hold); }
+  .stamp.done{ background:var(--good); }
+
+  .newtag{ font-family:var(--mono); font-size:9.5px; color:#fff; background:var(--bark); padding:1px 6px; border-radius:3px; margin-left:6px; vertical-align:2px; }
+
+  /* variable list section */
+  .vblock{ margin:26px 0 8px; }
+  .vblock h3{ font-family:var(--serif); font-weight:400; font-size:19px; margin:0 0 4px; display:flex; align-items:center; gap:10px; }
+  .vblock .vnote{ font-size:12.5px; color:var(--ink-faint); margin-bottom:10px; }
+  table.vars{ width:100%; border-collapse:collapse; margin-bottom:26px; }
+  table.vars th{ text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); font-weight:600; padding:0 10px 8px; border-bottom:1px solid var(--line); }
+  table.vars td{ padding:10px; border-bottom:1px solid var(--line); font-size:13.3px; vertical-align:top; }
+  table.vars tr:last-child td{ border-bottom:none; }
+  td.vname{ font-family:var(--mono); font-size:12.3px; color:var(--ink); width:34%; }
+  .role{ display:inline-block; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:600; white-space:nowrap; }
+  .role.main{ background:#E4EEE7; color:var(--good); }
+  .role.aux{ background:var(--bg-panel-2); color:var(--ink-soft); }
+  .role.excl{ background:#F0DCD3; color:var(--danger); }
+  .role.y{ background:#DCE6F2; color:#33547A; }
+  .role.meta{ background:var(--bg-panel); color:var(--ink-faint); }
+  td.vnote{ font-size:12.5px; color:var(--ink-soft); }
+
+  .flow{ display:flex; align-items:center; gap:0; margin:24px 0 12px; flex-wrap:wrap; }
+  .flow-node{ display:flex; flex-direction:column; align-items:center; gap:8px; width:100px; text-align:center; }
+  .flow-node .ring-big{ width:44px; height:44px; }
+  .flow-node .ring-big::after{ width:30px; height:30px; }
+  .flow-node .ring-big span{ font-size:15px; }
+  .flow-node .flabel{ font-size:11px; color:var(--ink-soft); line-height:1.3; }
+  .flow-arrow{ flex:0 0 auto; color:var(--bark-soft); font-size:18px; margin:0 2px 30px; }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:18px; margin:10px 0 30px; font-size:12.5px; color:var(--ink-soft); }
+  .legend .li{ display:flex; align-items:center; gap:7px; }
+  .legend .dot{ width:11px; height:11px; border-radius:50%; display:inline-block; }
+
+  footer{ padding:36px 0 60px; color:var(--ink-faint); font-size:12.5px; }
+  footer code{ font-family:var(--mono); }
+
+  @media (max-width:640px){
+    h1{font-size:29px;}
+    .stats{grid-template-columns:repeat(2,1fr);}
+    table.items td, table.items th, table.vars td, table.vars th{padding:9px 6px;}
+    .flow{gap:2px;} .flow-node{width:74px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="#s0"><span class="stage-tag">0</span>결정</a>
+    <a href="#s1"><span class="stage-tag">1</span>병합 키</a>
+    <a href="#s2"><span class="stage-tag">2</span>값 오류</a>
+    <a href="#s3"><span class="stage-tag">3</span>변수셋</a>
+    <a href="#s4"><span class="stage-tag">4</span>병합 실행</a>
+    <a href="#s5"><span class="stage-tag">5</span>사후 진단</a>
+    <a href="#vars">최종 변수 리스트</a>
+    <a href="#flow">전체 순서</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">CH2 · 소나무재선충병 위험도 통합패널 · v2</div>
+    <h1>우선순위 체크리스트 v2 &amp; 최종 변수 리스트</h1>
+    <p class="hero-sub">
+      지자체대응역량 재-EDA(최종변수선정 + 메인+확장 파일 기준) 결과를 반영해 체크리스트를 갱신했다.
+      확인·해결된 항목은 옅게 표시했고, 새로 드러난 항목은 <span class="newtag">NEW</span> 표시했다.
+      마지막 절에 5개 블록 전체의 최종 변수 리스트를 정리했다.
+    </p>
+    <div class="updatebar">✓ <b>확인됨:</b> 지자체 예산 2변수 세트(VIF 1.12) 및 확장변수 메인 제외 결정이 독립적인 재-EDA로 재확인됨</div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="num">4</div><div class="lbl">먼저 확정할 결정 (0단계) <span class="newtag">+1</span></div></div>
+    <div class="stat"><div class="num">29</div><div class="lbl">아직 열려있는 처리 항목</div></div>
+    <div class="stat"><div class="num g">1</div><div class="lbl">독립 재-EDA로 확인·해결된 항목</div></div>
+    <div class="stat"><div class="num">3</div><div class="lbl">새로 추가된 항목</div></div>
+    <div class="stat"><div class="num">7</div><div class="lbl">병합 전 고칠 값 오류</div></div>
+  </div>
+
+  <div class="note">
+    <b>이번 갱신의 핵심.</b> 지자체대응역량 블록은 재-EDA로 사실상 준비가 끝났다 — 예산 2변수 세트, 확장변수 부록화
+    결정이 독립적으로 재확인됐다. 다만 이 과정에서 <b>종속변수(Y) 선택이 아직 안 됐다는 것</b>이 새로 드러났다
+    (D4). 나머지 블록(기후·노출도·인위적확산·국가대응수준)의 항목은 이전과 동일하게 열려 있다.
+  </div>
+
+  <!-- ===================== STAGE 0 ===================== -->
+  <section id="s0">
+    <div class="stage-head">
+      <div class="ring-big" style="--fill:0%"><span>0</span></div>
+      <div class="stage-title"><h2>결정</h2><p>선택의 문제. 늦게 정하면 이후 작업을 전부 다시 해야 한다.</p></div>
+    </div>
+
+    <div class="decisions">
+      <div class="decision">
+        <span class="dtag">D1</span>
+        <h3>분석 단위 — 250(일반구 분리) vs 229(시 통합)</h3>
+        <div class="opts"><span class="opt">250 유지</span><span class="opt rec">229로 상향 집계</span></div>
+        <div class="why">예산이 시 단위로만 존재해 250 유지 시 32개 일반구가 구조적 결측이 되고, 창원·포항·청주 등 11개 시가 병합에서 소멸한다.</div>
+      </div>
+      <div class="decision">
+        <span class="dtag">D2</span>
+        <h3>국가대응수준 표본 처리</h3>
+        <div class="opts"><span class="opt">(a) 전국 229 재처리</span><span class="opt">(b) 국가지표로 강등</span><span class="opt rec">(c) 31개 서브샘플 보조모형</span></div>
+        <div class="why">실측은 31/229 시군구뿐. (c)가 일정상 현실적.</div>
+      </div>
+      <div class="decision">
+        <span class="dtag">D3</span>
+        <h3>인위적확산 모형 전략 — FE vs RE</h3>
+        <div class="opts"><span class="opt">시군구 고정효과</span><span class="opt rec">RE / between</span></div>
+        <div class="why">도로·주거지 소나무비율, 목재변수가 시군구 내 변동이 거의 없어(주거지비율은 전부 시불변) FE에서 블록 전체가 소멸한다.</div>
+      </div>
+      <div class="decision new">
+        <span class="dtag">D4</span><span class="newflag">NEW</span>
+        <h3>최종 종속변수(Y) 선택</h3>
+        <div class="opts">
+          <span class="opt rec">노출도 log_피해밀도_본per_ha</span>
+          <span class="opt">지자체 자체 성과변수(당해_감염지점수 등)</span>
+        </div>
+        <div class="why">
+          지자체 재-EDA가 <code>당해_감염지점수</code>·<code>재발생률_300m</code> 등 <b>노출도 파일과는 다른 정의의 자체 성과변수</b>를
+          외적타당성 검증에 썼다는 게 이번에 드러났다. 노출도의 <code>log_피해밀도</code>는 229개 전체·실측 6년(2017–2022) 커버리지가
+          넓고 이미 여러 회귀에서 검증됐으므로 <b>메인 Y로 권고</b>. 지자체 성과변수는 250단위·다른 정의라 로버스트니스 체크로 남긴다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== STAGE 1 (unchanged) ===================== -->
+  <section id="s1">
+    <div class="stage-head">
+      <div class="ring-big" style="--fill:17%"><span>1</span></div>
+      <div class="stage-title"><h2>블로커 — 병합 자체가 안 되는 것</h2><p>변동 없음. 전부 필수.</p></div>
+    </div>
+    <table class="items">
+      <tr><th style="width:24px"></th><th>항목</th><th class="badge-col">난이도</th><th class="badge-col">등급</th></tr>
+      <tr><td class="num-col">1</td><td class="item-col"><b>시도명 표기 통일</b><div class="evi"><code>강원도</code>/<code>강원특별자치도</code> 등 두 계열 혼재</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">2</td><td class="item-col"><b>인위적확산 평택시 코드 수정</b><div class="evi"><code>41330</code> → <code>41220</code></div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">3</td><td class="item-col"><b>국가대응·노출도에 시군구코드 부여</b><div class="evi">중복 이름(동/중/서/남/북구) 때문에 시도 없이 병합 불가</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">4</td><td class="item-col"><b>250 → 229 상향 집계 실행</b><div class="evi">면적=합 · 비율=ha복원 후 재나눗셈 · 업체수=expm1합산 후 재log1p · 예산=시단위 그대로 · 기후=면적가중</div></td><td class="badge-col"><span class="ring-sm" style="--fill:66%"><span>중</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">5</td><td class="item-col"><b>집계 이력표 산출</b><div class="evi">32개 일반구 → 11개 시 매핑 기록</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+    </table>
+  </section>
+
+  <!-- ===================== STAGE 2 (updated) ===================== -->
+  <section id="s2">
+    <div class="stage-head">
+      <div class="ring-big" style="--fill:33%"><span>2</span></div>
+      <div class="stage-title"><h2>값 오류 — 병합 전 원본에서 고칠 것</h2><p>지자체 재-EDA로 항목 1개 추가·1개 재확인됨.</p></div>
+    </div>
+    <table class="items">
+      <tr><th style="width:24px"></th><th>항목</th><th class="badge-col">난이도</th><th class="badge-col">등급</th></tr>
+      <tr><td class="num-col">1</td><td class="item-col"><b>거리_km 폐기 또는 재계산 — 최우선</b><div class="evi">229개 전체에서 <code>2016=2019=2020=2023</code>, <code>2017=2018</code> 완전 동일</div></td><td class="badge-col"><span class="ring-sm" style="--fill:66%"><span>중</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">2</td><td class="item-col"><b>강화군 소나무림면적 2016–2019 = 0 수정</b><div class="evi">지자체 재-EDA에서도 결측률 15.7%로 이전과 <b>동일 → 미수정 재확인됨</b></div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">3</td><td class="item-col"><b>부산 동래·북구·사상구 관측소 재매칭</b><div class="evi">stnId 296(2023개시) 배정 → 7년 결측</div></td><td class="badge-col"><span class="ring-sm" style="--fill:66%"><span>중</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">4</td><td class="item-col"><b>부분연도 3행 NaN 처리</b><div class="evi">화천군 2016(92일), 세종·공주 2019(215일)</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">5</td><td class="item-col"><b>SPI3 유효월수 &lt; 11 행 NaN 처리</b></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">6</td><td class="item-col"><b>반출금지구역면적비율 분모 재확인</b><div class="evi">성남 수정구 등 100% 초과(최대 204%)</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp recommend">권장</span></td></tr>
+      <tr><td class="num-col">7</td><td class="item-col"><b>2016년 예찰진단예산 필터 미반영<span class="newtag">NEW</span></b><div class="evi">재-EDA가 <code>예산자료_사용가능여부=1</code>만 필터링 — 2016년 90.5% 미기록분이 그대로 포함된 채 분석됨</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+    </table>
+  </section>
+
+  <!-- ===================== STAGE 3 (updated) ===================== -->
+  <section id="s3">
+    <div class="stage-head">
+      <div class="ring-big" style="--fill:50%"><span>3</span></div>
+      <div class="stage-title"><h2>변수셋 확정</h2><p>1개 항목 확인·해결됨, 2개 항목 신규 추가.</p></div>
+    </div>
+    <table class="items">
+      <tr><th style="width:24px"></th><th>항목</th><th class="badge-col">난이도</th><th class="badge-col">등급</th></tr>
+      <tr><td class="num-col">1</td><td class="item-col"><b>기후: 온도는 GDD_솔수염하늘소 1개만</b><div class="evi">between VIF 45.9/27.8 → GDD 단독 1.79</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">2</td><td class="item-col"><b>도로소나무비율만 채택, 주거지비율 제외</b><div class="evi">상관 0.82, 주거지비율 시불변</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">3</td><td class="item-col"><b>원목생산업체수 "핵심 변수" 서술 재작성</b><div class="evi">면적 통제 후 부호 +→− 반전</div></td><td class="badge-col"><span class="ring-sm" style="--fill:66%"><span>중</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">4</td><td class="item-col"><b>도로비율·원목업체수는 log(소나무림면적) 동반 필수</b></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">5</td><td class="item-col"><b>예찰진단예산_ha당_log는 2017–2023 한정</b><div class="evi">2단계 #7과 동일 사안 — 재-EDA에서 미반영 재확인</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">6</td><td class="item-col"><b>면적하한미달_flag(&lt;500ha) 추가</b><div class="evi">지수 분산 3.7배 폭발. 재-EDA에서도 언급 없음</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr class="resolved"><td class="num-col">7</td><td class="item-col"><b>확장변수(법인밀도·이동통제·반출금지구역)는 메인에서 제외</b><div class="evi">지자체 재-EDA가 <b>동일 결론에 독립적으로 도달</b> — 주모형=예산2개, 방제법인=보조, 반출금지구역=주의 등급</div></td><td class="badge-col">—</td><td class="badge-col"><span class="stamp done">확인됨</span></td></tr>
+      <tr><td class="num-col">8</td><td class="item-col"><b>결과변수 분리</b><div class="evi"><code>인접시군_피해밀도</code>(공간시차)·<code>연속발생연수</code>·<code>집단발생여부</code> 설명변수에서 분리</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">9</td><td class="item-col"><b>반출금지구역 내생성 정량화<span class="newtag">NEW</span></b><div class="evi">재-EDA는 정성적 주의만 언급. lag상관(전년도피해→당해지정, rho +0.55/+0.63)을 근거로 추가하면 "주의" 등급이 더 방어됨</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp recommend">권장</span></td></tr>
+      <tr><td class="num-col">10</td><td class="item-col"><b>외적타당성 표에 유효쌍 n 표기<span class="newtag">NEW</span></b><div class="evi">재발생률·신규발생지비율은 구조적 결측이 커서 상관계수만으론 신뢰도 판단 어려움</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp recommend">권장</span></td></tr>
+    </table>
+  </section>
+
+  <!-- ===================== STAGE 4 (unchanged) ===================== -->
+  <section id="s4">
+    <div class="stage-head">
+      <div class="ring-big" style="--fill:67%"><span>4</span></div>
+      <div class="stage-title"><h2>병합 실행</h2><p>변동 없음.</p></div>
+    </div>
+    <table class="items">
+      <tr><th style="width:24px"></th><th>항목</th><th class="badge-col">난이도</th><th class="badge-col">등급</th></tr>
+      <tr><td class="num-col">1</td><td class="item-col"><b>키·범위 확정</b><div class="evi"><code>sigungu_cd(229)+연도</code>, 분석표본_메인 2017–2022</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">2</td><td class="item-col"><b>필수 메타 컬럼 부여</b><div class="evi">구성단위수·stnId/거리_km·기후자료불완전_flag·데이터유형·임상도판_후기_flag·면적하한미달_flag·예산관측여부·예찰자료_신뢰_flag·index_eligible_nat</div></td><td class="badge-col"><span class="ring-sm" style="--fill:66%"><span>중</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">3</td><td class="item-col"><b>커버리지 매트릭스 산출</b></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">4</td><td class="item-col"><b>변수 사전 작성</b></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+    </table>
+  </section>
+
+  <!-- ===================== STAGE 5 (unchanged) ===================== -->
+  <section id="s5">
+    <div class="stage-head">
+      <div class="ring-big" style="--fill:83%"><span>5</span></div>
+      <div class="stage-title"><h2>사후 진단</h2><p>변동 없음.</p></div>
+    </div>
+    <table class="items">
+      <tr><th style="width:24px"></th><th>항목</th><th class="badge-col">난이도</th><th class="badge-col">등급</th></tr>
+      <tr><td class="num-col">1</td><td class="item-col"><b>클러스터 SE 확정</b><div class="evi">안 하면 SE 최대 1.68배 과소</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">2</td><td class="item-col"><b>between/within VIF 재계산</b></td><td class="badge-col"><span class="ring-sm" style="--fill:66%"><span>중</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">3</td><td class="item-col"><b>Moran's I 잔차 공간자기상관 진단</b><div class="evi">인접시군 피해밀도 상관 0.73</div></td><td class="badge-col"><span class="ring-sm" style="--fill:66%"><span>중</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+      <tr><td class="num-col">4</td><td class="item-col"><b>부호 반전 결론 최종 반영 확인</b><div class="evi">도로비율·원목생산업체수</div></td><td class="badge-col"><span class="ring-sm" style="--fill:33%"><span>하</span></span></td><td class="badge-col"><span class="stamp necessary">필수</span></td></tr>
+    </table>
+  </section>
+
+  <!-- ===================== FINAL VARIABLE LIST ===================== -->
+  <section id="vars">
+    <div class="stage-head">
+      <div class="stage-title"><h2>최종 변수 리스트</h2><p>5개 블록 + 종속변수. D4 결정을 반영해 메인/보조/제외를 구분했다.</p></div>
+    </div>
+
+    <div class="vblock">
+      <h3>종속변수 (Y)</h3>
+      <div class="vnote">D4 결정에 따른 메인 Y. 지자체 자체 성과변수는 로버스트니스로만.</div>
+      <table class="vars">
+        <tr><th>변수</th><th>역할</th><th>비고</th></tr>
+        <tr><td class="vname">log_피해밀도_본per_ha</td><td><span class="role y">메인 Y</span></td><td class="vnote">노출도. 229 전체·실측 6년(2017–2022)</td></tr>
+        <tr><td class="vname">당해_감염지점수 / 재발생률_300m 등</td><td><span class="role aux">로버스트니스</span></td><td class="vnote">지자체 파일 자체 성과변수. 250단위, 다른 정의 — 교차검증용</td></tr>
+      </table>
+    </div>
+
+    <div class="vblock">
+      <h3>① 기후위험도</h3>
+      <table class="vars">
+        <tr><th>변수</th><th>역할</th><th>비고</th></tr>
+        <tr><td class="vname">GDD_솔수염하늘소_base11.9</td><td><span class="role main">주</span></td><td class="vnote">유일한 온도 대표변수</td></tr>
+        <tr><td class="vname">연강수량_mm</td><td><span class="role main">주</span></td><td></td></tr>
+        <tr><td class="vname">평균풍속_ms</td><td><span class="role main">주</span></td><td></td></tr>
+        <tr><td class="vname">SPI3_최저월(최심가뭄)</td><td><span class="role main">주</span></td><td>유효월수&lt;11 NaN 처리 후</td></tr>
+        <tr><td class="vname">겨울철_평균최저기온 / 여름철_평균기온</td><td><span class="role excl">제외</span></td><td class="vnote">GDD와 between VIF 27~46 — 동시 투입 금지</td></tr>
+        <tr><td class="vname">stnId · 거리_km · 연간관측일수 · 겨울철_자료완전성</td><td><span class="role meta">메타</span></td><td class="vnote">클러스터·게이트용</td></tr>
+      </table>
+    </div>
+
+    <div class="vblock">
+      <h3>② 노출도</h3>
+      <table class="vars">
+        <tr><th>변수</th><th>역할</th><th>비고</th></tr>
+        <tr><td class="vname">소나무류_면적비율(%)</td><td><span class="role main">주</span></td><td class="vnote">핵심 노출 지표</td></tr>
+        <tr><td class="vname">log_인접시군_피해밀도_본per_ha</td><td><span class="role aux">진단용만</span></td><td class="vnote">공간시차(spatial lag) — 설명변수 투입 금지, SAR/SLX나 Moran's I 진단용</td></tr>
+        <tr><td class="vname">연속발생연수 / 집단발생여부</td><td><span class="role aux">보조·통제</span></td><td class="vnote">결과 인접 변수, 신중히 사용</td></tr>
+        <tr><td class="vname">최근감염목과의_거리_km</td><td><span class="role excl">제외</span></td><td class="vnote">값 오류로 재계산 전까지 사용 불가</td></tr>
+        <tr><td class="vname">데이터유형(추정연도flag) · 임상도_기준판(후기flag)</td><td><span class="role meta">메타</span></td><td></td></tr>
+      </table>
+    </div>
+
+    <div class="vblock">
+      <h3>③ 인위적확산</h3>
+      <table class="vars">
+        <tr><th>변수</th><th>역할</th><th>비고</th></tr>
+        <tr><td class="vname">도로소나무비율_500m</td><td><span class="role main">주</span></td><td class="vnote">면적 통제 후 부호 (+)로 재해석. <code>log_소나무림면적</code> 동반 필수</td></tr>
+        <tr><td class="vname">log1p_원목생산업체수</td><td><span class="role main">주(재해석)</span></td><td class="vnote">면적 통제 후 부호 (−). "핵심" 서술 재작성 필요</td></tr>
+        <tr><td class="vname">주거지소나무비율_300m</td><td><span class="role excl">제외</span></td><td class="vnote">도로비율과 r=0.82, 시불변(전 시군구 SD=0)</td></tr>
+      </table>
+    </div>
+
+    <div class="vblock">
+      <h3>④ 지자체대응역량</h3>
+      <table class="vars">
+        <tr><th>변수</th><th>역할</th><th>비고</th></tr>
+        <tr><td class="vname">대응자원투입예산_소나무림ha당_log</td><td><span class="role main">주</span></td><td class="vnote">VIF 1.12 (재-EDA로 확인)</td></tr>
+        <tr><td class="vname">예찰진단예산_소나무림ha당_log</td><td><span class="role main">주</span></td><td class="vnote">2017–2023 한정 (2016 제외)</td></tr>
+        <tr><td class="vname">방제법인수_소나무림1만ha당_log</td><td><span class="role aux">보조·로버스트니스</span></td><td class="vnote">2016–2021 한정. 재-EDA도 동일 결론</td></tr>
+        <tr><td class="vname">이동통제예산_* / 예산비중_*</td><td><span class="role aux">민감도만</span></td><td class="vnote">배분구조 해석용, 메인 모형 제외</td></tr>
+        <tr><td class="vname">반출금지구역_지정여부 / 면적비율</td><td><span class="role excl">주의·제외</span></td><td class="vnote">내생성(피해→지정). 분모 오류(최대 204%) 확인 필요</td></tr>
+      </table>
+    </div>
+
+    <div class="vblock">
+      <h3>⑤ 국가대응수준</h3>
+      <table class="vars">
+        <tr><th>변수</th><th>역할</th><th>비고</th></tr>
+        <tr><td class="vname">전체 블록</td><td><span class="role excl">메인 제외</span></td><td class="vnote">D2(c) — 31개 시군구 서브샘플 로버스트니스 전용, 229 메인 모형에는 미포함</td></tr>
+        <tr><td class="vname">국비지원액_최종_원(log) · 국비비율_최종(%) · 매칭사업수_최종</td><td><span class="role aux">서브샘플용</span></td><td class="vnote">31개 시군구 한정 사용 시</td></tr>
+      </table>
+    </div>
+
+    <div class="vblock">
+      <h3>공통 통제·메타</h3>
+      <table class="vars">
+        <tr><th>변수</th><th>역할</th><th>비고</th></tr>
+        <tr><td class="vname">연도 고정효과</td><td><span class="role meta">통제</span></td><td></td></tr>
+        <tr><td class="vname">클러스터 SE (stnId 또는 시군구)</td><td><span class="role meta">통제</span></td><td></td></tr>
+        <tr><td class="vname">면적하한미달_flag · 기후자료불완전_flag · 추정연도_flag · 임상도판_후기_flag · 예산관측여부 · 분석표본_메인(2017–2022)</td><td><span class="role meta">플래그</span></td><td></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== FLOW ===================== -->
+  <section id="flow">
+    <div class="stage-head"><div class="stage-title"><h2>전체 순서 요약</h2><p>나이테처럼 안쪽부터 순서대로 — 건너뛰지 않는다.</p></div></div>
+    <div class="flow">
+      <div class="flow-node"><div class="ring-big" style="--fill:0%"><span>D</span></div><div class="flabel">결정<br>D1·D2·D3·D4</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="ring-big" style="--fill:17%"><span>1</span></div><div class="flabel">병합 가능하게</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="ring-big" style="--fill:33%"><span>2</span></div><div class="flabel">원본 값 수정</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="ring-big" style="--fill:50%"><span>3</span></div><div class="flabel">변수셋 확정</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="ring-big" style="--fill:67%"><span>4</span></div><div class="flabel">병합 실행</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="ring-big" style="--fill:100%"><span>5</span></div><div class="flabel">사후 진단 →<br>모델링 시작</div></div>
+    </div>
+    <div class="legend">
+      <span class="li"><span class="dot" style="background:var(--danger)"></span>필수</span>
+      <span class="li"><span class="dot" style="background:var(--warn)"></span>권장</span>
+      <span class="li"><span class="dot" style="background:var(--hold)"></span>보류</span>
+      <span class="li"><span class="dot" style="background:var(--good)"></span>확인됨/해결됨</span>
+      <span class="li"><span class="newtag">NEW</span>이번 갱신에서 추가</span>
+    </div>
+  </section>
+
+  <footer>
+    v1(<code>CH2_병합전_우선순위.html</code>) 대비 갱신본. 지자체대응역량 재-EDA(<code>CH2_지자체대응역량_최종변수선정.csv</code> +
+    <code>CH2_지자체대응역량_메인+확장.csv</code>) 결과를 반영해 0단계에 D4 추가, 2단계·3단계에 항목 3개 신규·1개 확인 처리했다.
+  </footer>
+
+</div>
+</body>
+</html>
