@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CH2 지자체 대응역량 최종 변수 후보 보고서</title>
+  <style>
+    body {
+      margin: 0;
+      color: #1f2933;
+      background: #f7f8fa;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif;
+      line-height: 1.65;
+    }
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 40px 28px 64px;
+      background: #fff;
+      min-height: 100vh;
+      box-shadow: 0 0 0 1px #e5e7eb;
+    }
+    h1, h2, h3 { line-height: 1.25; color: #111827; }
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    h2 { margin-top: 36px; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 22px; }
+    h3 { margin-top: 24px; font-size: 18px; }
+    p { margin: 10px 0; }
+    .meta {
+      color: #52606d;
+      margin-bottom: 28px;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .box {
+      border: 1px solid #d9e2ec;
+      border-radius: 6px;
+      padding: 14px 16px;
+      background: #fbfdff;
+    }
+    .box strong {
+      display: block;
+      font-size: 22px;
+      color: #102a43;
+    }
+    .box span {
+      color: #52606d;
+      font-size: 13px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 14px 0 22px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #d9e2ec;
+      padding: 9px 10px;
+      vertical-align: top;
+    }
+    th {
+      background: #eef2f7;
+      color: #102a43;
+      text-align: left;
+    }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      background: #f1f5f9;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+    .ok { color: #0f766e; font-weight: 700; }
+    .warn { color: #b45309; font-weight: 700; }
+    .note {
+      border-left: 4px solid #64748b;
+      background: #f8fafc;
+      padding: 12px 16px;
+      margin: 16px 0;
+    }
+    ul { padding-left: 22px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>CH2 지자체 대응역량 최종 변수 후보 보고서</h1>
+  <p class="meta">생성 기준: 감사 PASS 이후 EDA, 진단, 지수 생성 결과 요약</p>
+
+  <div class="summary">
+    <div class="box"><strong class="ok">PASS</strong><span>감사 판정</span></div>
+    <div class="box"><strong>2,000</strong><span>최종 패널 행 수</span></div>
+    <div class="box"><strong>62</strong><span>최종 패널 열 수</span></div>
+    <div class="box"><strong>1,686</strong><span>기본지수 A 유효 행</span></div>
+    <div class="box"><strong>1,264</strong><span>확장지수 B 유효 행</span></div>
+  </div>
+
+  <h2>1. 지금 어디까지 완료됐나</h2>
+  <p>지자체 대응역량 변수 생성, 감사, EDA, 2019-2020 전환 진단, 시도별 비교, 순위 진단, 상관 진단, 민감도 분석, 최종 지수 생성까지 완료된 상태다.</p>
+  <p>최종 산출 패널은 <code>CH2_local_capacity_final_panel.csv</code>이며, 기존 입력 패널 값은 덮어쓰지 않고 새 산출물로 분리했다.</p>
+
+  <h2>2. 최종 변수 후보 결론</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>구분</th>
+        <th>변수</th>
+        <th>판정</th>
+        <th>사용 방식</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>최종 핵심</td>
+        <td><code>log_resource_budget_per_pine_ha</code></td>
+        <td class="ok">포함</td>
+        <td>기본지수 A와 확장지수 B에 모두 포함</td>
+      </tr>
+      <tr>
+        <td>최종 핵심</td>
+        <td><code>log_surveillance_budget_per_pine_ha</code></td>
+        <td class="ok">포함</td>
+        <td>기본지수 A와 확장지수 B에 모두 포함</td>
+      </tr>
+      <tr>
+        <td>확장 핵심</td>
+        <td><code>log_active_pest_firm_per_10000_pine_ha</code></td>
+        <td class="ok">조건부 포함</td>
+        <td>확장지수 B에만 포함. <code>extended_index_eligible == 1</code>인 행에서만 사용</td>
+      </tr>
+      <tr>
+        <td>보조/민감도</td>
+        <td><code>log_movement_budget_per_pine_ha</code></td>
+        <td class="warn">핵심 제외</td>
+        <td>0 비율이 높아 핵심지수 대신 보조 분석에 사용</td>
+      </tr>
+      <tr>
+        <td>보조/구성비</td>
+        <td><code>surveillance_share</code></td>
+        <td class="warn">핵심 제외</td>
+        <td>예산 규모가 아니라 구성비라서 보조 변수로 사용</td>
+      </tr>
+      <tr>
+        <td>보조/구성비</td>
+        <td><code>movement_share_included_budget</code></td>
+        <td class="warn">핵심 제외</td>
+        <td>이동단속 비중 확인용</td>
+      </tr>
+      <tr>
+        <td>보조/규제 상태</td>
+        <td><code>restriction_designated</code></td>
+        <td class="warn">핵심 제외</td>
+        <td>대응역량이라기보다 규제 지정 상태로 해석</td>
+      </tr>
+      <tr>
+        <td>보조/민감도</td>
+        <td><code>active_restriction_area_ratio</code></td>
+        <td class="warn">핵심 제외</td>
+        <td>1을 초과할 수 있는 구조라 핵심지수 직접 투입은 부적절</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3. 최종 지수 후보</h2>
+  <h3>기본지수 A</h3>
+  <p><strong>메인 분석에 추천.</strong> 예산 기반 대응역량을 가장 안정적으로 반영한다.</p>
+  <ul>
+    <li><code>capacity_index_A_pooled</code>: 연도 간 수준 차이를 보존하는 주 지수</li>
+    <li><code>capacity_index_A_yearly</code>: 같은 연도 안에서 지자체 상대 순위 비교용</li>
+  </ul>
+
+  <h3>확장지수 B</h3>
+  <p><strong>강건성 분석 또는 보조 사양으로 추천.</strong> 예산 2개에 산림병해충 방제 법인 밀도 변수를 추가한 지수다.</p>
+  <ul>
+    <li><code>capacity_index_B_pooled</code>: 법인자료 포함 pooled 지수</li>
+    <li><code>capacity_index_B_yearly</code>: 법인자료 포함 연도별 표준화 지수</li>
+  </ul>
+  <div class="note">B 지수는 법인자료 완전성 조건 때문에 2022-2023년이 구조적으로 빠진다. 그래서 메인 지수 하나만 골라야 하면 A를 쓰고, B는 확장/민감도 결과로 제시하는 편이 안전하다.</div>
+
+  <h2>4. 변수별 주요 진단</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>변수</th>
+        <th>관측 행</th>
+        <th>결측 행</th>
+        <th>0 비율</th>
+        <th>판단</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>log_resource_budget_per_pine_ha</code></td><td>1,686</td><td>314</td><td>8.7%</td><td>핵심 적합</td></tr>
+      <tr><td><code>log_surveillance_budget_per_pine_ha</code></td><td>1,686</td><td>314</td><td>36.9%</td><td>핵심 적합</td></tr>
+      <tr><td><code>log_active_pest_firm_per_10000_pine_ha</code></td><td>1,482</td><td>518</td><td>41.2%</td><td>확장지수용</td></tr>
+      <tr><td><code>log_movement_budget_per_pine_ha</code></td><td>1,686</td><td>314</td><td>72.4%</td><td>핵심 제외, 보조</td></tr>
+      <tr><td><code>surveillance_share</code></td><td>1,552</td><td>448</td><td>31.3%</td><td>구성비 보조</td></tr>
+      <tr><td><code>movement_share_included_budget</code></td><td>1,552</td><td>448</td><td>69.8%</td><td>구성비 보조</td></tr>
+      <tr><td><code>restriction_designated</code></td><td>1,547</td><td>453</td><td>39.9%</td><td>규제 상태 보조</td></tr>
+      <tr><td><code>active_restriction_area_ratio</code></td><td>1,532</td><td>468</td><td>39.4%</td><td>민감도/보조</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5. 해석상 주의점</h2>
+  <ul>
+    <li>서울 일부 구가 상위권에 뜨는 것은 소나무림 면적 분모가 매우 작아서 per-ha 값이 커지는 효과가 크다.</li>
+    <li>상위 순위표는 단순 우수 지자체 목록이 아니라 검토 대상 목록으로 써야 한다.</li>
+    <li>예산이 높은 지역의 피해가 높다고 해서 대응역량이 피해를 키웠다고 해석하면 안 된다. 고위험 지역에 예산과 법인이 집중되는 역인과 가능성이 있다.</li>
+    <li><code>budget_observed = 0</code>인 지역은 0 예산이 아니라 자료 미관측 또는 행정단위 불일치로 표시해야 한다.</li>
+  </ul>
+
+  <h2>6. 최종 추천</h2>
+  <p>메인 분석에는 <code>capacity_index_A_pooled</code>를 사용한다. 같은 연도 안의 상대 순위나 지도 비교에는 <code>capacity_index_A_yearly</code>를 함께 확인한다.</p>
+  <p>확장 분석에는 <code>capacity_index_B_pooled</code>와 <code>capacity_index_B_yearly</code>를 사용하되, 2022-2023년 제외 조건을 반드시 명시한다.</p>
+</main>
+</body>
+</html>
