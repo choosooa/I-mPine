@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>I'mPine — CH4 맞춤형 방제 설계</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="data.js"></script>
+<style>
+:root{
+  --gd:#0d3a5c;--gm:#155a8a;--gl:#2a78d6;--gp:#6ba8e8;--ga:#dcebfb;
+  --wa:#e67e22;--r:#c0392b;--t:#1baf7a;--pu:#8b5cf6;
+  --bg:#f4f8fb;--sf:#fff;--bd:#dbe6ee;--tx:#1a2634;--mu:#5c6b7a;--mu2:#8494a3;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.55}
+.mono{font-family:'JetBrains Mono',monospace}
+.hdr{background:linear-gradient(135deg,var(--gd),var(--gm));padding:12px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 10px rgba(0,0,0,.25);position:sticky;top:0;z-index:999}
+.hdr h1{color:#fff;font-size:20px;font-weight:700}
+.hdr .sub{color:#a9d4f5;font-size:11px;margin-left:2px}
+
+.basisbar{background:#eaf2fb;border-bottom:1px solid var(--bd);
+  padding:7px 24px;display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--gd)}
+.basisbar b{color:var(--gd)}
+.basisbar .infobtn{margin-left:auto;background:#fff;border:1px solid var(--gl);color:var(--gl);
+  border-radius:14px;padding:3px 12px;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.basisbar .infobtn:hover{background:var(--gl);color:#fff}
+.estbadge{background:var(--wa);color:#fff;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:10px;letter-spacing:.3px}
+
+.pg{padding:16px 24px 24px;max-width:1300px;margin:0 auto}
+.qhead{margin:4px 0 14px}
+.qhead h2{font-size:16px;color:var(--gd)}
+.qhead .q{font-size:12px;color:var(--mu);font-style:italic;display:block;margin-top:2px}
+
+.layout{display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.ct{font-size:13.5px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.ct .cap{font-size:11px;font-weight:500;color:var(--mu)}
+
+.field{margin-bottom:14px}
+.field label{display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-bottom:5px}
+.field label .val{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gd)}
+.field input[type=range]{width:100%;accent-color:var(--gl)}
+.field input[type=number]{width:100%;padding:7px 9px;border:1px solid var(--bd);border-radius:7px;font-family:'JetBrains Mono',monospace;font-size:13px}
+.field .toggle{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--tx)}
+.field .toggle input{width:16px;height:16px}
+
+.recobox{background:linear-gradient(135deg,var(--gd),var(--gm));border-radius:12px;padding:18px 20px;color:#fff;margin-bottom:14px}
+.recobox .l{font-size:11px;color:#bcd9f2;margin-bottom:4px}
+.recobox .v{font-size:22px;font-weight:800}
+.recobox .why{font-size:12px;color:#dceafb;margin-top:6px;line-height:1.6}
+.recobox.warn{background:linear-gradient(135deg,#7a2b0f,#a3401a)}
+
+.krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--gl)}
+.kl{font-size:11px;color:var(--mu);margin-bottom:5px}
+.kv{font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.ks{font-size:10.5px;color:var(--mu2);margin-top:4px}
+
+table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
+.rtbl th{background:#eef4fa;text-align:left;padding:7px 9px;font-weight:600;color:var(--mu);border-bottom:2px solid var(--bd)}
+.rtbl td{padding:7px 9px;border-bottom:1px solid #eee}
+.rtbl td.num{text-align:right;font-family:'JetBrains Mono',monospace}
+.rtbl tr.best td{background:#eaf6f0}
+.rtbl tr.infeasible td{color:var(--mu2)}
+.pill{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:9px;display:inline-block}
+.pill.ok{background:#dcf4ea;color:#0f7a52}
+.pill.no{background:#fde2e1;color:#a33}
+
+.note{font-size:11px;color:var(--mu);background:#f2f7fb;border-radius:8px;padding:7px 11px;margin-top:8px;line-height:1.6}
+.note b{color:var(--tx)}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;padding:40px 20px;overflow-y:auto}
+.modal-bg.on{display:block}
+.modal{background:#fff;max-width:760px;margin:0 auto;border-radius:14px;padding:24px 28px;position:relative}
+.modal h3{font-size:16px;margin-bottom:12px;color:var(--gd)}
+.modal .close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu)}
+.modal hr{border:none;border-top:1px solid var(--bd);margin:18px 0}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>🌲 I'mPine</h1>
+  <div class="sub">맞춤형 방제 설계 계산기 · CH4</div>
+</div>
+<div class="basisbar">
+  <span class="estbadge">추정치</span>
+  단가·1인당 작업량은 실제 자료가 없어 추정한 값입니다. 실제 견적과 다를 수 있습니다.
+  <button class="infobtn" onclick="openModal()">ⓘ 가정한 계산식 보기</button>
+</div>
+
+<section class="pg">
+  <div class="qhead"><h2>예산·인력·거리를 입력하면 방제방법을 추천해드립니다</h2>
+    <span class="q">방제대상 조건을 조정하면 추천 방법·필요인력·예상비용이 즉시 다시 계산됩니다.</span></div>
+
+  <div class="layout">
+    <div class="card">
+      <div class="ct">현장 조건 입력</div>
+
+      <div class="field">
+        <label>방제대상 면적 <span class="val" id="v-area">50 ha</span></label>
+        <input type="range" id="in-area" min="1" max="300" value="50">
+      </div>
+      <div class="field">
+        <label>피해목 본수 <span class="val" id="v-tree">800 본</span></label>
+        <input type="range" id="in-tree" min="10" max="5000" step="10" value="800">
+      </div>
+      <div class="field">
+        <label>보유 예산 <span class="val" id="v-budget">3,000만원</span></label>
+        <input type="range" id="in-budget" min="200" max="20000" step="100" value="3000">
+      </div>
+      <div class="field">
+        <label>보유 인력 <span class="val" id="v-workers">10명</span></label>
+        <input type="range" id="in-workers" min="1" max="80" value="10">
+      </div>
+      <div class="field">
+        <label>현장까지 거리 <span class="val" id="v-distance">5 km</span></label>
+        <input type="range" id="in-distance" min="0" max="150" value="5">
+      </div>
+      <div class="field">
+        <label>목표 작업일수 <span class="val" id="v-days">7일</span></label>
+        <input type="range" id="in-days" min="1" max="30" value="7">
+      </div>
+      <div class="field">
+        <label class="toggle"><input type="checkbox" id="in-residential"> 현장이 주거지와 인접해 있음 (항공방제 제한)</label>
+      </div>
+    </div>
+
+    <div>
+      <div class="recobox" id="recobox">
+        <div class="l">추천 방제방법</div>
+        <div class="v" id="reco-name">–</div>
+        <div class="why" id="reco-why"></div>
+      </div>
+
+      <div class="krow" id="kpi-row"></div>
+
+      <div class="card">
+        <div class="ct">전체 방제방법 비교 <span class="cap">조건에 맞춰 재계산</span></div>
+        <table class="rtbl" id="compare-tbl"></table>
+        <div class="note">회색 처리된 행은 현재 조건(최소물량·주거지 인접·예산)에서 적용할 수 없는 방법입니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="close" onclick="closeModal()">×</button>
+    <h3>가정한 계산식 (전부 추정치입니다)</h3>
+    <div class="note"><b>⚠️ 실제 산림청 방제사업 표준시방서·품셈·업체 견적 자료를 확보하지 못해 상식적으로 추정한 값입니다.</b>
+    <code>ch4/data.js</code>의 <code>unitCost</code>·<code>dailyCapacityPerWorker</code>만 실제 값으로 교체하면 계산 로직은 그대로 정확해집니다.</div>
+    <hr>
+    <div class="ct">방법별 물량 기준</div>
+    <div class="note">항공방제는 <b>면적(ha)</b> 기준, 나머지(지상방제·훈증·벌채)는 <b>피해목 본수</b> 기준으로 계산합니다.</div>
+    <hr>
+    <div class="ct">비용 = 물량 × 단가 + 운반비 가산</div>
+    <div class="note">현장 거리가 10km를 넘으면, 초과 1km당 총비용의 0.5%를 운반비로 가산합니다(추정).</div>
+    <hr>
+    <div class="ct">필요인력 · 소요일수</div>
+    <div class="note">필요인력 = 물량 ÷ (1인당 일일 작업량 × 목표 작업일수), 올림 처리.<br>
+    실제 소요일수(보유인력 기준) = 물량 ÷ (보유인력 × 1인당 일일 작업량), 올림 처리.</div>
+    <hr>
+    <div class="ct">적용 가능 여부(feasible) 판정</div>
+    <div class="note">① 최소물량 기준 충족 ② 항공방제는 주거지 비인접일 것 ③ 총비용이 보유 예산 이내일 것 — 세 조건을 모두 만족해야 "적용 가능"으로 표시합니다.
+    적용 가능한 방법 중 총비용이 가장 낮은 방법을 추천합니다.</div>
+  </div>
+</div>
+
+<script>
+const D = CH4_DATA;
+function openModal(){ document.getElementById('modal-bg').classList.add('on'); }
+function closeModal(){ document.getElementById('modal-bg').classList.remove('on'); }
+const fmt = n => n==null||isNaN(n) ? '–' : Math.round(n).toLocaleString('ko-KR');
+
+const els = {
+  area: document.getElementById('in-area'), tree: document.getElementById('in-tree'),
+  budget: document.getElementById('in-budget'), workers: document.getElementById('in-workers'),
+  distance: document.getElementById('in-distance'), days: document.getElementById('in-days'),
+  residential: document.getElementById('in-residential'),
+};
+els.area.value = D.defaults.area_ha; els.tree.value = D.defaults.treeCount;
+els.budget.value = D.defaults.budget_won/10000; els.workers.value = D.defaults.workers;
+els.distance.value = D.defaults.distance_km; els.days.value = D.defaults.targetDays;
+els.residential.checked = D.defaults.nearResidential;
+
+function calcMethod(m, ctx){
+  const qty = m.unit === 'ha' ? ctx.area : ctx.tree;
+  const baseCost = qty * m.unitCost;
+  const overKm = Math.max(0, ctx.distance - D.distanceSurcharge.freeKm);
+  const surcharge = baseCost * (overKm * D.distanceSurcharge.pctPerKm / 100);
+  const totalCost = baseCost + surcharge;
+  const neededWorkers = Math.ceil(qty / (m.dailyCapacityPerWorker * ctx.days));
+  const daysWithCurrentWorkers = Math.ceil(qty / (m.dailyCapacityPerWorker * Math.max(1, ctx.workers)));
+
+  const meetsMinQty = qty >= (m.minQuantity || 0);
+  const meetsResidential = !(m.needsResidentialDistance && ctx.residential);
+  const meetsBudget = totalCost <= ctx.budget;
+  const feasible = meetsMinQty && meetsResidential && meetsBudget;
+
+  return { ...m, qty, totalCost, neededWorkers, daysWithCurrentWorkers, feasible, meetsMinQty, meetsResidential, meetsBudget };
+}
+
+function render(){
+  const ctx = {
+    area: +els.area.value, tree: +els.tree.value, budget: +els.budget.value*10000,
+    workers: +els.workers.value, distance: +els.distance.value, days: +els.days.value,
+    residential: els.residential.checked,
+  };
+  document.getElementById('v-area').textContent = ctx.area+' ha';
+  document.getElementById('v-tree').textContent = fmt(ctx.tree)+' 본';
+  document.getElementById('v-budget').textContent = fmt(ctx.budget/10000)+'만원';
+  document.getElementById('v-workers').textContent = ctx.workers+'명';
+  document.getElementById('v-distance').textContent = ctx.distance+' km';
+  document.getElementById('v-days').textContent = ctx.days+'일';
+
+  const results = D.methods.map(m=>calcMethod(m, ctx));
+  const feasibleResults = results.filter(r=>r.feasible).sort((a,b)=>a.totalCost-b.totalCost);
+  const best = feasibleResults[0];
+
+  const reco = document.getElementById('recobox');
+  if(best){
+    reco.classList.remove('warn');
+    document.getElementById('reco-name').textContent = best.name;
+    document.getElementById('reco-why').innerHTML =
+      `${best.condition}<br>예상비용 <b>${fmt(best.totalCost)}원</b>(예산의 ${(best.totalCost/ctx.budget*100).toFixed(0)}%) ·
+      보유인력 ${ctx.workers}명 기준 약 <b>${best.daysWithCurrentWorkers}일</b> 소요`;
+  } else {
+    reco.classList.add('warn');
+    const cheapest = [...results].sort((a,b)=>a.totalCost-b.totalCost)[0];
+    document.getElementById('reco-name').textContent = '적용 가능한 방법 없음';
+    document.getElementById('reco-why').innerHTML =
+      `현재 조건(예산·주거지 인접·최소물량)에서 적용 가능한 방법이 없습니다. 가장 저렴한 방법은 <b>${cheapest.name}</b>(예상비용 ${fmt(cheapest.totalCost)}원)이지만
+      ${!cheapest.meetsBudget?'예산을 초과':''}${!cheapest.meetsResidential?' 주거지 인접 문제':''}${!cheapest.meetsMinQty?' 최소물량 미달':''}합니다. 예산을 늘리거나 조건을 조정해보세요.`;
+  }
+
+  const kpis = best ? [
+    ['gl','예상 최소비용', fmt(best.totalCost)+'원', best.name],
+    ['t','필요인력', best.neededWorkers+'명', `목표 ${ctx.days}일 내 완료 기준`],
+    ['b','예상 소요일수', best.daysWithCurrentWorkers+'일', `보유인력 ${ctx.workers}명 기준`],
+    ['wa','예산 대비 비율', (best.totalCost/ctx.budget*100).toFixed(0)+'%', '보유 예산 대비'],
+  ] : [['r','적용가능','없음','조건을 조정하세요'],['mu','–','–','–']];
+  document.getElementById('kpi-row').innerHTML = kpis.map(([c,l,v,s])=>
+    `<div class="kpi ${c}"><div class="kl">${l}</div><div class="kv">${v}</div><div class="ks">${s}</div></div>`).join('');
+
+  document.getElementById('compare-tbl').innerHTML =
+    '<tr><th>방법</th><th>기준물량</th><th class="num">단가</th><th class="num">예상비용</th><th class="num">필요인력</th><th class="num">보유인력 기준 소요일수</th><th>적용가능</th></tr>' +
+    results.map(r=>`<tr class="${r.feasible?(best&&r.key===best.key?'best':''):'infeasible'}">
+      <td><b>${r.name}</b><div style="font-size:10.5px;color:var(--mu2)">${r.condition}</div></td>
+      <td class="num">${fmt(r.qty)}${r.unit}</td>
+      <td class="num">${fmt(r.unitCost)}원/${r.unit}</td>
+      <td class="num">${fmt(r.totalCost)}원</td>
+      <td class="num">${r.neededWorkers}명</td>
+      <td class="num">${r.daysWithCurrentWorkers}일</td>
+      <td>${r.feasible?'<span class="pill ok">가능</span>':'<span class="pill no">불가</span>'}</td>
+    </tr>`).join('');
+}
+
+Object.values(els).forEach(el=>el.addEventListener('input', render));
+render();
+</script>
+</body>
+</html>
