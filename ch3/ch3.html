@@ -1,22 +1,394 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>I'mPine — CH3 우선지원 전략 설계</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="../ch1/korea_geo.js"></script>
+<script src="../ch2/data.js"></script>
+<script src="data.js"></script>
 <style>
-body{font-family:'Noto Sans KR',sans-serif;background:#f5f3ee;display:flex;align-items:center;justify-content:center;height:100vh;color:#5e5a50}
-.placeholder{text-align:center}
-.placeholder h2{font-size:28px;color:#2c2a24;margin-bottom:12px;letter-spacing:-.5px}
-.placeholder p{font-size:14px;color:#918b7e;font-family:'JetBrains Mono',monospace}
-.icon{font-size:64px;margin-bottom:20px}
+:root{
+  --gd:#5c1c10;--gm:#8a2c1a;--gl:#c04b3a;--gp:#e0846f;--ga:#fbdad3;
+  --wa:#e67e22;--b:#2a78d6;--t:#1baf7a;--pu:#8b5cf6;
+  --bg:#faf6f4;--sf:#fff;--bd:#ecdcd6;--tx:#2c1e1a;--mu:#6b5a54;--mu2:#94827b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.55}
+.mono{font-family:'JetBrains Mono',monospace}
+.hdr{background:linear-gradient(135deg,var(--gd),var(--gm));padding:12px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 10px rgba(0,0,0,.25);position:sticky;top:0;z-index:999}
+.hdr h1{color:#fff;font-size:20px;font-weight:700}
+.hdr .sub{color:#f5c3b6;font-size:11px}
+.tabs{margin-left:auto;display:flex;gap:6px}
+.tab{padding:7px 15px;border-radius:20px;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.75);font-size:12px;cursor:pointer;background:transparent;transition:.18s;font-family:inherit;display:flex;align-items:center;gap:6px;text-decoration:none}
+.tab .n{font-family:'JetBrains Mono',monospace;font-size:9.5px;opacity:.7}
+.tab.on,.tab:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.8);color:#fff}
+
+.basisbar{position:sticky;top:49px;z-index:998;background:#fde7e1;border-bottom:1px solid var(--bd);
+  padding:7px 24px;display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--gd)}
+.basisbar b{color:var(--gd)}
+.basisbar .infobtn{margin-left:auto;background:#fff;border:1px solid var(--gl);color:var(--gl);
+  border-radius:14px;padding:3px 12px;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.basisbar .infobtn:hover{background:var(--gl);color:#fff}
+.mockbadge{background:var(--gl);color:#fff;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:10px;letter-spacing:.3px}
+.realbadge{background:var(--t);color:#fff;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:10px;letter-spacing:.3px}
+
+.pg{padding:16px 24px 10px;max-width:1420px;margin:0 auto;scroll-margin-top:96px}
+.qhead{display:flex;align-items:baseline;gap:10px;margin:4px 0 14px}
+.qhead h2{font-size:16px;color:var(--gd)}
+.qhead .q{font-size:12px;color:var(--mu);font-style:italic}
+.sec-divider{height:1px;background:var(--bd);max-width:1420px;margin:8px auto 0}
+
+.callout{background:linear-gradient(135deg,#3a0f08,var(--gm));border-radius:12px;padding:16px 20px;margin-bottom:14px;
+  color:#fff;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.callout .big{font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#ffd7cb}
+.callout .tx{font-size:13px;line-height:1.5}
+.callout .badge2{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:5px 12px;font-size:11.5px;margin-left:auto}
+
+.krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--gl)}
+.kpi.wa::before{background:var(--wa)}.kpi.b::before{background:var(--b)}.kpi.t::before{background:var(--t)}.kpi.pu::before{background:var(--pu)}
+.kl{font-size:11px;color:var(--mu);margin-bottom:6px;font-weight:500}
+.kv{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px}
+.ks{font-size:10.5px;color:var(--mu2);margin-top:5px}
+
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.ct{font-size:13.5px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ct .cap{font-size:11px;font-weight:500;color:var(--mu)}
+.tag{font-size:10px;font-weight:500;background:var(--ga);color:var(--gd);padding:2px 8px;border-radius:10px;cursor:help}
+.tag.gray{background:#eee;color:#666}
+.tag.warn{background:#fde8d6;color:#9a4a0a}
+.tag.mock{background:#fde2e1;color:#a33}
+.tag.real{background:#dcf4ea;color:#0f7a52}
+.note{font-size:11px;color:var(--mu);background:#f8f2ef;border-radius:8px;padding:7px 11px;margin-top:8px;line-height:1.6}
+.note b{color:var(--tx)}
+.note.warn{background:#fff3e2;border-left:3px solid var(--wa)}
+.concl{background:#fbe9e3;border-left:4px solid var(--gl);border-radius:8px;padding:12px 15px;margin-top:6px;font-size:12.5px;line-height:1.7}
+.concl .lbl{font-size:10.5px;font-weight:700;color:var(--gl);letter-spacing:.5px;margin-bottom:4px}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.cw{position:relative}
+
+table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
+.rtbl th{background:#f7ece8;text-align:left;padding:6px 9px;font-weight:600;color:var(--mu);border-bottom:2px solid var(--bd)}
+.rtbl td{padding:6px 9px;border-bottom:1px solid #eee}
+.rtbl td.num{text-align:right;font-family:'JetBrains Mono',monospace}
+.rtbl tr:hover td{background:#fdf6f4}
+.rtbl .rk{display:inline-flex;width:18px;height:18px;border-radius:50%;background:var(--gl);color:#fff;
+  align-items:center;justify-content:center;font-size:10px;font-weight:700}
+
+.lmap{width:100%;height:420px;border-radius:8px;background:#f4ebe6}
+.leaflet-container{background:#f4ebe6!important;font-family:'Noto Sans KR'!important}
+.gu-tooltip{background:#241109!important;border:none!important;color:#f5ece6!important;font-size:11.5px!important;padding:8px 11px!important;border-radius:6px!important;line-height:1.6!important}
+.gu-tooltip b{color:#f0a488}
+
+.legend-box{position:absolute;bottom:14px;left:14px;background:rgba(255,255,255,.95);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;font-size:11px;z-index:500;box-shadow:0 2px 8px rgba(0,0,0,.1);max-width:230px}
+.legend-row{display:flex;align-items:center;gap:6px;margin:2px 0}
+.legend-sw{width:13px;height:13px;border-radius:3px;border:1px solid rgba(0,0,0,.15);flex:none}
+.legend-cap{font-size:9.5px;color:var(--mu);margin-top:5px;line-height:1.4}
+
+.chiprow{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.chip{background:#f8f2ef;border:1px solid var(--bd);border-radius:9px;padding:9px 13px;flex:1;min-width:160px}
+.chip .l{font-size:10.5px;color:var(--mu)}
+.chip .v{font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--gd)}
+
+.banner{background:#fff3e2;border:1.5px dashed var(--wa);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start}
+.banner.info{background:#fde7e1;border-color:var(--gl)}
+.banner .ic{font-size:20px}
+.banner .tx{font-size:12px;color:#7a2b13;line-height:1.6}
+
+.policy-card{border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fffdfc}
+.policy-card .ph{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.policy-card .pd{font-size:10.5px;font-weight:700;background:var(--ga);color:var(--gd);padding:2px 9px;border-radius:9px}
+.policy-card .pn{font-size:13.5px;font-weight:700;color:var(--tx)}
+.policy-card .actions{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.policy-card .act{font-size:11px;background:#f2e8e4;border-radius:8px;padding:3px 9px;color:var(--mu)}
+.policy-card .trig{font-size:11px;color:var(--mu2);font-style:italic}
+
+.matrix-quad{position:absolute;font-size:10.5px;font-weight:700;color:var(--mu2);pointer-events:none}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;padding:40px 20px;overflow-y:auto}
+.modal-bg.on{display:block}
+.modal{background:#fff;max-width:900px;margin:0 auto;border-radius:14px;padding:24px 28px;position:relative}
+.modal h3{font-size:16px;margin-bottom:12px;color:var(--gd)}
+.modal .close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu)}
+.modal hr{border:none;border-top:1px solid var(--bd);margin:18px 0}
 </style>
 </head>
 <body>
-<div class="placeholder">
-  <div class="icon">🎯</div>
-  <h2>CH.3 — 우선지원 전략 설계</h2>
-  <p>취약도 지수 기반 우선지원 · 맞춤형 방제정책 매칭 · 지원 효과 시뮬레이션</p>
-  <p style="margin-top:8px;color:#c04b3a">다음 단계에서 구현 예정</p>
+
+<div class="hdr">
+  <h1>🌲 I'mPine</h1>
+  <div class="sub">우선지원 전략 설계 · CH3</div>
+  <div class="tabs">
+    <a class="tab" href="#sec01" data-i="0"><span class="n">01</span> 우선지원 대상 선정</a>
+    <a class="tab" href="#sec02" data-i="1"><span class="n">02</span> 맞춤형 정책 매칭</a>
+    <a class="tab" href="#sec03" data-i="2"><span class="n">03</span> 산업기반·실행가능성</a>
+    <a class="tab" href="#sec04" data-i="3"><span class="n">04</span> 지원효과 시뮬레이션</a>
+  </div>
 </div>
+<div class="basisbar">
+  <span class="mockbadge">MOCK</span> 01·02·04 (CH2 결과 대기)
+  <span class="realbadge">REAL</span> 03 (2025년 산림산업조사)
+  이 대시보드는 틀만 구성한 것입니다. CH2가 실측으로 바뀌면 01·02·04는 자동으로 갱신됩니다.
+  <button class="infobtn" onclick="openModal()">ⓘ 데이터 출처 및 해상도 주의</button>
+</div>
+
+<!-- ══════════ SECTION 01 · 우선지원 대상 선정 ══════════ -->
+<section class="pg" id="sec01">
+  <div class="qhead"><h2>01. 우선지원 대상 선정</h2><span class="q">어디부터 지원해야 하는가?</span></div>
+
+  <div class="krow" id="kpi-row-01"></div>
+
+  <div class="card" style="position:relative">
+    <div class="ct">우선지원 순위 지도 <span class="cap">취약성지수 − 배분갭</span></div>
+    <div class="g3">
+      <div style="position:relative"><div id="mapPriority" class="lmap" style="height:400px"></div>
+        <div class="legend-box" id="legPriority"></div></div>
+      <div><table class="rtbl" id="top15-priority-tbl"></table></div>
+    </div>
+    <div class="note">순위 = 취약성지수가 높을수록, 배분갭이 과소배분(음수)일수록 높아지도록 계산한 목업 점수입니다. 참고로 산림청이 실제 지정한 특별방제구역은 <b id="special-zone-ref">–</b>곳입니다.</div>
+  </div>
+
+  <div class="concl"><div class="lbl">해석</div><b>(목업)</b> CH2의 취약성지수·배분갭이 실측으로 바뀌면 이 순위도 바로 갱신됩니다. 지금은 계산 로직이 맞게 작동하는지 확인하는 용도입니다.</div>
+</section>
+<div class="sec-divider"></div>
+
+<!-- ══════════ SECTION 02 · 맞춤형 정책 매칭 ══════════ -->
+<section class="pg" id="sec02">
+  <div class="qhead"><h2>02. 맞춤형 정책 매칭</h2><span class="q">무엇을 지원해야 하는가?</span></div>
+
+  <div class="card">
+    <div class="ct">정책 카탈로그 <span class="tag real">확정본 · 실측</span></div>
+    <div id="policy-catalog-body"></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ct">우세 도메인별 시군구 분포 <span class="cap">어떤 원인이 가장 흔한가</span></div>
+      <div class="cw" style="height:240px"><canvas id="c_dominantDomain"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">우선지원 TOP15 정책 매칭 <span class="cap">시군구별 추천 정책</span></div>
+      <table class="rtbl" id="policy-match-tbl"></table>
+    </div>
+  </div>
+
+  <div class="note">산업기반부족형(업계 육성 연계 지원)은 취약성지수 상위이면서, 관할 시도의 정부지원필요도 평균이 3.2점 이상이거나 지원사업 참여경험이 0.5% 이하인 경우로 판정합니다.</div>
+
+  <div class="concl"><div class="lbl">해석</div><b>(목업)</b> 실측 도메인 분포가 나오면 어떤 정책 트랙이 가장 많이 필요한지로 문장을 다시 씁니다.</div>
+</section>
+<div class="sec-divider"></div>
+
+<!-- ══════════ SECTION 03 · 산업기반·실행가능성 진단 ══════════ -->
+<section class="pg" id="sec03">
+  <div class="qhead"><h2>03. 산업기반·실행가능성 진단</h2><span class="q">지원해도 실행할 수 있는 여건인가?</span></div>
+
+  <div class="banner info">
+    <div class="ic">📊</div>
+    <div class="tx">이 탭은 <b>실측 데이터</b>입니다 (산림청 『2025년 산림산업조사(2024년 기준)』). 다만 <b>시도(17개 광역) 단위</b>까지만 공개되어
+    CH2의 229개 시군구보다 거친 해상도입니다. 시군구별 값은 관할 시도 값을 그대로 적용한 근사치이니, 시군구 간 세부 차이는 반영되지 못합니다.</div>
+  </div>
+
+  <div class="krow" id="kpi-row-03"></div>
+
+  <div class="card">
+    <div class="ct">실행가능성 매트릭스 <span class="cap">취약성지수 × 정부지원필요도(관할 시도)</span></div>
+    <div class="cw" style="height:340px;position:relative"><canvas id="c_feasibilityMatrix"></canvas></div>
+    <div class="note">1사분면(우상단)=취약성 높음·지원필요도 높음 → <b>즉시 지원</b> / 2사분면(좌상단)=취약성 낮음·필요도 높음 → <b>모니터링</b> /
+    3사분면(좌하단)=취약성 낮음·필요도 낮음 → <b>저우선</b> / 4사분면(우하단)=취약성 높음·필요도 낮음 → <b>역량구축 우선</b> (필요도 인식 자체가 낮아 정책 접근성부터 높여야 함)</div>
+  </div>
+
+  <div class="card">
+    <div class="ct">시도별 산업기반 현황 <span class="tag real">실측 · 2025년 산림산업조사</span></div>
+    <table class="rtbl" id="industry-tbl"></table>
+  </div>
+</section>
+<div class="sec-divider"></div>
+
+<!-- ══════════ SECTION 04 · 지원효과 시뮬레이션 ══════════ -->
+<section class="pg" id="sec04">
+  <div class="qhead"><h2>04. 지원효과 시뮬레이션</h2><span class="q">지원하면 얼마나 효과가 있을까?</span></div>
+
+  <div class="banner">
+    <div class="ic">⏳</div>
+    <div class="tx" id="sim-status"></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">대기 중</div>
+    <div class="note" id="sim-note"></div>
+  </div>
+</section>
+
+<!-- 데이터 출처 및 해상도 주의 모달 -->
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="close" onclick="closeModal()">×</button>
+    <h3>데이터 출처 및 해상도 주의</h3>
+    <div class="note warn"><b>01·02·04는 목업, 03은 실측입니다.</b> CH2 병합·모델링이 끝나면 01·02·04도 자동으로 실측 결과를 반영합니다.</div>
+    <hr>
+    <div class="ct">해상도 불일치 주의</div>
+    <div class="note" id="modal-resolution"></div>
+    <hr>
+    <div class="ct">데이터 출처</div>
+    <div class="note" id="modal-source"></div>
+    <hr>
+    <div class="ct">정책 매칭 판정 기준</div>
+    <div class="note">각 시군구의 4개 도메인 점수 중 최댓값을 "우세 도메인"으로 보고 해당 정책 트랙을 매칭합니다. 단, 취약성지수 상위이면서 관할 시도의 산업기반 여건이 취약한 경우(정부지원필요도 평균 ≥3.2 또는 참여경험 ≤0.5%)는 산업기반부족형으로 우선 분류합니다.</div>
+  </div>
+</div>
+
+<script>
+const D = CH3_DATA;
+function openModal(){ document.getElementById('modal-bg').classList.add('on'); }
+function closeModal(){ document.getElementById('modal-bg').classList.remove('on'); }
+const fmt = n => n==null||isNaN(n) ? '–' : Number(n).toLocaleString('ko-KR');
+
+// ── 스크롤 네비게이션 ──────────────────────────────────────────────────────
+const navTabs = document.querySelectorAll('.tab');
+navTabs.forEach(a=>a.addEventListener('click', e=>{
+  e.preventDefault();
+  document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth', block:'start'});
+}));
+const sections = ['sec01','sec02','sec03','sec04'].map(id=>document.getElementById(id));
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      const idx = sections.indexOf(en.target);
+      navTabs.forEach((t,i)=>t.classList.toggle('on', i===idx));
+    }
+  });
+}, {rootMargin:'-100px 0px -70% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+let mapPriority;
+window.addEventListener('load', ()=> setTimeout(()=>{ mapPriority&&mapPriority.invalidateSize(); }, 200));
+
+const NO_CH2 = D.prioritySggList.length === 0;
+
+// ═══════════════════════ SECTION 01 ═══════════════════════
+document.getElementById('special-zone-ref').textContent = D.meta.special_zone_ref;
+
+if(NO_CH2){
+  document.getElementById('kpi-row-01').innerHTML = `<div class="note warn">CH2_DATA를 불러오지 못했습니다 — ch2/data.js가 같은 프로젝트 안에 있는지 확인하세요.</div>`;
+} else {
+  const top15N = Math.max(1, Math.round(D.prioritySggList.length * 0.1));
+  const kpis01 = [
+    ['gl','우선지원 대상 시군구', top15N+'개', '전체의 상위 10% (목업 기준)'],
+    ['wa','산출 기준', '취약성지수 − 배분갭', '취약할수록 · 과소배분일수록 상위'],
+    ['b','참고 규모', D.meta.special_zone_ref+'곳', '산림청 실제 특별방제구역 지정 개수'],
+    ['t','CH2 연동', D.meta.ch2_linked?'연결됨':'미연결', 'ch2/data.js를 직접 로드해서 계산'],
+  ];
+  document.getElementById('kpi-row-01').innerHTML = kpis01.map(([c,l,v,s])=>
+    `<div class="kpi ${c}"><div class="kl">${l}</div><div class="kv">${v}</div><div class="ks">${s}</div></div>`).join('');
+
+  const priMap = {}; D.prioritySggList.forEach(r=>priMap[r.sgg_cd]=r);
+  const ORRD = ['#fbe0da','#f2b3a2','#e37f63','#c9503a','#8f2a17'];
+  function quantileColor(v, arr, colors){
+    if(v==null||isNaN(v)) return '#eeeeee';
+    const sorted=[...arr].sort((a,b)=>a-b);
+    const q=[0.2,0.4,0.6,0.8].map(p=>sorted[Math.floor(p*sorted.length)]);
+    let i=0; while(i<q.length && v>q[i]) i++;
+    return colors[i];
+  }
+  const priorityVals = D.prioritySggList.map(r=>r.priority_score);
+  function stylePriority(f){
+    const b = priMap[f.properties.code];
+    if(!b) return {fillColor:'#e3e3e3', weight:.5, color:'#bbb', fillOpacity:.5};
+    return {fillColor: quantileColor(b.priority_score, priorityVals, ORRD), weight:.5, color:'#999', fillOpacity:.85};
+  }
+  mapPriority = L.map('mapPriority',{scrollWheelZoom:false}).setView([36.3,127.8],7);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:12}).addTo(mapPriority);
+  const geoPriority = (typeof KOREA_GEO!=='undefined') ? L.geoJSON(KOREA_GEO,{style:stylePriority, onEachFeature:(f,l)=>{
+      const b = priMap[f.properties.code];
+      l.bindTooltip(b ? `<b>${b.시도명} ${b.시군구명}</b><br>순위 ${b.priority_rank}/${D.prioritySggList.length}<br>취약성지수 ${b.index_main.toFixed(3)} · 배분갭 ${b.배분갭!=null?b.배분갭.toFixed(2):'–'}<br>추천정책: <b>${b.recommended_policy}</b>`
+        : `<b>${f.properties.name}</b><br>분석대상 아님`, {className:'gu-tooltip', sticky:true});
+      l.on({mouseover:e=>e.target.setStyle({weight:2,color:'#222'}), mouseout:e=>l.setStyle(stylePriority(f))});
+    }}).addTo(mapPriority) : null;
+  document.getElementById('legPriority').innerHTML = `<b>우선지원 순위 점수</b>` +
+    ORRD.map((c,i)=>`<div class="legend-row"><span class="legend-sw" style="background:${c}"></span>${i===0?'낮음(후순위)':i===ORRD.length-1?'높음(최우선)':''}</div>`).join('') +
+    `<div class="legend-cap">취약성지수 − 배분갭 기준 5분위</div>`;
+
+  const top15 = D.prioritySggList.slice(0, 15);
+  document.getElementById('top15-priority-tbl').innerHTML =
+    '<tr><th>순위</th><th>시군구</th><th class="num">취약성지수</th><th>추천정책</th></tr>' +
+    top15.map(r=>`<tr><td><span class="rk">${r.priority_rank}</span></td><td>${r.시도명} ${r.시군구명}</td>
+      <td class="num">${r.index_main.toFixed(3)}</td><td>${r.recommended_policy}</td></tr>`).join('');
+}
+
+// ═══════════════════════ SECTION 02 ═══════════════════════
+const DOMAIN_LABEL = { dom_노출도:'노출도', dom_기후위험도:'기후위험도', dom_지자체역량_역:'지자체대응역량(역)', dom_인위적확산:'인위적확산' };
+document.getElementById('policy-catalog-body').innerHTML = D.policyCatalog.map(p=>`
+  <div class="policy-card">
+    <div class="ph"><span class="pd">${p.domain}</span><span class="pn">${p.policy}</span></div>
+    <div class="actions">${p.actions.map(a=>`<span class="act">${a}</span>`).join('')}</div>
+    <div class="trig">적용 기준: ${p.trigger} · 근거: ${p.evidence}</div>
+  </div>`).join('');
+
+if(!NO_CH2){
+  const domCounts = {};
+  D.prioritySggList.forEach(r=>{ domCounts[r.dominant_domain] = (domCounts[r.dominant_domain]||0)+1; });
+  const domKeys = Object.keys(DOMAIN_LABEL);
+  new Chart(document.getElementById('c_dominantDomain').getContext('2d'),{type:'doughnut',data:{
+    labels: domKeys.map(k=>DOMAIN_LABEL[k]),
+    datasets:[{data: domKeys.map(k=>domCounts[k]||0), backgroundColor:['#c04b3a','#2a78d6','#8b5cf6','#e67e22'], borderWidth:2, borderColor:'#fff'}]},
+    options:{plugins:{legend:{position:'bottom',labels:{boxWidth:11,font:{size:10}}}}}
+  });
+
+  const top15b = D.prioritySggList.slice(0, 15);
+  document.getElementById('policy-match-tbl').innerHTML =
+    '<tr><th>시군구</th><th>우세 도메인</th><th>추천 정책</th></tr>' +
+    top15b.map(r=>`<tr><td><b>${r.시도명} ${r.시군구명}</b></td><td>${DOMAIN_LABEL[r.dominant_domain]||r.dominant_domain}</td><td>${r.recommended_policy}</td></tr>`).join('');
+}
+
+// ═══════════════════════ SECTION 03 ═══════════════════════
+const avgNeed = +(D.industryBySido.reduce((s,r)=>s+r.정부지원필요도_평균,0)/D.industryBySido.length).toFixed(2);
+const avgParticipate = +(D.industryBySido.reduce((s,r)=>s+r.참여경험_있음비율,0)/D.industryBySido.length).toFixed(1);
+const avgDomestic = +(D.industryBySido.reduce((s,r)=>s+r.애로_국내판매비율,0)/D.industryBySido.length).toFixed(1);
+const kpis03 = [
+  ['gl','조사 단위', D.meta.n_sido+'개 시도', '2025년 산림산업조사(2024년 기준)'],
+  ['wa','정부지원필요도 평균', avgNeed+'점', '5점 척도, 10개 항목 평균'],
+  ['b','지원사업 참여경험', avgParticipate+'%', '전국 평균 — 매우 낮음(접근성 이슈)'],
+  ['t','국내판매 애로 비율', avgDomestic+'%', '영위 시 어려운 분야 중 응답률'],
+];
+document.getElementById('kpi-row-03').innerHTML = kpis03.map(([c,l,v,s])=>
+  `<div class="kpi ${c}"><div class="kl">${l}</div><div class="kv">${v}</div><div class="ks">${s}</div></div>`).join('');
+
+if(!NO_CH2 && D.feasibilityMatrix.length){
+  const xs = D.feasibilityMatrix.map(r=>r.x_취약성);
+  const ys = D.feasibilityMatrix.map(r=>r.y_산업지원필요도).filter(v=>v!=null);
+  const xMid = xs.reduce((a,b)=>a+b,0)/xs.length;
+  const yMid = ys.reduce((a,b)=>a+b,0)/ys.length;
+  new Chart(document.getElementById('c_feasibilityMatrix').getContext('2d'),{type:'scatter',data:{
+    datasets:[{label:'시군구', data: D.feasibilityMatrix.map(r=>({x:r.x_취약성, y:r.y_산업지원필요도, nm:r.시도명+' '+r.시군구명})),
+      backgroundColor:'#c04b3aaa', pointRadius:4}]},
+    options:{plugins:{legend:{display:false},tooltip:{callbacks:{
+      label:ctx=>`${ctx.raw.nm}: 취약성 ${ctx.raw.x.toFixed(3)}, 지원필요도 ${ctx.raw.y!=null?ctx.raw.y.toFixed(2):'–'}`}},
+      annotation:{}},
+    scales:{x:{title:{display:true,text:'취약성지수'}}, y:{title:{display:true,text:'관할 시도 정부지원필요도 평균(점)'}}}}
+  });
+}
+
+document.getElementById('industry-tbl').innerHTML =
+  '<tr><th>시도</th><th class="num">사업체 수</th><th class="num">정부지원필요도(5점)</th><th class="num">국내판매 애로(%)</th><th class="num">지원사업 참여경험(%)</th><th class="num">판로개척 희망(%)</th></tr>' +
+  [...D.industryBySido].sort((a,b)=>b.정부지원필요도_평균-a.정부지원필요도_평균).map(r=>
+  `<tr><td><b>${r.시도명}</b></td><td class="num">${fmt(r.사업체수)}</td><td class="num">${r.정부지원필요도_평균}</td>
+    <td class="num">${r.애로_국내판매비율}</td><td class="num">${r.참여경험_있음비율}</td><td class="num">${r.희망_판로개척비율}</td></tr>`).join('');
+
+// ═══════════════════════ SECTION 04 ═══════════════════════
+document.getElementById('sim-status').innerHTML = `<b>${D.simulation.status}</b>`;
+document.getElementById('sim-note').textContent = D.simulation.note;
+
+// ═══════════════════════ 모달 ═══════════════════════
+document.getElementById('modal-resolution').textContent = D.meta.resolution_note;
+document.getElementById('modal-source').innerHTML = `${D.meta.source}<br>${D.meta.priority_note}`;
+</script>
 </body>
 </html>

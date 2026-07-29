@@ -10,7 +10,7 @@
   --bg:#f5f3ee; --bg2:#ffffff; --bg3:#ede9e1;
   --border:rgba(88,72,48,.08); --border2:rgba(88,72,48,.18);
   --text:#2c2a24; --text2:#5e5a50; --text3:#918b7e;
-  --green:#3a9a6e; --amber:#b8860b; --red:#c04b3a;
+  --green:#3a9a6e; --amber:#b8860b; --red:#c04b3a; --blue:#2a78d6;
   --pine:#2d6b3f;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -31,6 +31,8 @@ nav.tabs{display:flex;gap:6px;margin-left:auto}
 .tab.amber.active .num{color:#fff;background:var(--amber);border-color:var(--amber)}
 .tab.red.active{border-color:var(--red);background:rgba(192,75,58,.12);color:var(--red)}
 .tab.red.active .num{color:#fff;background:var(--red);border-color:var(--red)}
+.tab.blue.active{border-color:var(--blue);background:rgba(42,120,214,.12);color:var(--blue)}
+.tab.blue.active .num{color:#fff;background:var(--blue);border-color:var(--blue)}
 .frames{flex:1;position:relative;overflow:hidden}
 iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg);display:none}
 iframe.active{display:block}
@@ -43,12 +45,14 @@ iframe.active{display:block}
     <div class="tab green active" onclick="show(0)"><span class="num">CH.1</span>발생 현황</div>
     <div class="tab amber" onclick="show(1)"><span class="num">CH.2</span>취약도 분석</div>
     <div class="tab red" onclick="show(2)"><span class="num">CH.3</span>우선지원 전략</div>
+    <div class="tab blue" onclick="show(3)"><span class="num">CH.4</span>맞춤형 방제 설계</div>
   </nav>
 </header>
 <div class="frames">
   <iframe id="f0" class="active" src="ch1/ch1.html"></iframe>
   <iframe id="f1" data-src="ch2/ch2.html"></iframe>
   <iframe id="f2" data-src="ch3/ch3.html"></iframe>
+  <iframe id="f3" data-src="ch4/ch4.html"></iframe>
 </div>
 <script>
 function show(i){
