@@ -1,0 +1,165 @@
+# -*- coding: utf-8 -*-
+"""
+모형 B - 3단계: 배분공식 시뮬레이션
+설계 원칙:
+  - 배분기준(설명변수)은 1단계와 동일하게 "위험지수"(역량도메인 제외) 사용
+    -> 역량(=현재예산 반영)을 기준으로 미래예산을 정하면 현재 배분관행이 그대로 고착됨(순환).
+  - 실무제약: (a) 소규모/저위험 지자체 하한(최소 배분비율), (b) 전년 대비 증감률 상한(예산 충격 방지)
+  - 총 배분액(pool)은 실제 지출 총액과 동일하게 유지 - "재배분" 시뮬레이션이지 증액 시뮬레이션이 아님.
+  - 검증: 2단계(예산의 인과적 한계효과)를 보류했으므로, 여기서는 "이 공식이 실제 피해발생 지역에
+    돈을 더 많이 보냈을 것인가"라는 타겟팅/안면타당성만 확인. 인과적 피해감소효과 주장 아님.
+입력: output/모델링/방제취약성지수_산출결과.csv, output/CH2_전체병합패널_5도메인_2016_2023.csv
+출력: output/모델링/배분공식_시뮬레이션결과.csv, 배분공식_로그.txt
+"""
+import numpy as np
+import pandas as pd
+from scipy import stats
+
+pd.set_option("display.width", 200)
+pd.set_option("display.max_columns", 50)
+
+OUTDIR = "/Users/chanhaeng17/Desktop/최종 CH2 EDA/병합패널/output"
+MODELDIR = f"{OUTDIR}/모델링"
+PANEL = f"{OUTDIR}/CH2_전체병합패널_5도메인_2016_2023.csv"
+IDXFILE = f"{MODELDIR}/방제취약성지수_산출결과.csv"
+
+BUDGET_WON = "대응자원투입예산_원_재선충명시"
+FLOOR_RATIO = 0.30   # 지자체 하한 = 균등배분액(1/N)의 30%
+CAP_RATE = 0.30      # 전년 대비 증감률 상한 ±30%
+
+LOG = []
+def log(msg):
+    print(msg)
+    LOG.append(str(msg))
+
+# =========================================================
+# 1. 데이터 결합
+# =========================================================
+panel = pd.read_csv(PANEL)[["연도", "시도", "시군구", BUDGET_WON, "log_피해밀도_본per_ha"]]
+idx = pd.read_csv(IDXFILE)[["연도", "시도", "시군구", "노출도_점수", "기후위험도_점수", "인위적확산_점수", "Y_bin"]]
+df = idx.merge(panel, on=["연도", "시도", "시군구"], how="left")
+df["위험지수"] = df[["노출도_점수", "기후위험도_점수", "인위적확산_점수"]].mean(axis=1)
+
+main = df[df["연도"].between(2017, 2022)].dropna(subset=[BUDGET_WON]).copy()
+log(f"[시뮬레이션 표본] {main.shape}, 연도범위 2017-2022, 시군구수 {main['시도'].str.cat(main['시군구']).nunique()}")
+main["key"] = main["시도"] + main["시군구"]
+
+# =========================================================
+# 2. 연도별 공식 배분 시뮬레이션 (순차적, 전년도 기준 증감률 상한 적용)
+# =========================================================
+years = sorted(main["연도"].unique())
+all_units = sorted(main["key"].unique())
+
+# 초기 기준(2016 실제예산, 없으면 0) - 2017년의 "전년도" 역할
+panel_all = pd.read_csv(PANEL)
+panel_all["key"] = panel_all["시도"] + panel_all["시군구"]
+prev_actual = panel_all[panel_all["연도"] == 2016].set_index("key")[BUDGET_WON].reindex(all_units).fillna(0.0)
+sim_prev = prev_actual.copy()
+
+records = []
+floor_bind_count = 0
+cap_bind_count = 0
+total_n = 0
+
+for y in years:
+    yr = main[main["연도"] == y].set_index("key").reindex(all_units)
+    pool = yr[BUDGET_WON].sum(skipna=True)
+    n = yr[BUDGET_WON].notna().sum()
+
+    risk = yr["위험지수"]
+    risk_norm = (risk - risk.min()) / (risk.max() - risk.min())  # [0,1] within-year min-max
+    risk_norm = risk_norm.fillna(risk_norm.mean())
+
+    raw_share = risk_norm / risk_norm.sum()
+    target = raw_share * pool
+
+    floor_amt = FLOOR_RATIO * (pool / n)
+    step1 = target.clip(lower=floor_amt)
+    n_floor = (target < floor_amt).sum()
+
+    lower_cap = sim_prev * (1 - CAP_RATE)
+    upper_cap = sim_prev * (1 + CAP_RATE)
+    # 전년도 0원인 단위는 상한만 의미있게 적용(하한 0으로 두되 floor_amt가 이미 최소치 보장)
+    upper_cap = upper_cap.where(sim_prev > 0, np.inf)
+    step2 = step1.clip(lower=lower_cap, upper=upper_cap)
+    step2 = step2.clip(lower=floor_amt)  # 하한 재보장
+    n_cap = ((step1 > upper_cap) | (step1 < lower_cap)).sum()
+
+    # 총액을 pool에 정확히 재일치(비례 재조정)
+    step2 = step2 * (pool / step2.sum())
+
+    floor_bind_count += n_floor
+    cap_bind_count += n_cap
+    total_n += n
+
+    for u in all_units:
+        records.append({
+            "key": u, "연도": y,
+            "실제예산": yr.loc[u, BUDGET_WON],
+            "시뮬예산": step2.loc[u],
+            "위험지수": risk.loc[u],
+            "Y": yr.loc[u, "log_피해밀도_본per_ha"],
+            "Y_bin": yr.loc[u, "Y_bin"],
+        })
+    sim_prev = step2
+
+sim = pd.DataFrame(records)
+sim = sim.merge(main[["key", "연도"]].drop_duplicates().assign(_in=1), on=["key", "연도"], how="left")
+sim = sim[sim["_in"] == 1].drop(columns="_in")
+key_to_region = main[["key", "시도", "시군구"]].drop_duplicates(subset="key").set_index("key")
+sim["시도"] = sim["key"].map(key_to_region["시도"])
+sim["시군구"] = sim["key"].map(key_to_region["시군구"])
+
+log(f"\n[제약 발동 빈도] 하한(floor) 발동: {floor_bind_count}/{total_n}건 ({floor_bind_count/total_n*100:.1f}%), "
+    f"상한(cap) 발동: {cap_bind_count}/{total_n}건 ({cap_bind_count/total_n*100:.1f}%)")
+
+# =========================================================
+# 3. 총 재배분 규모
+# =========================================================
+sim["diff"] = sim["시뮬예산"] - sim["실제예산"]
+realloc_by_year = sim.groupby("연도").apply(lambda g: g["diff"].clip(lower=0).sum(), include_groups=False)
+pool_by_year = sim.groupby("연도")["실제예산"].sum()
+log("\n=== 연도별 재배분 규모 (총 pool 대비 이동 비율) ===")
+for y in years:
+    log(f"  {y}: 이동액 {realloc_by_year[y]:,.0f}원 / 총액 {pool_by_year[y]:,.0f}원 = {realloc_by_year[y]/pool_by_year[y]*100:.1f}%")
+
+# =========================================================
+# 4. 타겟팅 검증: 실제 피해발생 지역 포착률 (인과 아님, 안면타당성)
+# =========================================================
+log("\n=== 피해발생(Y_bin=1) 지역이 받은 예산 비중: 실제 배분 vs 시뮬 배분 ===")
+for y in years:
+    yr = sim[sim["연도"] == y]
+    pos = yr[yr["Y_bin"] == 1]
+    tot_actual = yr["실제예산"].sum()
+    tot_sim = yr["시뮬예산"].sum()
+    cap_actual = pos["실제예산"].sum() / tot_actual if tot_actual > 0 else np.nan
+    cap_sim = pos["시뮬예산"].sum() / tot_sim if tot_sim > 0 else np.nan
+    log(f"  {y}: 피해발생지역 수={len(pos)}/{len(yr)}  실제배분 포착률={cap_actual*100:.1f}%  시뮬배분 포착률={cap_sim*100:.1f}%")
+
+overall_actual = sim.loc[sim["Y_bin"] == 1, "실제예산"].sum() / sim["실제예산"].sum()
+overall_sim = sim.loc[sim["Y_bin"] == 1, "시뮬예산"].sum() / sim["시뮬예산"].sum()
+log(f"\n[전체기간 합산] 실제배분 포착률={overall_actual*100:.1f}%  시뮬배분 포착률={overall_sim*100:.1f}%")
+
+r_actual = stats.spearmanr(sim["실제예산"], sim["Y"]).correlation
+r_sim = stats.spearmanr(sim["시뮬예산"], sim["Y"]).correlation
+log(f"\n[Spearman 상관: 예산 vs 실제피해밀도] 실제배분={r_actual:.3f}  시뮬배분={r_sim:.3f}")
+
+# =========================================================
+# 5. 마지막 연도(2022) 기준 승자/패자 Top 10
+# =========================================================
+last = sim[sim["연도"] == 2022].copy()
+last["변화율(%)"] = np.where(last["실제예산"] > 0, last["diff"] / last["실제예산"] * 100, np.nan)
+log("\n=== 2022년 기준 시뮬레이션 vs 실제 - 증액 Top 10 ===")
+log(last.sort_values("diff", ascending=False).head(10)[["시도", "시군구", "위험지수", "실제예산", "시뮬예산", "diff"]]
+    .round(0).to_string(index=False))
+log("\n=== 2022년 기준 시뮬레이션 vs 실제 - 감액 Top 10 ===")
+log(last.sort_values("diff").head(10)[["시도", "시군구", "위험지수", "실제예산", "시뮬예산", "diff"]]
+    .round(0).to_string(index=False))
+
+# =========================================================
+# 저장
+# =========================================================
+sim.to_csv(f"{MODELDIR}/배분공식_시뮬레이션결과.csv", index=False, encoding="utf-8-sig")
+with open(f"{MODELDIR}/배분공식_로그.txt", "w", encoding="utf-8") as f:
+    f.write("\n".join(LOG))
+log(f"\n저장 완료: {MODELDIR}/배분공식_시뮬레이션결과.csv, {MODELDIR}/배분공식_로그.txt")

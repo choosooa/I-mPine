@@ -1,0 +1,122 @@
+# -*- coding: utf-8 -*-
+"""
+모형 B - 1단계: 배분갭 진단 (현재 예산배분 vs 취약성/위험 회귀)
+설계 원칙:
+  - 지자체대응역량(예산) 도메인은 종속변수(예산) 자체와 겹치므로, 진단용 설명변수는
+    "위험지수"(노출도+기후위험도+인위적확산, 역량도메인 제외)만 사용 -> 순환논리 회피.
+  - 주 분석: 지자체 평균(between, 2017-2022) 회귀 - "이 지자체는 평균적으로 위험 대비
+    예산을 얼마나 받는가"를 묻는 설계이므로 between이 자연스러움.
+  - 보조 분석: 연도FE+군집표준오차 패널 회귀로 between 결과가 특정 연도 쏠림이 아닌지 확인.
+  - 잔차 해석 주의: "현행 평균 배분관행 대비 편차"이지 "최적 대비 부족"이 아님.
+입력: output/CH2_전체병합패널_5도메인_2016_2023.csv, output/모델링/방제취약성지수_산출결과.csv
+출력: output/모델링/배분갭_진단결과.csv, 배분갭_로그.txt
+"""
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+
+pd.set_option("display.width", 200)
+pd.set_option("display.max_columns", 50)
+
+OUTDIR = "/Users/chanhaeng17/Desktop/최종 CH2 EDA/병합패널/output"
+MODELDIR = f"{OUTDIR}/모델링"
+PANEL = f"{OUTDIR}/CH2_전체병합패널_5도메인_2016_2023.csv"
+IDXFILE = f"{MODELDIR}/방제취약성지수_산출결과.csv"
+
+LOG = []
+def log(msg):
+    print(msg)
+    LOG.append(str(msg))
+
+BUDGET = "대응자원투입예산_소나무림ha당_log_재선충명시"
+
+# =========================================================
+# 1. 데이터 결합
+# =========================================================
+panel = pd.read_csv(PANEL)[["연도", "시도", "시군구", BUDGET]]
+idx = pd.read_csv(IDXFILE)
+df = idx.merge(panel, on=["연도", "시도", "시군구"], how="left")
+log(f"[결합 후] {df.shape}, 예산결측: {df[BUDGET].isna().sum()}")
+
+df = df.dropna(subset=[BUDGET]).copy()
+log(f"[예산 결측 제외 후] {df.shape}")
+
+# =========================================================
+# 2. 위험지수(역량도메인 제외) 구성 - 순환논리 회피
+# =========================================================
+RISK_DOMAINS = ["노출도_점수", "기후위험도_점수", "인위적확산_점수"]
+df["위험지수_동일가중"] = df[RISK_DOMAINS].mean(axis=1)
+
+# 앞서 모형A에서 추정한 LMG 비중 재사용(2017-2020 훈련, 노출도/기후위험도/인위적확산)
+LMG_W = {"노출도_점수": 0.4550, "기후위험도_점수": 0.0070, "인위적확산_점수": 0.5380}  # final_modeling.py 결과 재사용
+w_sum = sum(LMG_W.values())
+LMG_W = {k: v / w_sum for k, v in LMG_W.items()}
+df["위험지수_실증가중"] = sum(LMG_W[d] * df[d] for d in RISK_DOMAINS)
+
+log(f"\n[위험지수 vs 취약성지수(역량포함) 상관] "
+    f"동일가중: {df[['위험지수_동일가중','취약성지수_동일가중']].corr().iloc[0,1]:.3f}, "
+    f"실증가중: {df[['위험지수_실증가중','취약성지수_실증가중']].corr().iloc[0,1]:.3f}")
+
+# 주 분석 표본: 메인 2017-2022 (2016·2023 제외, 기존 정의와 일관)
+main = df[df["연도"].between(2017, 2022)].copy()
+log(f"\n[주 분석표본 2017-2022] {main.shape}, 시군구 수: {main['시군구'].nunique()}")
+
+# =========================================================
+# 3. 지자체 평균(between) 회귀 - 주 분석
+# =========================================================
+gm = main.groupby(["시도", "시군구"]).agg(
+    평균예산=(BUDGET, "mean"),
+    평균위험_동일가중=("위험지수_동일가중", "mean"),
+    평균위험_실증가중=("위험지수_실증가중", "mean"),
+    n연도=(BUDGET, "size"),
+).reset_index()
+log(f"\n[지자체 평균 표본] n={len(gm)}")
+
+def run_between(y, x, label):
+    X = sm.add_constant(gm[x])
+    m = sm.OLS(gm[y], X).fit(cov_type="HC3")
+    log(f"\n----- {label} (between, n={len(gm)}) -----")
+    log(m.summary2().tables[1].round(4).to_string())
+    log(f"  R² = {m.rsquared:.4f}")
+    return m
+
+m_equal = run_between("평균예산", "평균위험_동일가중", "예산 ~ 위험지수(동일가중)")
+m_lmg = run_between("평균예산", "평균위험_실증가중", "예산 ~ 위험지수(실증가중)")
+
+gm["예측예산_동일가중"] = m_equal.predict(sm.add_constant(gm["평균위험_동일가중"]))
+gm["배분갭_동일가중"] = gm["평균예산"] - gm["예측예산_동일가중"]
+gm["배분갭_순위"] = gm["배분갭_동일가중"].rank()  # 낮을수록 위험 대비 예산 부족
+
+log("\n=== 배분갭 하위 15개 (위험 대비 예산 '부족' 후보 - 현재 배분관행 대비) ===")
+under = gm.sort_values("배분갭_동일가중").head(15)[
+    ["시도", "시군구", "평균위험_동일가중", "평균예산", "예측예산_동일가중", "배분갭_동일가중"]
+]
+log(under.round(3).to_string(index=False))
+
+log("\n=== 배분갭 상위 15개 (위험 대비 예산 '과다' 후보 - 현재 배분관행 대비) ===")
+over = gm.sort_values("배분갭_동일가중", ascending=False).head(15)[
+    ["시도", "시군구", "평균위험_동일가중", "평균예산", "예측예산_동일가중", "배분갭_동일가중"]
+]
+log(over.round(3).to_string(index=False))
+
+# =========================================================
+# 4. 패널 보조분석 - 연도FE + 군집표준오차 (between 결과가 특정연도 쏠림 아닌지 확인)
+# =========================================================
+log("\n\n" + "=" * 70)
+log("보조분석: 패널(연도FE + 시군구 군집SE) - between 결과의 강건성 확인")
+log("=" * 70)
+main["지자체_key"] = main["시도"] + main["시군구"]
+year_dummies = pd.get_dummies(main["연도"], prefix="yr", drop_first=True)
+X = pd.concat([main[["위험지수_동일가중"]], year_dummies], axis=1)
+X = sm.add_constant(X).astype(float)
+m_panel = sm.OLS(main[BUDGET], X).fit(cov_type="cluster", cov_kwds={"groups": main["지자체_key"]})
+log(m_panel.summary2().tables[1].round(4).to_string())
+
+# =========================================================
+# 저장
+# =========================================================
+gm_out = gm.sort_values("배분갭_동일가중")
+gm_out.to_csv(f"{MODELDIR}/배분갭_진단결과.csv", index=False, encoding="utf-8-sig")
+with open(f"{MODELDIR}/배분갭_로그.txt", "w", encoding="utf-8") as f:
+    f.write("\n".join(LOG))
+log(f"\n저장 완료: {MODELDIR}/배분갭_진단결과.csv, {MODELDIR}/배분갭_로그.txt")
