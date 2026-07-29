@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>CH2 2차 EDA — 보정판 모델링 사전진단</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:        #f2f3ec;
+    --surface:     #fbfbf8;
+    --surface-2:   #f6f7f0;
+    --ink:         #171b13;
+    --ink-soft:    #52564a;
+    --muted:       #8b8d7e;
+    --line:        #dcded1;
+    --line-strong: #c3c6b5;
+    --accent:      #2f6b4f;
+    --accent-ink:  #1f4d38;
+    --accent-soft: #e3ece2;
+    --m2:          #2a6b78;
+    --m2-soft:     #e1ecee;
+    --m2-ink:      #1c4b54;
+    --good:        #0ca30c;
+    --warning:     #b8790a;
+    --warning-bg:  #fbeed3;
+    --critical:    #d03b3b;
+    --critical-bg: #f9dedb;
+    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+    --shadow: 0 1px 2px rgba(23,27,19,0.06), 0 8px 24px -12px rgba(23,27,19,0.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page:#14160f; --surface:#1b1e15; --surface-2:#20241a;
+      --ink:#eef0e6; --ink-soft:#c7c9ba; --muted:#8f9184;
+      --line:#2e3226; --line-strong:#3a3f30;
+      --accent:#7cc39e; --accent-ink:#a6dec0; --accent-soft:#1e2a20;
+      --m2:#5fb8c4; --m2-soft:#17262a; --m2-ink:#9adae2;
+      --warning-bg:#3a2c0c; --critical-bg:#3a1c1a;
+      --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:#14160f; --surface:#1b1e15; --surface-2:#20241a;
+    --ink:#eef0e6; --ink-soft:#c7c9ba; --muted:#8f9184;
+    --line:#2e3226; --line-strong:#3a3f30;
+    --accent:#7cc39e; --accent-ink:#a6dec0; --accent-soft:#1e2a20;
+    --m2:#5fb8c4; --m2-soft:#17262a; --m2-ink:#9adae2;
+    --warning-bg:#3a2c0c; --critical-bg:#3a1c1a;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page:#f2f3ec; --surface:#fbfbf8; --surface-2:#f6f7f0;
+    --ink:#171b13; --ink-soft:#52564a; --muted:#8b8d7e;
+    --line:#dcded1; --line-strong:#c3c6b5;
+    --accent:#2f6b4f; --accent-ink:#1f4d38; --accent-soft:#e3ece2;
+    --m2:#2a6b78; --m2-soft:#e1ecee; --m2-ink:#1c4b54;
+    --warning-bg:#fbeed3; --critical-bg:#f9dedb;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font-family: Pretendard, -apple-system, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    font-size: 15.5px; line-height: 1.7; -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace; font-variant-numeric: tabular-nums; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 52px 24px 100px; }
+
+  header.doc-head { margin-bottom: 36px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent-ink); font-weight: 700; margin-bottom: 14px; }
+  .eyebrow::before { content: ""; width: 18px; height: 2px; background: var(--accent); display: inline-block; }
+  h1 { font-size: 30px; line-height: 1.24; font-weight: 800; margin: 0 0 12px; letter-spacing: -0.01em; text-wrap: balance; }
+  .subtitle { color: var(--ink-soft); font-size: 15.5px; max-width: 66ch; margin: 0 0 20px; }
+  .meta-row { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 13px; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 26px 0 8px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .stat .n { font-size: 21px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .stat .l { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  @media (max-width: 640px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+  nav.toc { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0 8px; }
+  nav.toc a { display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 9px 10px; font-size: 12px; font-weight: 700; color: var(--ink-soft); text-decoration: none; }
+  nav.toc a span { display: block; font-size: 9.5px; color: var(--muted); font-weight: 700; margin-bottom: 2px; }
+  @media (max-width: 700px) { nav.toc { grid-template-columns: repeat(2, 1fr); } }
+
+  section { margin-top: 52px; }
+  section > h2 { font-size: 21px; font-weight: 800; margin: 0 0 6px; letter-spacing: -0.005em; display: flex; align-items: baseline; gap: 10px; scroll-margin-top: 20px; }
+  section > h2 .idx { color: var(--accent); font-family: ui-monospace, Consolas, monospace; font-size: 16px; font-weight: 700; }
+  .section-desc { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 20px; max-width: 68ch; }
+  h3 { font-size: 15px; font-weight: 800; margin: 26px 0 10px; }
+  p { margin: 0 0 14px; }
+  ul, ol { margin: 0 0 14px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  strong { font-weight: 700; }
+  code { font-family: ui-monospace, Consolas, monospace; background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; font-size: 0.9em; }
+
+  .chip { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; padding: 3px 10px 3px 6px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); white-space: nowrap; margin: 2px 4px 2px 0; }
+  .chip .dot { width: 14px; height: 14px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .chip.good .dot { background: var(--good); }
+  .chip.critical .dot { background: var(--critical); }
+  .chip.warn .dot { background: var(--warning); }
+  .chip .dot svg { width: 9px; height: 9px; }
+
+  .callout { border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 16px 0; font-size: 14.5px; }
+  .callout.critical { border-color: var(--critical); background: var(--critical-bg); }
+  .callout.warn { border-color: var(--warning); background: var(--warning-bg); }
+  .callout.m2 { border-color: var(--m2); background: var(--m2-soft); }
+  .callout .ct-label { font-weight: 800; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; display: block; }
+  .callout.critical .ct-label { color: var(--critical); }
+  .callout.warn .ct-label { color: var(--warning); }
+  .callout.m2 .ct-label { color: var(--m2-ink); }
+
+  .tblwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); margin: 14px 0 20px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 13.3px; min-width: 460px; }
+  thead th { text-align: left; font-size: 10.8px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 700; padding: 9px 13px; border-bottom: 1px solid var(--line-strong); background: var(--surface-2); white-space: nowrap; }
+  tbody td { padding: 8px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, Consolas, monospace; }
+  td.check { text-align: center; }
+
+  .chart-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px 14px; box-shadow: var(--shadow); margin: 16px 0 20px; }
+  .chart-title { font-size: 12.5px; font-weight: 800; margin-bottom: 2px; }
+  .chart-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .barrow { display: grid; grid-template-columns: 150px 1fr 56px; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .barrow .rl { font-size: 12px; color: var(--ink-soft); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bartrack { position: relative; height: 14px; background: var(--surface-2); border-radius: 4px; }
+  .barfill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 4px; }
+  .barrow .rv { font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .refline { position: absolute; top: -4px; bottom: -4px; width: 1px; background: var(--muted); opacity: 0.7; }
+  .chart-legend { display: flex; gap: 14px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); flex-wrap: wrap; font-size: 11.5px; color: var(--ink-soft); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+
+  /* matrix */
+  .matrix-wrap { overflow-x: auto; margin: 14px 0 8px; }
+  .matrix { display: grid; grid-template-columns: 130px repeat(3, 1fr); gap: 2px; min-width: 580px; background: var(--line); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
+  .matrix > div { background: var(--surface); padding: 12px 14px; font-size: 12.5px; }
+  .matrix .hcorner { background: var(--surface-2); }
+  .matrix .hcol { background: var(--surface-2); font-weight: 800; text-align: center; font-size: 11.5px; }
+  .matrix .hrow { background: var(--surface-2); font-weight: 800; display: flex; align-items: center; font-size: 12.5px; }
+  .matrix .cell { text-align: center; }
+  .matrix .cell .cn { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .matrix .cell .cl { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+  .matrix .cell.thin .cn { color: var(--warning); }
+
+  .qa-item { display: grid; grid-template-columns: 22px 1fr; gap: 10px; margin-bottom: 12px; }
+  .qa-item svg { margin-top: 3px; }
+  .qa-item .qt { font-weight: 700; }
+  .qa-item .qd { color: var(--ink-soft); font-size: 14px; }
+
+  .divider { border: none; border-top: 1px solid var(--line); margin: 50px 0; }
+  footer.docfoot { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="doc-head">
+    <div class="eyebrow">2차 EDA · 모델링 투입 전 사전진단</div>
+    <h1>보정판 패널로 다시 본 모델링 전 체크리스트</h1>
+    <p class="subtitle"><code>CH2_전체병합패널_5도메인_2016_2023_최종보정.csv</code> 기준으로, 지난번에 짠 4단계 EDA 계획(Phase 0~3)을 실제로 돌린 결과입니다. 접경 6곳 보정이 제대로 반영됐는지부터, VIF·ICC 재확인, 유형화 2축 분포, 조기경보모형 사전진단까지 포함합니다.</p>
+    <div class="meta-row">분석표본: 자료유효_flag 적용 후 1,746행(2016-2023) · 지자체 평균표본(2017-2022) n=221</div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="n">3.22%</div><div class="l">핵심변수 listwise deletion 손실률</div></div>
+    <div class="stat"><div class="n">7.77→3.54</div><div class="l">log_소나무림면적 VIF (잔차화 전→후)</div></div>
+    <div class="stat"><div class="n">0 / 0.06</div><div class="l">SPI3·연강수량 ICC(between-비중)</div></div>
+    <div class="stat"><div class="n" style="color:var(--good)">100%→9개</div><div class="l">2022년 인접시군 centroid 전량대체, 팀원 조치로 정상화 완료</div></div>
+  </div>
+
+  <nav class="toc">
+    <a href="#p0"><span>P0</span>보정 검증</a>
+    <a href="#p1"><span>P1</span>Model 1 진단</a>
+    <a href="#p2"><span>P2</span>유형화 축</a>
+    <a href="#p3"><span>P3</span>Model 2 진단</a>
+    <a href="#next"><span>NEXT</span>액션아이템</a>
+  </nav>
+
+  <section id="p0">
+    <h2><span class="idx">P0.</span> 보정 반영 검증 + 잔여 아티팩트 전수 스캔</h2>
+    <p class="section-desc">보정판이 지난번 권고(강원 3곳 Tier B, 옹진·연천·파주 Tier C)를 정확히 반영했는지 diff로 확인하고, 소나무비율·도로비율 외 나머지 변수에도 같은 문제가 남아있는지 기계적으로 재스캔했습니다.</p>
+
+    <h3>P0-1. 보정 반영 확인</h3>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>지역</th><th>처리방식</th><th>실제 반영 내용</th><th class="check">확인</th></tr></thead>
+        <tbody>
+          <tr><td>강원 고성군·양구군·철원군</td><td>Tier B</td><td>2016-2019 값을 2024판 값으로 교체, 보정_flag 0→1</td><td class="check">✓</td></tr>
+          <tr><td>경기 연천군·파주시, 인천 옹진군</td><td>Tier C</td><td>원본값 유지, 자료유효_flag 1→0(모델링 시 제외 대상으로 표시)</td><td class="check">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <span class="ct-label">확인됨</span>
+      권고안 그대로 반영됐습니다. 다만 <code>자료유효_flag</code>는 값만 바꿔놨을 뿐, 실제로 이 플래그를 걸러내는 코드는 <code>final_modeling.py</code>에 아직 없습니다 — 표본 정의 단계에 <code>자료유효_flag != 0</code> 필터를 추가해야 실제로 제외됩니다(이번 EDA에서는 수동으로 필터링해서 진행).
+    </div>
+
+    <h3>P0-2. 잔여 아티팩트 전수 스캔 (2019→2020 변화율)</h3>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>변수</th><th class="num">중앙값 |Δ|</th><th class="num">|Δ|&gt;30%</th><th class="num">|Δ|&gt;50%</th><th>최상위 지역</th></tr></thead>
+        <tbody>
+          <tr><td>소나무류_면적비율(%)</td><td class="num">1.7%</td><td class="num">9</td><td class="num">3</td><td>옹진군 +367%, 연천군 +100%, 파주시 +74% <span class="chip warn"><span class="dot"></span>Tier C 대상, 예상대로 잔존</span></td></tr>
+          <tr><td>도로소나무비율_500m</td><td class="num">5.5%</td><td class="num">33</td><td class="num">21</td><td>도봉구 +1765%, 강화군 +573%, 구로구 +416% <span class="chip good"><span class="dot"></span>완료 · Tier B(2023년 고정) 적용</span></td></tr>
+          <tr><td>log1p_원목생산업체수</td><td class="num">0.0%</td><td class="num">4</td><td class="num">2</td><td>사천시·광주 서구 +58.5% <span class="chip good"><span class="dot"></span>GIS 무관, 실제 사업체수 변동 추정</span></td></tr>
+          <tr><td>log_소나무림면적</td><td class="num">0.2%</td><td class="num">0</td><td class="num">0</td><td>옹진군 +21.9%(잔존, Tier C) — 그 외 이상 없음</td></tr>
+          <tr><td>주거지소나무비율_300m</td><td class="num">0.0%</td><td class="num">0</td><td class="num">0</td><td>이상 없음(변수사전에 이미 시불변으로 명시된 변수)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>새로 걸리는 시군구는 없었습니다 — 지난번에 찾은 6곳(+도로비율의 서울 다수 자치구) 외에 추가 발견은 없음.</p>
+    <div class="callout">
+      <span class="ct-label">후속 조치 완료 — 도로소나무비율_500m</span>
+      원인을 ROAD_RANK 104등급(지방도급 추정)까지 특정했습니다 — 2019→2020년 사이 104등급 총연장이 12,362km→23,615km(+91%)로 폭증한 뒤 안정화된 패턴으로, 도로망 데이터 제공기관의 하위등급 도로 디지털화 범위 확장(전국표준노드링크→NODELINKDATA 전환)으로 추정됩니다. <strong>시군구별 2023년 값으로 8개년 전체를 고정(Tier B)</strong>해 <code>최종보정.csv</code>에 반영 완료(원본값은 <code>도로소나무비율_500m_보정전</code> 컬럼에 보존). ROAD_RANK 104 제외 후 연도별 재계산(Tier A)은 강건성 검증용으로 백그라운드에서 별도 진행 중 — 기록: <code>2차 변수/CH2_인위적확산_도로소나무비율_레벨시프트_보정기록.md</code>.
+    </div>
+
+    <h3>P0-3. 표본 정의 최종본</h3>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>단계</th><th class="num">행수</th><th>비고</th></tr></thead>
+        <tbody>
+          <tr><td>원본</td><td class="num">1,832</td><td></td></tr>
+          <tr><td>면적=0 제외</td><td class="num">1,816</td><td>대구 중구·서울 영등포구</td></tr>
+          <tr><td>자료유효_flag=0 제외</td><td class="num">1,804</td><td>연천·파주·옹진 2016-2019, 12행</td></tr>
+          <tr><td>핵심변수 listwise deletion</td><td class="num">1,746</td><td>손실률 3.22%(플래그 적용 전 3.19%와 거의 동일)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="p1">
+    <h2><span class="idx">P1.</span> Model 1(구조적 지수) 투입 전 진단</h2>
+    <p class="section-desc">잔차화 이후 VIF를 한 번도 재확인 안 했던 부분, 도메인별 between-분산 비중(ICC), 연도별 표준화 안정성을 확인했습니다.</p>
+
+    <h3>P1-1. VIF — 잔차화 전후 비교</h3>
+    <div class="chart-card">
+      <div class="chart-title">log_소나무림면적 VIF 변화</div>
+      <div class="chart-sub">점선 = 주의 임계치(5) · 잔차화로 실제 개선됨을 최초로 확인</div>
+      <div id="chart-vif"></div>
+      <div class="chart-legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--s2)"></span>잔차화 전(raw)</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--s3)"></span>잔차화 후</div>
+      </div>
+    </div>
+    <div class="callout">
+      <span class="ct-label">확인됨 — 지난번 지적사항 해소</span>
+      log_소나무림면적 VIF가 7.77(주의구간)에서 3.54(안전)로 낮아지고, 도로소나무비율_resid=1.25·원목업체_resid=1.63으로 전부 5 미만입니다. 잔차화가 실제로 공선성 문제를 해결했다는 게 이번에 처음 수치로 확인됐습니다.
+    </div>
+
+    <h3>P1-2. ICC(between-분산 비중) — 기후 도메인 약점의 새로운 근거</h3>
+    <div class="chart-card">
+      <div class="chart-title">후보변수별 ICC (전체 분산 중 지자체간 비중)</div>
+      <div class="chart-sub">1에 가까울수록 "만성적 지자체 특성", 0에 가까울수록 "그 해의 공통 충격"</div>
+      <div id="chart-icc"></div>
+    </div>
+    <div class="callout critical">
+      <span class="ct-label">신규 발견 — LMG 결과의 이론적 원인</span>
+      <p>SPI3(최저월 최심가뭄)의 ICC는 <strong>정확히 0</strong>, 연강수량도 0.06에 불과합니다. 반면 노출도·인위적확산·log_소나무림면적은 0.86~0.95로 매우 높습니다. 이건 기존 §3.3의 "기후위험도 LMG 기여 0.5~0.7%" 결과에 대한 <strong>구조적 설명</strong>이 됩니다 — 기후변수(특히 SPI3)는 애초에 "지자체간 만성적 차이"를 거의 담고 있지 않고 거의 전부 "그 해 전국 공통 기상 충격"이라, between 중심으로 설계된 이 지수가 원리적으로 활용할 수 있는 신호가 없었던 것. 상관이 약해서가 아니라 <strong>측정 설계상 애초에 못 쓰는 재료였다</strong>는 뜻이라, 보고서에 이 근거를 추가하면 "왜 기후 기여가 0인가"에 대한 답이 훨씬 단단해집니다.</p>
+    </div>
+    <div class="callout">
+      <span class="ct-label">덤 — Y 자체의 between 비중도 확인됨</span>
+      log_피해밀도의 ICC는 0.367 — 전체 피해변이의 약 37%만 "지자체간 만성차이"이고 나머지 63%는 그 해 특유의 변동입니다. Model 1은 이 37% 부분만 설명하도록 설계돼 있으니, R²≈8%(전체 분산 대비)가 낮아 보여도 "between 37% 중 상당 부분을 잡는다"는 관점에서 보면 이론적 상한 자체가 원래 낮게 잡혀 있었다는 뜻 — §4.4의 "낮지만 정직한 AUC" 논리를 한 번 더 뒷받침하는 근거로 쓸 수 있습니다.
+    </div>
+
+    <h3>P1-3. 연도별 표준화 안정성</h3>
+    <p>8개 연도 모두 표준편차가 정상 범위였고, 특정 연도에 분모가 비정상적으로 작아지는 경우는 없었습니다. 연강수량·SPI3의 연도별 변동폭이 상대적으로 크긴 하지만(연강수량 SD 205~410mm), 이는 실제 기상 변동성이지 계산 오류가 아닙니다 — 문제 없음.</p>
+  </section>
+
+  <section id="p2">
+    <h2><span class="idx">P2.</span> 유형화 2축 설계 검증</h2>
+    <p class="section-desc">지난번에 설계한 축 A(위험요인 우세)·축 B(배분갭)를 실제 데이터로 계산해, 임계치가 자의적이지 않은지·매트릭스 셀이 비거나 너무 작지 않은지 확인했습니다.</p>
+
+    <h3>P2-1. 축 A — 임계치 민감도</h3>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>임계치(SD)</th><th class="num">노출도우세</th><th class="num">인위적확산우세</th><th class="num">복합형</th></tr></thead>
+        <tbody>
+          <tr><td>0.4</td><td class="num">51</td><td class="num">29</td><td class="num">31</td></tr>
+          <tr><td>0.5 (채택)</td><td class="num">50</td><td class="num">24</td><td class="num">37</td></tr>
+          <tr><td>0.6</td><td class="num">49</td><td class="num">22</td><td class="num">40</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>고위험 111개 지자체 기준, 임계치를 0.4~0.6SD로 흔들어도 "노출도우세" 그룹은 49~51개로 거의 고정 — 안정적입니다. "인위적확산우세"는 22~29개로 다소 흔들리는데, 이는 자연스러운 결과입니다(경계 근처에 지자체가 몰려있으면 임계치 민감도가 생기는 게 정상). 임의성은 있지만 결론을 뒤집을 정도는 아님을 확인.</p>
+
+    <h3>P2-2. 축 B — 배분갭 회귀</h3>
+    <p>위험지수 ~ 예산 회귀 R² = <strong>3.88%</strong> — 기존 Model B 1단계 보고값("3~4%")과 사실상 동일해, 보정판으로 바뀌어도 이 핵심 결론은 그대로 유지됨을 재확인했습니다. 3분위 경계는 배분갭 -3.96 / +3.11.</p>
+
+    <h3>P2-3. 3×3 매트릭스 — 셀 크기 확인</h3>
+    <div class="matrix-wrap">
+      <div class="matrix">
+        <div class="hcorner"></div>
+        <div class="hcol">배분 부족</div>
+        <div class="hcol">배분 적정</div>
+        <div class="hcol">배분 과다</div>
+
+        <div class="hrow">노출도-우세</div>
+        <div class="cell"><div class="cn">16</div><div class="cl">시군구</div></div>
+        <div class="cell"><div class="cn">24</div><div class="cl">시군구</div></div>
+        <div class="cell"><div class="cn">10</div><div class="cl">시군구</div></div>
+
+        <div class="hrow">인위적확산-우세</div>
+        <div class="cell thin"><div class="cn">6</div><div class="cl">시군구 · 표본 작음</div></div>
+        <div class="cell"><div class="cn">8</div><div class="cl">시군구</div></div>
+        <div class="cell"><div class="cn">10</div><div class="cl">시군구</div></div>
+
+        <div class="hrow">복합형</div>
+        <div class="cell"><div class="cn">10</div><div class="cl">시군구</div></div>
+        <div class="cell"><div class="cn">14</div><div class="cl">시군구</div></div>
+        <div class="cell"><div class="cn">13</div><div class="cl">시군구</div></div>
+      </div>
+    </div>
+    <p style="font-size:13.5px;color:var(--muted)">저위험 지자체 110곳은 매트릭스에서 제외(별도 "저위험형"). 빈 칸은 없지만 "인위적확산-우세 × 배분부족"이 n=6으로 제일 작음 — 이 칸의 정책처방을 발표할 때는 "표본이 작다"는 단서를 달아야 과도한 일반화로 안 보입니다.</p>
+  </section>
+
+  <section id="p3">
+    <h2><span class="idx">P3.</span> Model 2(조기경보) 투입 전 진단</h2>
+    <p class="section-desc">확산이력 신호의 실제 크기, 과산포 확인 가능 여부, 그리고 공간시차 항의 근간이 되는 인접시군 산정방식을 들여다봤습니다.</p>
+
+    <h3>P3-1. 자기상관 — 이론이 실제로 맞는지</h3>
+    <div class="chart-card">
+      <div class="chart-title">Y(t) vs Y(t-1) 상관</div>
+      <div id="chart-autocorr"></div>
+    </div>
+    <p>log_피해밀도 기준 전년도와의 상관 0.886, 발생여부(이항) 기준 point-biserial 상관 0.8 — 둘 다 매우 강함. "확산이력이 압도적 예측변수"라는 이론적 전제가 실측으로도 확인됩니다.</p>
+
+    <h3>P3-2. 과산포 확인 — 한계 인정</h3>
+    <div class="callout warn">
+      <span class="ct-label">확인 불가 — 원자료 한계</span>
+      NB(음이항) 채택을 이론적으로 권고했지만, 실제 원시 피해목 개수가 패널에 없어서(보고서에도 이미 명시된 한계) 진짜 Poisson-vs-NB 과산포 검정은 이번에도 못 했습니다. 이항변수(Y_bin)의 연도별 분산은 이항분포 기대치와 거의 일치(비율 1.005)했지만, 이건 애초에 이항변수라 당연한 결과일 뿐 카운트 모형의 과산포 여부와는 무관한 체크입니다 — <strong>이 항목은 "완료"가 아니라 여전히 열린 질문으로 남겨둡니다.</strong>
+    </div>
+
+    <h3>P3-3. 인접시군 산정방식 — 발견 후 해결 완료</h3>
+    <div class="callout">
+      <span class="ct-label">발견 당시(원본 파일 기준) · 이후 조치 완료</span>
+      <p><code>인접시군_산정방식</code>을 연도별로 쪼개보니, 2016~2021년·2023년은 매년 8~10개 시군구만 centroid 대체(거제시·남해군·울릉군·부산 영도구·강화군·옹진군·완도군·진도군 — 전부 실제 섬/고립지역이라 정상)였는데, <strong>원본 병합패널(<code>_2016_2023.csv</code>)에서는 2022년만 229개 전체가 100% centroid 대체</strong>로 나왔습니다. 공간시차 변수(log_인접시군_피해밀도)가 Model A 홀드아웃·Model 2 rolling-origin 검증 구간에 정확히 걸리는 해라 결과 해석에 영향을 줄 수 있는 문제였습니다.</p>
+      <p style="margin-bottom:0"><strong>현재 사용 중인 <code>최종보정.csv</code>에서는 이미 해결되어 있음을 확인</strong>했습니다(팀원이 공간인접 계산을 별도로 재작업해 반영) — 2022년도 다른 연도와 같은 정상 패턴(220개 실제인접 / 9개 centroid대체)으로 나옵니다. 아래 표는 문제가 발견됐던 원본 파일 기준입니다.</p>
+    </div>
+
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>연도</th><th class="num">실제인접(원본)</th><th class="num">centroid대체(원본)</th><th class="num">최종보정.csv</th></tr></thead>
+        <tbody>
+          <tr><td>2016</td><td class="num">219</td><td class="num">10</td><td class="num">동일</td></tr>
+          <tr><td>2017</td><td class="num">219</td><td class="num">10</td><td class="num">동일</td></tr>
+          <tr><td>2018</td><td class="num">220</td><td class="num">9</td><td class="num">동일</td></tr>
+          <tr><td>2019</td><td class="num">220</td><td class="num">9</td><td class="num">동일</td></tr>
+          <tr><td>2020</td><td class="num">220</td><td class="num">9</td><td class="num">동일</td></tr>
+          <tr><td>2021</td><td class="num">220</td><td class="num">9</td><td class="num">동일</td></tr>
+          <tr><td>2022</td><td class="num" style="color:var(--critical);font-weight:800">0</td><td class="num" style="color:var(--critical);font-weight:800">229</td><td class="num" style="color:var(--good);font-weight:800">220 / 9로 정상화</td></tr>
+          <tr><td>2023</td><td class="num">221</td><td class="num">8</td><td class="num">동일</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="next">
+    <h2><span class="idx">Next.</span> 액션아이템</h2>
+    <p class="section-desc">완료된 항목은 체크 표시, 나머지는 우선순위 그대로 유지했습니다.</p>
+    <ol>
+      <li><span class="chip good" style="margin-right:8px"><span class="dot"></span>완료</span> 도로소나무비율_500m 레벨시프트 — ROAD_RANK 104등급 원인 규명 후 2023년 값으로 8개년 고정(Tier B) 적용, <code>최종보정.csv</code>에 반영됨. 104 제외 재계산(Tier A)은 강건성 검증용으로 백그라운드 진행 중(완료 후 결과 대조 예정).</li>
+      <li><span class="chip good" style="margin-right:8px"><span class="dot"></span>완료</span> 2022년 인접시군 산정방식 전량 centroid 대체 — 팀원이 공간인접 계산을 재작업해 해결, <code>최종보정.csv</code>에는 이미 정상 패턴(220/9)으로 반영되어 있음을 확인.</li>
+      <li><strong>[보통]</strong> <code>final_modeling.py</code>에 <code>소나무림면적_자료유효_flag != 0</code> 필터를 실제로 추가 — 지금은 플래그만 세워져 있고 코드에 반영 안 됨.</li>
+      <li><strong>[보통]</strong> 유형화 매트릭스의 "인위적확산-우세×배분부족"(n=6) 칸은 발표 시 표본 작음을 명시.</li>
+      <li><strong>[낮음/향후]</strong> ICC=0 발견을 보고서 §3.3 근거로 추가(기후 도메인 기여 0의 이론적 설명 보강).</li>
+      <li><strong>[열린 질문]</strong> NB vs Poisson 과산포 검정은 원시 카운트 없이는 이번에도 결론 못 냄 — 향후과제로 명시.</li>
+      <li><strong>[신규 · 진행중]</strong> Tier A(104등급 제외 8개년 재계산) 완료 시, Tier B(2023 고정) 기준 결론이 유지되는지 대조 검증 — 결과는 <code>도로소나무비율_TierA_104제외_전체8개년.csv</code>에 저장 예정.</li>
+    </ol>
+  </section>
+
+  <footer class="docfoot">
+    입력: <code>data/CH2_전체병합패널_5도메인_2016_2023_최종보정.csv</code> · 재현 로직: final_modeling.py의 도메인/잔차화 구성을 그대로 사용, 위험지수·배분갭은 model_b_stage1.py 로직 재현.
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  function bar(container, rows, opts) {
+    opts = opts || {};
+    const max = opts.max || Math.max(...rows.map(r => r.value)) * 1.1;
+    const refX = opts.ref;
+    rows.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'barrow';
+      const pct = Math.max(2, (r.value / max) * 100);
+      const refPct = refX != null ? (refX / max) * 100 : null;
+      row.innerHTML = `
+        <div class="rl">${r.label}</div>
+        <div class="bartrack">
+          <div class="barfill" style="width:${pct}%; background:${r.color || 'var(--s1)'}"></div>
+          ${refPct != null ? `<div class="refline" style="left:${refPct}%"></div>` : ''}
+        </div>
+        <div class="rv">${r.display}</div>
+      `;
+      container.appendChild(row);
+    });
+  }
+
+  bar(document.getElementById('chart-vif'), [
+    { label: 'log_소나무림면적 (전)', value: 7.766, display: '7.77', color: 'var(--s2)' },
+    { label: 'log_소나무림면적 (후)', value: 3.537, display: '3.54', color: 'var(--s3)' },
+    { label: '도로소나무비율 (전)', value: 2.857, display: '2.86', color: 'var(--s2)' },
+    { label: '도로소나무비율_resid', value: 1.251, display: '1.25', color: 'var(--s3)' },
+    { label: '원목업체수 (전)', value: 2.478, display: '2.48', color: 'var(--s2)' },
+    { label: '원목업체_resid', value: 1.625, display: '1.63', color: 'var(--s3)' },
+  ], { max: 10, ref: 5 });
+
+  bar(document.getElementById('chart-icc'), [
+    { label: 'log_소나무림면적', value: 0.945, display: '0.945', color: 'var(--s3)' },
+    { label: '소나무류_면적비율', value: 0.929, display: '0.929', color: 'var(--s3)' },
+    { label: '원목생산업체수', value: 0.910, display: '0.910', color: 'var(--s3)' },
+    { label: '예찰사업_존재', value: 0.873, display: '0.873', color: 'var(--s3)' },
+    { label: '도로소나무비율', value: 0.856, display: '0.856', color: 'var(--s3)' },
+    { label: '평균풍속', value: 0.832, display: '0.832', color: 'var(--s1)' },
+    { label: 'GDD', value: 0.782, display: '0.782', color: 'var(--s1)' },
+    { label: '대응예산', value: 0.546, display: '0.546', color: 'var(--s1)' },
+    { label: '연강수량', value: 0.063, display: '0.063', color: 'var(--critical)' },
+    { label: 'SPI3(최심가뭄)', value: 0.000, display: '0.000', color: 'var(--critical)' },
+  ], { max: 1.0 });
+
+  bar(document.getElementById('chart-autocorr'), [
+    { label: 'log_피해밀도 vs t-1', value: 0.886, display: '0.886', color: 'var(--s1)' },
+    { label: '발생여부 vs t-1', value: 0.800, display: '0.800', color: 'var(--s3)' },
+  ], { max: 1.0 });
+})();
+</script>
+</body>
+</html>

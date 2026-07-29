@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<!-- saved from url=(0253)https://2c9d447c-3122-4d2b-bc2e-6e42401926f2.frame.claudeusercontent.com/_f/1785340064-6468/?__frame_t=r7u4g3BSGuIpWvexM1MJMnAJ.e1d05cfc-dbd5-4128-a031-4b67902f4e23.605a4aad-6afa-461a-829a-5f4cd28696b3.1785344001&__frame_v=manifest.ec369d2e020e53f6.json -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><!-- frame-runtime --><!--<base href="/_f/1785340064-6468/">--><base href="."><script>window.__FRAME_PREAMBLE={"capabilities":{"downloads":"downloads.BABDwU1K.js","mcp":"mcp.hoz5jxDa.js","permissions":"permissions.ByA9Fd8x.js","self":"self.D3u1zjZe.js","user":"user.Cp1-RnjB.js"},"transforms":"_transforms.DYk1Ltlh.js","comments":"_comments.DiwQajF_.js","translate":"_translate.C5leZL2A.js"}</script><script>(function(){"use strict";const Ee="modulepreload",we=function(e){return"/"+e},Se={},ee=function(t,n,l){let i=Promise.resolve();function s(f){const c=new Event("vite:preloadError",{cancelable:!0});if(c.payload=f,window.dispatchEvent(c),!c.defaultPrevented)throw f}return i.then(f=>{for(const c of f||[])c.status==="rejected"&&s(c.reason);return t().catch(s)})},te=["light","dark","system"];function ne(e){if(e===null||typeof e!="object")return!1;const t=e.__frame_init;return t!==null&&typeof t=="object"}function W(e){return e!==null&&typeof e=="object"&&e.__frame_size_poke===!0}function re(e){if(e===null||typeof e!="object")return!1;const t=e.__frame_theme;if(t===null||typeof t!="object")return!1;const n=t.theme;return typeof n=="string"&&te.includes(n)}function se(e){try{typeof reportError=="function"?reportError(e):setTimeout(()=>{throw e},0)}catch{}}const oe=Object.freeze(Object.assign(Object.create(null),{user:Object.freeze(Object.assign(Object.create(null),{id:null,isOwner:!1,canEdit:!1,name:null,avatarUrl:null,email:null}))}));function Y(e){if(window===top||e.type==="auxclick"&&e.button!==1)return;const t=e.composedPath?e.composedPath():[e.target];let n=null;for(let f=0;f<t.length;f++){const c=t[f];if(c&&c.matches&&c.matches("a[href],area[href]")){n=c;break}}if(!n&&e.target&&e.target.closest&&(n=e.target.closest("a[href],area[href]")),!n)return;const l=n.getAttribute("href");if(!l)return;let i,s;try{i=new URL(l,document.baseURI),s=new URL(document.baseURI).origin}catch{return}(i.protocol==="http:"||i.protocol==="https:")&&i.origin!==s&&(e.preventDefault(),parent.postMessage({__frame_nav:!0,url:i.href},"*"))}const K={};function D(e){if(window===top)return;const t=Date.now();t-(K[e]||0)<500||(K[e]=t,parent.postMessage({__frame_engaged:!0,kind:e},"*"))}const ie=2e3,x=["wheel","touchstart","touchmove","keydown","pointerdown"];let J=0;function ae(e){e.isTrusted&&(J=Date.now())}function ce(){addEventListener("click",Y,!0),addEventListener("auxclick",Y,!0)}function le(){for(let e=0;e<x.length;e++)addEventListener(x[e],ae,{capture:!0,passive:!0});addEventListener("scroll",e=>{e.isTrusted&&Date.now()-J<ie&&D("scroll")},{capture:!0,passive:!0}),addEventListener("pointermove",e=>{e.isTrusted&&D("pointer")},{capture:!0,passive:!0}),addEventListener("click",e=>{e.isTrusted&&D("click")},{capture:!0,passive:!0})}const I="__frame_scroll",ue=150,fe=310,de=160,me=3e4;function pe(){let e=0,t=!1,n=!1,l=!1,i=0;const s=a=>{try{sessionStorage.setItem(I,JSON.stringify({y:a}))}catch{}},f=()=>{if(t){t=!1;return}n=!0,clearTimeout(e),e=setTimeout(()=>s(scrollY),ue)};try{addEventListener("scroll",f,{passive:!0}),addEventListener("pagehide",()=>{clearTimeout(e),s(scrollY)})}catch{}const c=()=>{let a;try{a=sessionStorage.getItem(I)}catch{return null}if(a===null)return null;let _;try{_=JSON.parse(a)}catch{_=null}const m=_?.y;if(!(typeof m=="number"&&Number.isFinite(m)&&m>=0)){try{sessionStorage.removeItem(I)}catch{}return null}return m};let g=!1;const p=a=>{try{const _=scrollY;scrollTo({top:a,left:0,behavior:"instant"}),i=a,l=!0,s(a);const m=scrollY;m!==_&&(t=!0),m!==a&&!g&&(g=!0,addEventListener("load",()=>{try{if(scrollY===m){const y=c();p(y!==null?y:i)}}catch{}},{once:!0}))}catch{}},o=()=>{try{return!!location.hash}catch{return!0}};let u=!1;const d=()=>{try{if(u||innerWidth>fe||innerHeight>de)return;u=!0;const a=Date.now(),_=()=>{try{removeEventListener("resize",_)}catch{}if(Date.now()-a>me||n||o())return;const m=c();p(m!==null?m:i)};addEventListener("resize",_)}catch{}};let h=!1,b=!1;return{restore(){if(h||(h=!0,o()))return;const a=c();a!==null&&(p(a),d())},promoted(){if(b||(b=!0,o()))return;const a=c();a!==null?(p(a),d()):l&&p(i)}}}function he(e,t,n){const l=[...t.values()].filter(i=>i.targets.some(s=>s.startsWith(e+".")));return{wrap(i,s){const f=`${e}.${i}`,c=l.filter(g=>g.targets.includes(f));return c.length===0?(...g)=>{try{return s(...g)}catch(p){return Promise.reject(p)}}:(...g)=>{let p=g;for(const u of c){const d=u.module.parameters;if(d)try{p=d(p)}catch{return Promise.reject({code:"transform_error",id:u.id,scope:e,message:"parameters transform failed"})}}let o;try{o=s(...p)}catch(u){o=Promise.reject(u)}return o.then(u=>{for(let d=c.length-1;d>=0;d--){const h=c[d],b=h.module.returns;if(b)try{u=b(u)}catch{return n({id:h.id,scope:e,leg:"returns"}),u}}return u},u=>{for(let d=c.length-1;d>=0;d--){const h=c[d],b=h.module.throws;if(b)try{u=b(u)}catch{return n({id:h.id,scope:e,leg:"throws"}),Promise.reject(u)}}return Promise.reject(u)})}}}}function ge(e,t,n,l=()=>{}){const i=new Set(e.changes??[]),s=new Map;for(const f of i){const c=t[f];c&&s.set(f,c)}return{contract:e.contract,changes:i,flags:new Set(e.flags??[]),capabilities:e.capabilities??{},capBudgets:e.capBudgets??{},transforms:s,shellOrigin:n.shellOrigin,mount:n.mount,pipe:f=>he(f,s,l)}}(function(){const e=Object.defineProperty,t=globalThis,n=["RTCPeerConnection","webkitRTCPeerConnection","RTCDataChannel","RTCIceCandidate","RTCSessionDescription","RTCRtpSender","RTCRtpReceiver"];let l=0;for(let i=0;i<n.length;i++){const s=n[i];try{e(t,s,{value:void 0,writable:!1,configurable:!1})}catch{try{delete t[s]}catch{}try{e(t,s,{value:void 0,writable:!1,configurable:!0})}catch{}}typeof t[s]=="function"&&l++}if(l&&window!==top)try{parent.postMessage({__frame_rtc_lockdown_failed:l},"*")}catch{}})();const _e=1e4,ye=Object.freeze([...window.__FRAME_PREAMBLE?.origins??["https://claude.ai","https://preview.claude.ai"]]);function G(e){for(const t of ye)if(t.endsWith(":*"))try{const n=new URL(e);if(`${n.protocol}//${n.hostname}:*`===t)return!0}catch{}else if(e===t)return!0;return!1}const R=Object.freeze({...window.__FRAME_PREAMBLE?.capabilities}),U=window.__FRAME_PREAMBLE?.transforms,z=window.__FRAME_PREAMBLE?.comments,$=window.__FRAME_PREAMBLE?.translate,T=/^[\w.-]+\.js$/,be=/^[a-z][a-z0-9_-]{0,63}$/;let V=null,j=null;function q(e,t,n){try{Object.defineProperty(e,t,{value:n,writable:!1,configurable:!1,enumerable:!0})}catch{try{Object.defineProperty(e,t,{value:n,writable:!1,configurable:!0,enumerable:!0})}catch{}}}let B=!1;function X(e){const t=document.documentElement;e==="light"||e==="dark"?(t.dataset.theme=e,t.style.colorScheme=e,B=!0):B&&(delete t.dataset.theme,t.style.colorScheme="",B=!1)}const A=Object.assign(Object.create(null),{mcp:Object.assign(Object.create(null),{watchTool:{handlerArg:3}})}),M=new Map;function Q(e,t){const n=M.get(e);if(!n)return;const l=Object.assign(Object.create(null),t);Object.assign(n.impl,l),n.impl.__settled=()=>Promise.reject({code:"capability_removed",message:`${e}: method not in this runtime`});const i=n.queue;n.queue=[];for(const s of i){const f=l[s.method];if(f)if(A[e]?.[s.method])try{s.resolve(f(...s.args))}catch{k(s,A[e][s.method].handlerArg,{code:"transform_error",message:`${e}.${s.method} rejected its arguments`})}else f(...s.args).then(s.resolve,s.reject);else{const c={code:"capability_removed",message:`${e}.${s.method} is not in this runtime`},g=A[e]?.[s.method];if(g){k(s,g.handlerArg,c);continue}s.reject(c)}}}function ve(e,t){const n=M.get(e);if(!n)return;n.impl.__settled=()=>Promise.reject(t);const l=n.queue;n.queue=[];for(const i of l){const s=A[e]?.[i.method];if(s){k(i,s.handlerArg,t);continue}i.reject(t)}}function N(e,t){const n=oe[e];if(!n){ve(e,t);return}Q(e,Object.fromEntries(Object.entries(n).map(([l,i])=>[l,()=>Promise.resolve(i)])))}function k(e,t,n){if(e.syncState?.dead)return;const l=e.args[t];typeof l=="function"&&queueMicrotask(()=>{if(!e.syncState?.dead)try{l({type:"error",error:n})}catch(i){se(i)}})}const F=Object.getOwnPropertyDescriptor(window,"claude");if(window!==top&&!(F&&F.writable===!1)){ce(),le();let e=null;try{e=pe()}catch{}const t=F?.value??{};q(window,"claude",t);const n=o=>{const u={impl:Object.create(null),queue:[]};M.set(o,u);const d=u.impl,h=new Proxy(d,{get:(b,a)=>{if(typeof a!="string"||a==="then"||a==="toJSON"||a==="valueOf")return;if(a==="toString")return Object.prototype.toString;const _=A[o]?.[a];return _?(...m)=>{if(typeof m[_.handlerArg]!="function")throw new TypeError(`${o}.${a} requires a handler function`);const y=d[a];if(y)return y(...m);if(d.__settled){const v={dead:!1},P={args:[...m],syncState:v};return d.__settled().catch(C=>k(P,_.handlerArg,C)),()=>{v.dead=!0}}let E=null;const S={dead:!1};return u.queue.push({method:a,args:m,resolve:v=>{E=typeof v=="function"?v:null,S.dead&&E?.()},reject:()=>{},syncState:S}),()=>{S.dead=!0,E?.()}}:(...m)=>{const y=d[a]??d.__settled;return y?y(...m):new Promise((E,S)=>{u.queue.push({method:a,args:m,resolve:E,reject:S})})}},set:()=>!1});q(t,o,h)};for(const o of Object.keys(R)){if(t[o]!==void 0){q(t,o,t[o]);continue}n(o)}let l=null,i=null,s=0;const f=o=>{o.source!==parent||!G(o.origin)||ne(o.data)&&(l=o.data.__frame_init,j=o.origin,removeEventListener("message",f),clearTimeout(s),i?.())};addEventListener("message",f),parent.postMessage({__frame_connect:!0},"*");const c=new Promise(o=>{i=o,s=setTimeout(()=>{removeEventListener("message",f),o()},_e)}),g=document.readyState==="loading"?new Promise(o=>document.addEventListener("DOMContentLoaded",()=>o(),{once:!0})):Promise.resolve();g.then(()=>{try{e?.restore()}catch{}});const p=o=>{if(!(o.source!==parent||!G(o.origin))&&W(o.data)){removeEventListener("message",p);try{e?.promoted()}catch{}}};addEventListener("message",p),c.then(async()=>{if(!l||!j){for(const r of M.keys())N(r,{code:"not_granted",message:"frame initialization did not arrive - capability unavailable"});return}X(l.theme);const o=j;let u=!1,d=!1;addEventListener("message",r=>{if(r.source!==parent||r.origin!==o)return;re(r.data)&&X(r.data.__frame_theme.theme);const w=r.data?.__fc_mode;w&&typeof w=="object"&&!u&&z&&T.test(z)&&(u=!0,h(z).then(H=>H.install?.(o,w.on===!0)).catch(()=>{}));const O=r.data?.__ft_cmd;O&&typeof O=="object"&&!d&&$&&T.test($)&&(d=!0,h($).then(H=>H.install?.(o,O)).catch(()=>{}))});const h=r=>ee(()=>import("/_runtime/"+r),void 0),b=Object.keys(l.capabilities??{});for(const r of b)Object.hasOwn(R,r)||be.test(r)&&t[r]===void 0&&(n(r),N(r,{code:"capability_disabled",message:"capability not in this runtime generation"}));const a=b.filter(r=>Object.hasOwn(R,r)).map(r=>[r,R[r]]).filter(r=>typeof r[1]=="string"&&T.test(r[1])),[_,...m]=await Promise.allSettled([U&&T.test(U)?h(U):Promise.resolve({}),...a.map(([,r])=>h(r))]),y=j;V=ge(l,_.status==="fulfilled"&&_.value?.TRANSFORMS||{},{shellOrigin:y,mount:Q},r=>parent.postMessage({__frame_cap_telemetry:r},y));const E=r=>parent.postMessage({__frame_cap_telemetry:{kind:"cap-load-error",cap:r}},y),S=V;m.forEach((r,w)=>{const O=a[w][0];if(r.status!=="fulfilled"){E(O);return}try{r.value?.install?.(S)}catch{E(O)}});for(const[r,w]of M)if(!(w.queue.length===0&&Object.keys(w.impl).length>0)){if(b.includes(r)){N(r,{code:"capability_disabled",message:"capability not available in this session"});continue}N(r,{code:"not_granted",message:"capability not available in this session"})}await g,parent.postMessage({__frame_ready:!0},j);let v=-1,P=0;const C=()=>{P=0;const r=Math.max(document.documentElement.scrollHeight,document.body?document.body.scrollHeight:0);r!==v&&(v=r,parent.postMessage({__frame_size:!0,h:r},y))},L=()=>{P||(P=setTimeout(C,200))},Z=new ResizeObserver(L);Z.observe(document.documentElement),document.body&&Z.observe(document.body),document.addEventListener("load",L,!0),document.fonts?.ready.then(L,()=>{}),addEventListener("beforeprint",()=>{v=-1,C()}),L(),addEventListener("message",r=>{if(!(r.source!==parent||r.origin!==y)&&W(r.data)){try{e?.promoted()}catch{}v=-1,L()}})})}})();</script><!-- /frame-runtime --><meta name="viewport" content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>CH2 공모전 전략 노트 — 2엔진 구조·유형화·이론적 근거</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:        #f2f3ec;
+    --surface:     #fbfbf8;
+    --surface-2:   #f6f7f0;
+    --ink:         #171b13;
+    --ink-soft:    #52564a;
+    --muted:       #8b8d7e;
+    --line:        #dcded1;
+    --line-strong: #c3c6b5;
+    --m1:          #2f6b4f;  /* Model 1 accent — pine green (측정도구) */
+    --m1-soft:     #e3ece2;
+    --m1-ink:      #1f4d38;
+    --m2:          #2a6b78;  /* Model 2 accent — teal (예측도구) */
+    --m2-soft:     #e1ecee;
+    --m2-ink:      #1c4b54;
+    --good:        #0ca30c;
+    --warning:     #b8790a;
+    --warning-bg:  #fbeed3;
+    --critical:    #d03b3b;
+    --shadow: 0 1px 2px rgba(23,27,19,0.06), 0 8px 24px -12px rgba(23,27,19,0.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page:        #14160f;
+      --surface:     #1b1e15;
+      --surface-2:   #20241a;
+      --ink:         #eef0e6;
+      --ink-soft:    #c7c9ba;
+      --muted:       #8f9184;
+      --line:        #2e3226;
+      --line-strong: #3a3f30;
+      --m1:          #7cc39e;
+      --m1-soft:     #1e2a20;
+      --m1-ink:      #a6dec0;
+      --m2:          #5fb8c4;
+      --m2-soft:     #17262a;
+      --m2-ink:      #9adae2;
+      --warning-bg:  #3a2c0c;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:#14160f; --surface:#1b1e15; --surface-2:#20241a;
+    --ink:#eef0e6; --ink-soft:#c7c9ba; --muted:#8f9184;
+    --line:#2e3226; --line-strong:#3a3f30;
+    --m1:#7cc39e; --m1-soft:#1e2a20; --m1-ink:#a6dec0;
+    --m2:#5fb8c4; --m2-soft:#17262a; --m2-ink:#9adae2;
+    --warning-bg:#3a2c0c;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page:#f2f3ec; --surface:#fbfbf8; --surface-2:#f6f7f0;
+    --ink:#171b13; --ink-soft:#52564a; --muted:#8b8d7e;
+    --line:#dcded1; --line-strong:#c3c6b5;
+    --m1:#2f6b4f; --m1-soft:#e3ece2; --m1-ink:#1f4d38;
+    --m2:#2a6b78; --m2-soft:#e1ecee; --m2-ink:#1c4b54;
+    --warning-bg:#fbeed3;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font-family: Pretendard, -apple-system, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    font-size: 15.5px; line-height: 1.7; -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 52px 24px 100px; }
+
+  header.doc-head { margin-bottom: 36px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 11px;
+    letter-spacing: 0.09em; text-transform: uppercase; color: var(--m1-ink); font-weight: 700; margin-bottom: 14px;
+  }
+  .eyebrow::before { content: ""; width: 18px; height: 2px; background: var(--m1); display: inline-block; }
+  h1 { font-size: 31px; line-height: 1.22; font-weight: 800; margin: 0 0 12px; letter-spacing: -0.01em; text-wrap: balance; }
+  .subtitle { color: var(--ink-soft); font-size: 15.5px; max-width: 64ch; margin: 0 0 20px; }
+  .meta-row { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 13px; }
+
+  nav.toc {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 26px 0 8px;
+  }
+  nav.toc a {
+    display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 9px;
+    padding: 10px 12px; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none;
+  }
+  nav.toc a span { display: block; font-size: 10px; color: var(--muted); font-weight: 700; margin-bottom: 2px; }
+  @media (max-width: 640px) { nav.toc { grid-template-columns: repeat(2, 1fr); } }
+
+  section { margin-top: 54px; }
+  section > h2 {
+    font-size: 21px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.005em;
+    display: flex; align-items: baseline; gap: 10px; scroll-margin-top: 20px;
+  }
+  section > h2 .idx { color: var(--m1); font-family: ui-monospace, Consolas, monospace; font-size: 16px; font-weight: 700; }
+  .section-desc { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 22px; max-width: 68ch; }
+  h3 { font-size: 15.5px; font-weight: 800; margin: 26px 0 10px; }
+  p { margin: 0 0 14px; }
+  ul, ol { margin: 0 0 14px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  strong { font-weight: 700; }
+  code { font-family: ui-monospace, Consolas, monospace; background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; font-size: 0.9em; }
+
+  .formula {
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 18px; font-family: ui-monospace, Consolas, monospace; font-size: 13.5px;
+    margin: 14px 0; overflow-x: auto; white-space: nowrap;
+  }
+
+  /* model cards */
+  .model-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0 8px; }
+  @media (max-width: 700px) { .model-pair { grid-template-columns: 1fr; } }
+  .mcard { border-radius: 12px; padding: 18px 20px; box-shadow: var(--shadow); border: 1px solid var(--line); }
+  .mcard.m1 { background: var(--m1-soft); border-color: color-mix(in srgb, var(--m1) 35%, var(--line)); }
+  .mcard.m2 { background: var(--m2-soft); border-color: color-mix(in srgb, var(--m2) 35%, var(--line)); }
+  .mcard .mtag { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .mcard.m1 .mtag { color: var(--m1-ink); }
+  .mcard.m2 .mtag { color: var(--m2-ink); }
+  .mcard h4 { margin: 0 0 10px; font-size: 16.5px; font-weight: 800; }
+  .mcard ul { padding-left: 18px; margin: 0; font-size: 13.8px; }
+  .mcard li { margin-bottom: 7px; }
+  .mcard .stat-line { display: flex; align-items: baseline; gap: 8px; margin: 10px 0 14px; }
+  .mcard .stat-line .n { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .mcard .stat-line .l { font-size: 12px; color: var(--muted); }
+
+  /* tables */
+  .tblwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); margin: 16px 0 22px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 460px; }
+  thead th {
+    text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--muted); font-weight: 700; padding: 10px 14px; border-bottom: 1px solid var(--line-strong);
+    background: var(--surface-2); white-space: nowrap;
+  }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, Consolas, monospace; }
+  td.q { font-weight: 700; color: var(--ink); width: 34%; }
+
+  /* callouts */
+  .callout { border-left: 3px solid var(--m1); background: var(--m1-soft); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 18px 0; font-size: 14.5px; }
+  .callout.m2 { border-color: var(--m2); background: var(--m2-soft); }
+  .callout .ct-label { font-weight: 800; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; display: block; }
+  .callout.m1 .ct-label { color: var(--m1-ink); }
+  .callout.m2 .ct-label { color: var(--m2-ink); }
+
+  /* typology matrix */
+  .matrix-wrap { overflow-x: auto; margin: 18px 0 8px; }
+  .matrix { display: grid; grid-template-columns: 140px repeat(3, 1fr); gap: 2px; min-width: 620px; background: var(--line); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
+  .matrix > div { background: var(--surface); padding: 12px 14px; font-size: 12.8px; }
+  .matrix .hcorner { background: var(--surface-2); }
+  .matrix .hcol { background: var(--surface-2); font-weight: 800; text-align: center; font-size: 12px; }
+  .matrix .hrow { background: var(--surface-2); font-weight: 800; display: flex; align-items: center; }
+  .matrix .cell { line-height: 1.5; }
+  .matrix .cell.priority { background: var(--m1-soft); }
+  .matrix .cell.neutral { color: var(--muted); }
+  .matrix .cell.source { background: var(--warning-bg); }
+  .matrix .cell b { display: block; font-size: 12.5px; margin-bottom: 3px; }
+
+  .flow { counter-reset: step; margin: 18px 0; }
+  .flow li { list-style: none; position: relative; padding: 4px 0 16px 34px; border-left: 2px solid var(--line); margin-left: 14px; }
+  .flow li:last-child { border-color: transparent; padding-bottom: 0; }
+  .flow li::before {
+    counter-increment: step; content: counter(step);
+    position: absolute; left: -15px; top: 2px; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--m1); color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 12.5px; font-weight: 800;
+  }
+  .flow li b { display: block; margin-bottom: 3px; }
+  .flow li .tag { font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; margin-left: 8px; }
+  .flow li .tag.done { background: var(--m1-soft); color: var(--m1-ink); }
+  .flow li .tag.todo { background: var(--warning-bg); color: var(--warning); }
+
+  .cmp-table td.rowlabel { font-weight: 700; color: var(--ink-soft); font-size: 12.5px; }
+
+  .divider { border: none; border-top: 1px solid var(--line); margin: 50px 0; }
+  footer.docfoot { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+</style>
+
+<div class="wrap">
+
+  <header class="doc-head">
+    <div class="eyebrow">공모전 전략 노트 · I-m_Pine CH2</div>
+    <h1>2엔진 구조로 성능·설명력·정책 임팩트를 동시에 만족시키기</h1>
+    <p class="subtitle">구조적 취약성지수(Model 1, 측정도구)와 조기경보모형(Model 2, 예측도구)을 분리하는 전체 설계 — 왜 나누는지, 각 모형의 이론적 근거, 정책 유형화 설계, 예상 심사질문 대응까지 한 문서로 정리.</p>
+    <div class="meta-row">정리일 2026-07-30 · 이전 세션 논의 통합본</div>
+  </header>
+
+  <nav class="toc">
+    <a href="https://2c9d447c-3122-4d2b-bc2e-6e42401926f2.frame.claudeusercontent.com/_f/1785340064-6468/#arch"><span>01</span>전체 아키텍처</a>
+    <a href="https://2c9d447c-3122-4d2b-bc2e-6e42401926f2.frame.claudeusercontent.com/_f/1785340064-6468/#theory"><span>02</span>이론적 근거</a>
+    <a href="https://2c9d447c-3122-4d2b-bc2e-6e42401926f2.frame.claudeusercontent.com/_f/1785340064-6468/#typology"><span>03</span>유형화 설계</a>
+    <a href="https://2c9d447c-3122-4d2b-bc2e-6e42401926f2.frame.claudeusercontent.com/_f/1785340064-6468/#qa"><span>04</span>심사질문 대응</a>
+  </nav>
+
+  <section id="arch">
+    <h2><span class="idx">01.</span> 전체 아키텍처 — 왜 모형을 하나로 합치면 안 되는가</h2>
+    <p class="section-desc">지수에 과거이력·공간확산을 넣으면 AUC는 0.97까지 뛰지만, 그 순간 지수는 "구조적으로 왜 취약한가"가 아니라 "작년에 터진 곳이 올해도 터진다"는 걸 재확인하는 물건이 된다. 그러면 "취약성에 기여한 변수를 바탕으로 맞춤형 예산을 설계한다"는 프로젝트의 핵심 스토리 자체가 무너진다 — 기여 변수가 전부 "작년 발생 여부"가 돼버리니 정책적으로 할 말이 없어진다(예산을 더 준다고 작년 발생 이력이 바뀌진 않으니까). 그래서 역할을 분리한 2엔진 구조를 쓴다.</p>
+
+    <div class="model-pair">
+      <div class="mcard m1">
+        <div class="mtag">Model 1 · 측정도구</div>
+        <h4>구조적 취약성지수</h4>
+        <div class="stat-line"><span class="n">0.58–0.64</span><span class="l">AUC — 낮지만 정직</span></div>
+        <ul>
+          <li>투입: 노출도·기후·인위적확산·대응역량 (정책개입 가능한 변수만)</li>
+          <li>역할: "왜 취약한가" 설명 → 정책 설계 엔진</li>
+          <li>산출물: 시군구별 도메인 기여도 분해</li>
+        </ul>
+      </div>
+      <div class="mcard m2">
+        <div class="mtag">Model 2 · 예측도구</div>
+        <h4>조기경보모형</h4>
+        <div class="stat-line"><span class="n">0.97</span><span class="l">AUC — 검증·신뢰성 확보용</span></div>
+        <ul>
+          <li>투입: Model 1 전체 + 전년도 발생이력·인접확산(t-1)</li>
+          <li>역할: "이 프레임워크가 실제로 맞다"는 신뢰성 과시</li>
+          <li>산출물: 발생확률 랭킹(단기 예찰자원 배치용)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout m1">
+      <span class="ct-label">피치 화법</span>
+      심사 발표에서 "AUC가 왜 낮냐"는 질문에 <em>"저희는 정책개입 가능한 구조변수만 썼고, 여기에 과거이력을 더하면 AUC 0.97까지 나온다는 것도 검증했습니다 — 다만 그건 '작년에 터진 곳이 또 터진다'는 당연한 결과라 정책설계엔 안 씁니다"</em>라고 먼저 선수치는 답변이 가능해진다. 이게 오히려 방법론적 성숙도를 어필하는 포인트가 된다.
+    </div>
+
+    <h3>Model 1이 실제로 하는 일 — 기여도 분해가 핵심</h3>
+    <p>취약성지수는 도메인 점수의 가중합이므로, 시군구별로 어느 도메인이 점수를 밀어올렸는지 자동으로 분해된다.</p>
+    <div class="formula">지수_i&nbsp; =&nbsp; 0.25×노출도_i&nbsp; +&nbsp; 0.25×기후위험도_i&nbsp; +&nbsp; 0.25×인위적확산_i&nbsp; +&nbsp; 0.25×지자체대응역량_i&nbsp; <span style="color:var(--muted)">(역량 항은 구성 단계에서 이미 역방향 부호 반영, 결합 시 추가 반전 없음)</span></div>
+    <p>완도군의 지수가 높다면, 그게 "노출도 때문"인지 "대응역량이 낮아서"인지 도메인별 기여분을 가중치×도메인점수로 그대로 계산할 수 있다. "얼마를 더 줄까"가 아니라 <strong>"어떤 종류의 지원이 필요한가"</strong>까지 구분해서 제안하는 게 이 프로젝트의 차별화 포인트다 — 대부분의 팀은 "취약한 곳에 예산 더"까지만 가고, 유형 매칭까지 가는 팀은 드물다. (단, 이 1축 기여도만으로 정책유형을 만들면 순환논리 문제가 생기는데, 이건 §03에서 2축 구조로 해결한다.)</p>
+
+    <h3>정책 제안까지 이어지는 흐름</h3>
+    <ol class="flow">
+      <li><b>취약성지수 산출</b> (Model 1) → 시군구별 기여도 분해 <span class="tag done">완료</span></li>
+      <li><b>배분갭 진단</b> → "위험 대비 예산이 R²=4%밖에 설명 안 됨" — 현재 배분이 위험을 거의 반영 못한다는 문제 제기 <span class="tag done">완료</span></li>
+      <li><b>배분공식 시뮬레이션</b> → 완도군·의성군처럼 위험최상위인데 예산 0원인 곳을 구체적으로 지목, 재배분 시뮬레이션 <span class="tag done">완료</span></li>
+      <li><b>기여도 기반 지원 유형 매핑</b> → 같은 "부족" 판정이라도 지자체마다 다른 처방 제안 <span class="tag todo">§03 참고</span></li>
+      <li><b>조기경보모형</b> (Model 2, AUC 0.97) → "이 프레임워크 전체가 실제로 검증됐다"는 신뢰도 보강용 부록 <span class="tag todo">정식 섹션화 예정</span></li>
+    </ol>
+  </section>
+
+  <section id="theory">
+    <h2><span class="idx">02.</span> 이론적 근거 — 두 모형은 완전히 다른 기준으로 평가해야 한다</h2>
+    <p class="section-desc">Model 1의 정체는 "예측모형"이 아니라 <strong>측정도구</strong>다. 심리측정학에서 관측 안 되는 잠재특성(construct)을 여러 지표로 근사하는 것과 같은 문제라서, 이론적으로 맞는 모형·지표도 예측모형과는 다르게 골라야 한다. Model 2는 반대로 완전한 <strong>예측/의사결정 도구</strong>다. 같은 잣대(AUC 하나)를 두 모형에 들이대면 안 된다는 게 이 절의 핵심.</p>
+
+    <div class="model-pair">
+      <div class="mcard m1">
+        <div class="mtag">Model 1 · 측정도구로서의 이론</div>
+        <h4>Y 분포 → 패널구조 → 표준오차 → 가중치</h4>
+        <ul>
+          <li><strong>Y 분포</strong>: 구조적 영과잉이라 OLS·Tobit 부적합. Tobit은 "발생"과 "발생시 크기"가 같은 잠재변수의 검열이라 가정하는데, 두 메커니즘(노출·전파 vs 대응역량)이 다를 수 있음 → <strong>Cragg(1971) two-part/hurdle</strong>이 이론적으로 더 맞음</li>
+          <li><strong>패널구조</strong>: FE는 검증 대상인 between 변이를 지워버리는 자기모순, RE는 외생성 가정이 비현실적 → <strong>Mundlak(1978) CRE</strong>가 Hausman 딜레마의 표준 해법</li>
+          <li><strong>표준오차</strong>: 229군집은 cluster-robust(Moulton 1990) 근거 충분, 31군집 하위표본은 <strong>pairs cluster bootstrap</strong>(Cameron &amp; Miller 2015)이 더 안전</li>
+          <li><strong>가중치</strong>: LMG/Shapley(Lindeman-Merenda-Gold 1980)는 저신호 도메인에서 불안정 + 역인과 도메인엔 적용 불가 → <strong>OECD 합성지표 편람(2008)</strong>이 권고하는 이론지향 동일가중이 정답</li>
+        </ul>
+      </div>
+      <div class="mcard m2">
+        <div class="mtag">Model 2 · 예측도구로서의 이론</div>
+        <h4>이론적 앵커 → 모형군 → 동적패널 유의점</h4>
+        <ul>
+          <li><strong>이론적 앵커</strong>: <strong>Held–Höhle–Hofmann(2005)</strong> 감시통계 프레임워크의 endemic(구조적 공변량)+epidemic(자기시차+공간시차) 분해와 Model1/Model2 구조가 개념적으로 동일 — "임의로 지수를 두 개 만들었다"가 아니라 "확립된 감시모형 이론의 표준 분해"로 프레이밍 가능</li>
+          <li><strong>모형군</strong>: binary 로지스틱은 강도 정보를 버림 → <strong>Poisson/Negative Binomial</strong>(log 소나무림면적 오프셋)이 더 적합, 산림병해충의 군집성(overdispersion) 때문에 NB 권장</li>
+          <li><strong>예측식</strong>: <code>log(λ_it) = endemic(Model1 구조변수) + φ·log(Y_i,t-1+1) + ψ·log(인접시군_Y_i,t-1+1)</code> — hhh4 사양과 이론적으로 일치</li>
+          <li><strong>동적패널 유의점</strong>: 자기시차(lagged DV)는 단기패널(T=8)에서 <strong>Nickell(1981) bias</strong> 발생 — 이론적 해법은 System GMM(Arellano-Bond/Blundell-Bond), 공모전 범위에선 이 편향을 인지하고 있다는 것 자체가 방법론적 성숙도. Model1의 CRE 장치를 그대로 재사용할 근거는 없음(목적이 다름)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tblwrap cmp-table">
+      <table>
+        <thead><tr><th></th><th>Model 1 · 취약성지수</th><th>Model 2 · 조기경보</th></tr></thead>
+        <tbody>
+          <tr><td class="rowlabel">이론적 위상</td><td>측정도구 (측정학)</td><td>예측도구 (의사결정이론)</td></tr>
+          <tr><td class="rowlabel">이론적 앵커</td><td>Mundlak CRE · Cragg two-part · OECD 합성지표이론</td><td>Held–Höhle–Hofmann endemic-epidemic · 동적패널 GMM</td></tr>
+          <tr><td class="rowlabel">핵심 모형군</td><td>2부문(로지스틱+OLS) + CRE</td><td>NB/Poisson(로그오프셋) + AR/공간시차</td></tr>
+          <tr><td class="rowlabel">1순위 지표</td><td>between 계수 유의성·안정성</td><td>walk-forward 예측정확도</td></tr>
+          <tr><td class="rowlabel">2순위 지표</td><td>가중치 강건성(순위상관)</td><td>Calibration(Brier)</td></tr>
+          <tr><td class="rowlabel">3순위 지표</td><td>AUC (필요조건)</td><td>Precision@K, DeLong 유의성검정</td></tr>
+          <tr><td class="rowlabel">R² 위상</td><td>부차적, 낮아도 정상</td><td>부차적</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Model 1 핵심 판정지표 (우선순위 순)</h3>
+    <ol>
+      <li>between 계수의 부호·유의성(훈련·홀드아웃 모두) — 측정도구의 "수렴타당도", 예측정확도보다 우선</li>
+      <li>두 가중치 버전 간 순위상관 — 방법론적 강건성</li>
+      <li>between 계수의 시간적 안정성(rolling-origin) — "그 해만 우연히 유의했나" 확인</li>
+      <li>십분위 실적표(단조성) — calibration에 가까운 확인용, 정밀예측 지표 아님</li>
+      <li>AUC/Spearman — 필요조건("무작위보다 낫다")이지 목표 자체 아님. R²는 부차적</li>
+    </ol>
+
+    <h3>Model 2 핵심 판정지표 (완전히 다른 지표군)</h3>
+    <ol>
+      <li>진짜 walk-forward(rolling-origin) out-of-sample 정확도 — 훈련기간 정보만으로 미래를 맞히는지가 유일한 기준</li>
+      <li>Calibration(Brier score, reliability diagram) — 실제 배치 임계값을 정하려면 예측확률 자체가 정확해야 함</li>
+      <li>Precision@K / Recall@K — 제한된 예찰자원 하에서 상위 K곳 포착률(미탐지≫오탐지 비용 반영)</li>
+      <li>Nested model 유의성 검정(우도비검정 또는 DeLong's test) — "AUC가 커졌다"가 아니라 epidemic 성분 추가가 통계적으로 유의한지 정식 검정</li>
+    </ol>
+  </section>
+
+  <section id="typology">
+    <h2><span class="idx">03.</span> 유형화 설계 — 2축으로 쪼개는 게 핵심</h2>
+    <p class="section-desc">역량 도메인 z-score로 "부족형"을 만들면 동어반복(순환논리)이 된다. 이를 풀려면 "왜 위험한가" 축과 "예산이 맞는가" 축을 아예 분리된 두 축으로 만들어야 한다 — 하나의 유형 리스트에 원인과 결과를 섞으면 안 된다.</p>
+
+    <div class="model-pair">
+      <div class="mcard m1">
+        <div class="mtag">축 A · 위험요인 우세형</div>
+        <h4>위험지수 = 노출도 + 인위적확산만</h4>
+        <ul>
+          <li>임계치 룰: <code>노출도_점수 − 인위적확산_점수</code> 차이가 ±0.5SD 넘으면 우세형, 그 안이면 복합형</li>
+          <li>기후위험도는 축에서 제외 — 지자체별 참고각주로만 병기(LMG 기여 0.5%, 방향 불안정을 이미 자인)</li>
+          <li>저위험 지자체(위험지수 &lt; 중앙값)는 유형화 대상에서 제외 → "저위험형"으로 별도 처리</li>
+        </ul>
+      </div>
+      <div class="mcard m2">
+        <div class="mtag">축 B · 배분 적정성</div>
+        <h4>Model B 1단계 배분갭 잔차 사용</h4>
+        <ul>
+          <li>역량 도메인 z-score가 <strong>아니라</strong> 회귀잔차(위험 대비 예산의 편차) 사용 — 독립적인 통계적 진단</li>
+          <li>하위/중위/상위 3분위 또는 유의성 기준으로 부족/적정/과다 구분</li>
+        </ul>
+      </div>
+    </div>
+
+    <p>두 축을 교차하면 3×3(저위험 제외 시 2×3) 매트릭스가 나오고, <strong>"부족" 열에만</strong> 실제 신규예산 처방을 매핑한다.</p>
+
+    <div class="matrix-wrap">
+      <div class="matrix">
+        <div class="hcorner"></div>
+        <div class="hcol">배분 부족</div>
+        <div class="hcol">배분 적정</div>
+        <div class="hcol">배분 과다</div>
+
+        <div class="hrow">노출도-우세</div>
+        <div class="cell priority"><b>예찰·모니터링 인프라</b>조기발견 인프라, 소나무 밀집지 우선 인력배치</div>
+        <div class="cell neutral">현행 유지, 정기 재평가</div>
+        <div class="cell source"><b>재배분 재원 후보</b>처방 아님</div>
+
+        <div class="hrow">인위적확산-우세</div>
+        <div class="cell priority"><b>도로변·유통 관리</b>완충구역 관리, 원목유통 이력관리, 반출금지구역 지정 검토</div>
+        <div class="cell neutral">현행 유지, 정기 재평가</div>
+        <div class="cell source"><b>재배분 재원 후보</b>처방 아님</div>
+
+        <div class="hrow">복합형</div>
+        <div class="cell priority"><b>기본 대응체계 확충</b>특정 채널보다 방제조직·인력 전반 강화</div>
+        <div class="cell neutral">현행 유지, 정기 재평가</div>
+        <div class="cell source"><b>재배분 재원 후보</b>처방 아님(아티팩트 의심 지역 별도 각주)</div>
+      </div>
+    </div>
+
+    <div class="callout m1">
+      <span class="ct-label">설계 장점</span>
+      심사위원이 "역량-부족형이랑 배분갭이랑 뭐가 다르냐"고 물어도 "역량 도메인은 유형 축에서 아예 뺐고, 배분갭은 독립된 통계적 진단(회귀잔차)"이라고 명확히 답할 수 있다. "과다" 열(성남·용인·전주 + 접경지역 임상도 아티팩트 의심 지역인 연천·파주 등)은 처방이 아니라 재배분 재원 후보로만 표시한다.
+    </div>
+  </section>
+
+  <section id="qa">
+    <h2><span class="idx">04.</span> 예상 심사질문 대응 로직</h2>
+    <p class="section-desc">이미 보고서 안에 답이 다 있는 것들이라, 실제로 필요한 건 질문→답 매핑을 미리 정리해두는 것뿐이다.</p>
+
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>예상 질문</th><th>준비된 답변의 핵심</th></tr></thead>
+        <tbody>
+          <tr><td class="q">AUC가 왜 이렇게 낮나(0.58~0.64)?</td><td>정책개입 가능한 구조변수만 씀. 확산이력 넣으면 0.97 나오는 것도 검증했지만 그건 "작년 터진 곳이 또 터진다"는 재확인이라 정책엔 못 씀 (Model 2로 선수치기)</td></tr>
+          <tr><td class="q">R²=8%로 신뢰할 수 있나?</td><td>검증 대상은 between(지자체간 만성적 줄세우기)이지 연도별 변동 예측이 아님 — 맞춤형 예산배분은 정확히 between 질문(§4.2 근거)</td></tr>
+          <tr><td class="q">기후위험도 기여가 거의 0인데 왜 넣었나?</td><td>지수엔 이론적 구성요소로 유지, 동일가중을 주지수로 채택한 이유가 바로 이것(LMG 불신). 유형화 단계에선 제외</td></tr>
+          <tr><td class="q">예산 변수 부호를 억지로 뒤집은 거 아닌가?</td><td>역인과가 §6.3 타겟팅 역전 결과로 실증됨. 사전에 문서화된 이론적 원칙 적용이지 사후 자의적 조정 아님</td></tr>
+          <tr><td class="q">배분갭이 인과관계 증거인가?</td><td>아니다, 명시적으로 기술적 진단+안면타당성 수준으로 프레이밍(§6.1에서 인과추정 보류 명시). 우선순위 신호로만 사용</td></tr>
+          <tr><td class="q">국가대응수준은 왜 뺐나?</td><td>31개 시군구뿐이고 selection-on-outcome(t=11.53) 확인됨 — 억지로 포함시키면 전체 신뢰도가 떨어짐. 로버스트니스 부록으로 격리한 게 더 정직</td></tr>
+          <tr><td class="q">완도군 등 상위 지역이 우연 아닌가?</td><td>배분갭(1단계, 횡단면 회귀)과 배분공식 시뮬레이션(3단계, 동적 재배분)이라는 서로 다른 방법론이 같은 지역을 지목 — 교차검증</td></tr>
+          <tr><td class="q">유형화 임계치가 자의적 아닌가?</td><td>맞다, 조정 가능한 설계 선택. 그래서 블랙박스 군집 알고리즘 대신 두 도메인 점수 차이 기준 룰베이스로 투명하게 설계함</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="docfoot">
+    통합 대상: "공모전_전략_2엔진구조" 초안 + 유형화 설계·심사질문 대응 로직·Model 1/2 이론적 근거 논의. 다음 단계 — 기여도 분해표·상위 취약지역 스택바 시각화 제작, Model 2 정식 섹션화, 임상도 판전환 아티팩트 지역(§03 "과다" 열 각주) 처리.
+  </footer>
+
+</div>
+
+</body></html>
