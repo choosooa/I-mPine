@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CH2 지자체 대응역량 모델링용 변수 분류</title>
+  <style>
+    :root {
+      --ink: #1f2937;
+      --muted: #64748b;
+      --line: #d8dee9;
+      --bg: #f7f8fb;
+      --panel: #ffffff;
+      --core: #0f766e;
+      --support: #2563eb;
+      --sensitivity: #7c3aed;
+      --hold: #b45309;
+      --drop: #b91c1c;
+      --quality: #475569;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.55;
+    }
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 24px 56px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 34px 0 12px;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+    p { margin: 8px 0; }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.95em;
+      background: #eef2f7;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .lead {
+      color: var(--muted);
+      max-width: 980px;
+    }
+    .notice {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-left: 5px solid var(--core);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .box {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .box h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      margin-right: 6px;
+    }
+    .tag.core { background: var(--core); }
+    .tag.support { background: var(--support); }
+    .tag.sensitivity { background: var(--sensitivity); }
+    .tag.hold { background: var(--hold); }
+    .tag.drop { background: var(--drop); }
+    .tag.quality { background: var(--quality); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      margin-top: 10px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+      word-break: keep-all;
+    }
+    th {
+      background: #eef2f7;
+      font-weight: 700;
+    }
+    tr:last-child td { border-bottom: 0; }
+    .var {
+      font-family: Consolas, "Courier New", monospace;
+      white-space: nowrap;
+      word-break: normal;
+    }
+    ul {
+      margin: 8px 0 0 18px;
+      padding: 0;
+    }
+    li { margin: 4px 0; }
+    .small { color: var(--muted); font-size: 13px; }
+    @media (max-width: 860px) {
+      main { padding: 22px 14px 44px; }
+      .grid { grid-template-columns: 1fr; }
+      table { font-size: 14px; }
+      th, td { padding: 8px; }
+      .var { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>CH2 지자체 대응역량 모델링용 변수 분류</h1>
+  <p class="lead">
+    기준 파일:
+    <code>CH2_지자체대응역량_최종변수선정_보조변수포함_모델링용_v2.csv</code>.
+    이 문서는 모델 투입 전 변수 역할과 제외/보류 사유를 정리한 설명서다.
+  </p>
+
+  <div class="notice">
+    <strong>핵심 원칙</strong>
+    <p>
+      주 분석은 <code>재선충명시</code> 변수를 사용한다.
+      <code>산림병해충포괄</code> 변수는 민감도 분석용이며,
+      이동통제/비율 계열은 11개 상위 시의 구단위 합산 이슈 때문에 보류한다.
+    </p>
+  </div>
+
+  <section>
+    <h2>최종 추천 사양</h2>
+    <div class="grid">
+      <div class="box">
+        <h3><span class="tag core">핵심</span>기본 모델</h3>
+        <ul>
+          <li><code>대응자원투입예산_소나무림ha당_log_재선충명시</code></li>
+          <li><code>예찰사업_재선충명시_존재_flag</code></li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3><span class="tag support">보조</span>확장 모델</h3>
+        <ul>
+          <li><code>방제법인수_소나무림1만ha당_log</code></li>
+          <li><code>반출금지구역_지정여부</code></li>
+          <li><code>반출금지구역면적비율</code></li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3><span class="tag sensitivity">민감도</span>포괄 대응역량 대체</h3>
+        <ul>
+          <li><code>대응자원투입예산_소나무림ha당_log_산림병해충포괄</code></li>
+          <li><code>예찰진단예산_소나무림ha당_log_산림병해충포괄</code></li>
+        </ul>
+        <p class="small">포괄 예찰 변수를 쓰는 민감도 분석은 2017~2023으로 제한 권장.</p>
+      </div>
+      <div class="box">
+        <h3><span class="tag hold">보류</span>이동통제/비율 계열</h3>
+        <ul>
+          <li><code>이동통제예산_소나무림ha당_log_산림병해충포괄</code></li>
+          <li><code>이동통제예산비중_산림병해충포괄</code></li>
+          <li><code>예찰진단예산비중_산림병해충포괄</code></li>
+          <li><code>이동통제예산비중_광의예산대비_산림병해충포괄</code></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>필수 식별 변수</h2>
+    <table>
+      <thead>
+        <tr><th>변수</th><th>역할</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="var">연도</td><td>필수</td><td>패널 연도. 연도 고정효과와 시계열 구분에 필요.</td></tr>
+        <tr><td class="var">시군구코드</td><td>필수</td><td>229개 시군구 패널의 지역 키.</td></tr>
+        <tr><td class="var">시도</td><td>필수</td><td>시도명. 기술통계와 지역 확인용.</td></tr>
+        <tr><td class="var">시군구</td><td>필수</td><td>시군구명. 결과 해석과 검산용.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>핵심 설명변수</h2>
+    <table>
+      <thead>
+        <tr><th>변수</th><th>분류</th><th>모델 사용</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="var">대응자원투입예산_소나무림ha당_log_재선충명시</td>
+          <td><span class="tag core">핵심</span></td>
+          <td>주 분석 투입</td>
+          <td>사업명에 <code>재선충</code>이 명시된 자원투입 예산을 소나무림 ha로 나눈 뒤 log1p 처리한 변수.</td>
+        </tr>
+        <tr>
+          <td class="var">예찰사업_재선충명시_존재_flag</td>
+          <td><span class="tag core">핵심</span></td>
+          <td>주 분석 투입</td>
+          <td>재선충 명시 예찰·진단 사업이 존재하면 1, 없으면 0, 예산자료 자체가 없으면 결측. 양수 비율이 낮으므로 연속형 예찰예산보다 안정적.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>핵심 검산/기술통계용</h2>
+    <table>
+      <thead>
+        <tr><th>변수</th><th>분류</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="var">대응자원투입예산_원_재선충명시</td><td>검산</td><td>재선충 명시 자원투입 예산 원자료 금액. 지방비 기준.</td></tr>
+        <tr><td class="var">예찰진단예산_원_재선충명시</td><td>검산</td><td>재선충 명시 예찰·진단 예산 원자료 금액. 지방비 기준.</td></tr>
+        <tr><td class="var">예찰진단예산_소나무림ha당_log_재선충명시</td><td>보조 검산</td><td>재선충 명시 예찰예산의 ha당 log. 양수 관측이 적어 주 변수보다는 검산/보조 해석 권장.</td></tr>
+        <tr><td class="var">대응자원투입사업_재선충명시_존재_flag</td><td>검산</td><td>재선충 명시 자원투입 사업 존재 여부.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>보조 변수</h2>
+    <table>
+      <thead>
+        <tr><th>변수</th><th>분류</th><th>주의</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="var">방제법인수_소나무림1만ha당_log</td>
+          <td><span class="tag support">보조</span></td>
+          <td>2023년 결측 처리</td>
+          <td>소나무림 1만 ha당 활동 방제법인 수의 log1p. <code>법인자료_관측여부==0</code>인 2023년은 결측 처리.</td>
+        </tr>
+        <tr>
+          <td class="var">반출금지구역_지정여부</td>
+          <td><span class="tag support">보조</span></td>
+          <td>해석상 규제 상태</td>
+          <td>해당 시군구에 반출금지구역이 지정되어 있으면 1.</td>
+        </tr>
+        <tr>
+          <td class="var">반출금지구역면적비율</td>
+          <td><span class="tag support">보조</span></td>
+          <td>1 초과 가능</td>
+          <td>반출금지구역 면적을 소나무림 면적으로 나눈 비율. 규제구역 정의상 1을 초과할 수 있음.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>품질/통제 변수</h2>
+    <table>
+      <thead>
+        <tr><th>변수</th><th>분류</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="var">예산자료_사용가능여부</td><td><span class="tag quality">품질</span></td><td>예산자료 사용 가능 여부. 0이면 예산 원값 결측.</td></tr>
+        <tr><td class="var">예산결측사유</td><td><span class="tag quality">품질</span></td><td><code>observed</code>, <code>source_missing</code> 등 예산 관측/결측 사유.</td></tr>
+        <tr><td class="var">소나무림면적_자료유효_flag</td><td><span class="tag quality">품질</span></td><td>ha당 log 계산의 분모 유효성 플래그.</td></tr>
+        <tr><td class="var">소나무림면적_보정_flag</td><td><span class="tag quality">품질</span></td><td>소나무림 면적 보정 여부. 민감도 분석에 활용 가능.</td></tr>
+        <tr><td class="var">면적하한미달_flag</td><td><span class="tag quality">품질</span></td><td>소나무림 면적이 매우 작은 지역 표시. 강건성 분석에서 제외 조건으로 활용 가능.</td></tr>
+        <tr><td class="var">예찰사업명_2016비표준_flag</td><td><span class="tag quality">품질</span></td><td>2016년 사업명 체계가 비표준임을 표시. 재선충명시 변수는 2016 포함 가능하되 이 플래그를 통제/민감도 기준으로 사용.</td></tr>
+        <tr><td class="var">법인자료_관측여부</td><td><span class="tag quality">품질</span></td><td>법인자료 관측 여부. 0인 행의 법인 변수는 v2에서 결측 처리.</td></tr>
+        <tr><td class="var">법인자료_연도완전여부</td><td><span class="tag quality">품질</span></td><td>연도별 법인자료 완전성. 2022년과 2023년은 0이므로 시계열 해석 시 주의.</td></tr>
+        <tr><td class="var">법인자료_최신성주의플래그</td><td><span class="tag quality">품질</span></td><td>최신성 주의 필요 여부. 상수 아님.</td></tr>
+        <tr><td class="var">반출금지구역_이력완전_flag</td><td><span class="tag quality">품질</span></td><td>반출금지구역 이력자료 완전성. 상수 아님.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>민감도 변수</h2>
+    <table>
+      <thead>
+        <tr><th>변수</th><th>분류</th><th>사용 조건</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="var">대응자원투입예산_소나무림ha당_log_산림병해충포괄</td>
+          <td><span class="tag sensitivity">민감도</span></td>
+          <td>재선충명시 변수와 동시 투입 금지</td>
+          <td>산림병해충 포괄 자원투입예산의 ha당 log. 재선충 특정성은 약하지만 대응체계 proxy로 활용 가능.</td>
+        </tr>
+        <tr>
+          <td class="var">예찰진단예산_소나무림ha당_log_산림병해충포괄</td>
+          <td><span class="tag sensitivity">민감도</span></td>
+          <td>2017~2023 권장</td>
+          <td>산림병해충 포괄 예찰진단예산의 ha당 log. 2016은 포괄 예찰 log가 전부 결측이므로 제외 권장.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>사용 보류 변수</h2>
+    <table>
+      <thead>
+        <tr><th>변수</th><th>분류</th><th>보류 사유</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="var">이동통제예산_원_산림병해충포괄</td><td><span class="tag hold">보류</span></td><td>11개 상위 시에서 구단위 합산 원천의 예산 필드가 비어 있어 0/결측 구조가 불안정.</td></tr>
+        <tr><td class="var">이동통제예산_소나무림ha당_log_산림병해충포괄</td><td><span class="tag hold">보류</span></td><td>이동통제 원예산의 11개 상위 시 문제가 그대로 반영됨.</td></tr>
+        <tr><td class="var">예찰진단예산비중_산림병해충포괄</td><td><span class="tag hold">보류</span></td><td>11개 상위 시에서 비율 분모가 없어 8년 내내 결측.</td></tr>
+        <tr><td class="var">이동통제예산비중_산림병해충포괄</td><td><span class="tag hold">보류</span></td><td>11개 상위 시에서 비율 분모가 없어 8년 내내 결측.</td></tr>
+        <tr><td class="var">이동통제예산비중_광의예산대비_산림병해충포괄</td><td><span class="tag hold">보류</span></td><td>11개 상위 시에서 비율 분모가 없어 8년 내내 결측.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>모델에서 제외할 변수</h2>
+    <table>
+      <thead>
+        <tr><th>변수</th><th>분류</th><th>제외 사유</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="var">예찰자료_신뢰_flag</td><td><span class="tag drop">제외</span></td><td>2016년 전부 0으로 연도 FE와 공선성이 크며, 신규 재선충명시 변수에는 값을 지우는 기준으로 쓰면 안 됨.</td></tr>
+        <tr><td class="var">활동방제법인수</td><td><span class="tag drop">제외</span></td><td>원본 컬럼은 2023년 전부 결측. v2에서는 <code>활동방제법인수_확장</code>과 <code>방제법인수_소나무림1만ha당_log</code>를 사용.</td></tr>
+        <tr><td class="var">면적_0_의심_flag</td><td><span class="tag drop">제외</span></td><td>전부 0인 상수 컬럼.</td></tr>
+        <tr><td class="var">반출금지구역_지역매칭_flag</td><td><span class="tag drop">제외</span></td><td>전부 1인 상수 컬럼.</td></tr>
+        <tr><td class="var">반출금지구역_날짜품질주의_flag</td><td><span class="tag drop">제외</span></td><td>전부 0인 상수 컬럼.</td></tr>
+        <tr><td class="var">*_source_rows</td><td><span class="tag drop">제외</span></td><td>모델 변수가 아니라 QA 메타데이터.</td></tr>
+        <tr><td class="var">*_unique_projects</td><td><span class="tag drop">제외</span></td><td>모델 변수가 아니라 QA 메타데이터.</td></tr>
+        <tr><td class="var">확장자료_250to229_집계방식</td><td><span class="tag drop">제외</span></td><td>문자형 재현성 메타데이터.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>추가 주의</h2>
+    <div class="box">
+      <ul>
+        <li><code>*_원</code> 변수와 해당 <code>*_log</code> 변수는 같은 정보를 다른 스케일로 표현하므로 한 세트만 선택한다.</li>
+        <li><code>재선충명시</code> 변수와 <code>산림병해충포괄</code> 변수도 같은 역할로 동시에 넣지 않는다.</li>
+        <li><code>예찰사업_재선충명시_존재_flag</code>는 양수 비율이 낮아 계수 신뢰구간이 넓게 나올 수 있다.</li>
+        <li>법인 변수 포함 모델에서는 2023년이 법인 변수 결측으로 빠질 수 있다. 2022년은 관측값은 있으나 연도완전여부가 0이므로 시계열 해석에 주의한다.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+</body>
+</html>
