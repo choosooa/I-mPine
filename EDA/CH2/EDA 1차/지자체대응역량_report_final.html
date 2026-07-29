@@ -1,0 +1,140 @@
+﻿<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>CH2 지자체 대응역량 3차 전체 EDA 및 외적타당성</title>
+<style>
+body{font-family:"Malgun Gothic",Arial,sans-serif;margin:0;background:#fbfaf7;color:#252525;line-height:1.58}
+main{max-width:1220px;margin:0 auto;padding:34px 28px 70px}
+h1{font-size:30px;margin:0 0 8px} h2{font-size:22px;margin:36px 0 12px;border-top:1px solid #ddd5c9;padding-top:22px}
+h3{font-size:18px;margin:24px 0 10px} h4{font-size:15px;margin:18px 0 8px}
+.meta,.small{color:#666;font-size:13px}.notice{background:#fff3cd;border:1px solid #e3ce7c;padding:14px 16px;border-radius:8px;margin:16px 0}
+.toc{background:#fff;border:1px solid #e1ddd4;border-radius:8px;padding:14px 18px;margin:18px 0}.toc a{display:block;color:#255f85;text-decoration:none;margin:4px 0}
+table{border-collapse:collapse;width:100%;background:#fff;margin:10px 0 20px} th,td{border:1px solid #e1ddd4;padding:7px 9px;text-align:left;font-size:13px;vertical-align:top} th{background:#f0eee8}
+.chart{width:100%;height:auto;border:1px solid #e1ddd4;background:#fff;border-radius:8px;margin:10px 0 18px}.svg-title{font-size:15px;font-weight:700;fill:#222}.tick{font-size:11px;fill:#666}.legend{font-size:11px;fill:#333}
+code{background:#eee8dc;padding:1px 4px;border-radius:4px}.warn{color:#9a5b00;font-weight:700}.ok{color:#1f6f4a;font-weight:700}
+</style>
+</head>
+<body><main>
+<h1>CH2 지자체 대응역량 3차 전체 EDA 및 외적타당성</h1>
+<div class="meta">생성일: 2026-07-29 01:08 · 입력 1: CH2_지자체대응역량_최종변수선정.csv · 입력 2: CH2_지자체대응역량_메인+확장.csv</div>
+<div class="notice">이번 보고서는 최신 최종 파일 2개를 기준으로 다시 생성했다. 지수화 변수는 사용하지 않고, 메인 예산 기반 변수와 확장/민감도 변수를 분리해 점검한다. 외적타당성은 기존 최종 패널의 발생·재발생 성과변수를 <code>연도×시군구코드</code>로 병합해 탐색적으로 확인했다.</div>
+
+<div class="toc">
+<b>목차</b>
+<a href="#main">1. 최종변수선정 파일 EDA</a>
+<a href="#main-validity">2. 최종변수선정 파일 외적타당성</a>
+<a href="#ext">3. 메인+확장 파일 EDA</a>
+<a href="#ext-validity">4. 메인+확장 파일 외적타당성</a>
+<a href="#modeling">5. 모델링 전 최종 판단</a>
+</div>
+
+<h2 id="main">1. 최종변수선정 파일 EDA</h2>
+<p>이 파일은 주 모형에 바로 투입할 메인 변수만 담은 파일이다. <code>예산자료_사용가능여부=1</code>인 행을 주 분석 표본으로 사용한다.</p>
+<table><thead><tr><th>항목</th><th>값</th></tr></thead><tbody><tr><td>행 수</td><td>2000</td></tr>
+<tr><td>열 수</td><td>11</td></tr>
+<tr><td>시군구 수</td><td>250</td></tr>
+<tr><td>연도 범위</td><td>2016-2023</td></tr>
+<tr><td>연도&#215;시군구코드 중복</td><td>0</td></tr>
+<tr><td>예산자료 사용가능 행</td><td>1686</td></tr></tbody></table>
+<h3>기본 기술통계</h3>
+<table><thead><tr><th>변수</th><th>관측치</th><th>결측치</th><th>결측률</th><th>평균</th><th>표준편차</th><th>최소</th><th>Q1</th><th>중앙값</th><th>Q3</th><th>최대</th><th>왜도</th><th>영비율</th></tr></thead><tbody><tr><td>대응자원투입예산_소나무림ha당_log</td><td>1686</td><td>314</td><td>15.7</td><td>10.096</td><td>3.651</td><td>0.000</td><td>9.298</td><td>10.594</td><td>12.059</td><td>17.212</td><td>-1.524</td><td>8.7</td></tr>
+<tr><td>예찰진단예산_소나무림ha당_log</td><td>1686</td><td>314</td><td>15.7</td><td>6.179</td><td>4.993</td><td>0.000</td><td>0.000</td><td>8.226</td><td>9.929</td><td>16.050</td><td>-0.218</td><td>36.9</td></tr></tbody></table>
+<h3>연도별 평균 추세</h3>
+<svg viewBox='0 0 920 300' class='chart'><rect width='920' height='300' fill='#fff'/><text x='68' y='22' class='svg-title'>최종변수선정: 메인 변수 연도별 평균</text><line x1='68' y1='34' x2='896' y2='34' stroke='#e7e2d9'/><text x='8' y='38' class='tick'>10.4</text><line x1='68' y1='90' x2='896' y2='90' stroke='#e7e2d9'/><text x='8' y='94' class='tick'>8.0</text><line x1='68' y1='146' x2='896' y2='146' stroke='#e7e2d9'/><text x='8' y='150' class='tick'>5.6</text><line x1='68' y1='202' x2='896' y2='202' stroke='#e7e2d9'/><text x='8' y='206' class='tick'>3.2</text><line x1='68' y1='258' x2='896' y2='258' stroke='#e7e2d9'/><text x='8' y='262' class='tick'>0.8</text><text x='54' y='286' class='tick'>2016</text><text x='172.285714285714' y='286' class='tick'>2017</text><text x='290.571428571429' y='286' class='tick'>2018</text><text x='408.857142857143' y='286' class='tick'>2019</text><text x='527.142857142857' y='286' class='tick'>2020</text><text x='645.428571428571' y='286' class='tick'>2021</text><text x='763.714285714286' y='286' class='tick'>2022</text><text x='882' y='286' class='tick'>2023</text><circle cx='68' cy='46.676210422792' r='3' fill='#2f6f9f'/><circle cx='186.285714285714' cy='46.5040454622598' r='3' fill='#2f6f9f'/><circle cx='304.571428571429' cy='42.1908406996969' r='3' fill='#2f6f9f'/><circle cx='422.857142857143' cy='40.6530947565578' r='3' fill='#2f6f9f'/><circle cx='541.142857142857' cy='40.6457719724543' r='3' fill='#2f6f9f'/><circle cx='659.428571428571' cy='43.8735554251829' r='3' fill='#2f6f9f'/><circle cx='777.714285714286' cy='39.455628869487' r='3' fill='#2f6f9f'/><circle cx='896' cy='34' r='3' fill='#2f6f9f'/><polyline points='68,46.676210422792 186.285714285714,46.5040454622598 304.571428571429,42.1908406996969 422.857142857143,40.6530947565578 541.142857142857,40.6457719724543 659.428571428571,43.8735554251829 777.714285714286,39.455628869487 896,34' fill='none' stroke='#2f6f9f' stroke-width='2.2'/><rect x='78' y='39' width='10' height='10' fill='#2f6f9f'/><text x='94' y='48' class='legend'>대응자원투입예산_소나무림ha당_log</text><circle cx='68' cy='258' r='3' fill='#d48331'/><circle cx='186.285714285714' cy='116.982313481637' r='3' fill='#d48331'/><circle cx='304.571428571429' cy='126.24460844986' r='3' fill='#d48331'/><circle cx='422.857142857143' cy='114.791720519918' r='3' fill='#d48331'/><circle cx='541.142857142857' cy='116.87232843658' r='3' fill='#d48331'/><circle cx='659.428571428571' cy='112.321473396231' r='3' fill='#d48331'/><circle cx='777.714285714286' cy='107.582251242979' r='3' fill='#d48331'/><circle cx='896' cy='107.980957960733' r='3' fill='#d48331'/><polyline points='68,258 186.285714285714,116.982313481637 304.571428571429,126.24460844986 422.857142857143,114.791720519918 541.142857142857,116.87232843658 659.428571428571,112.321473396231 777.714285714286,107.582251242979 896,107.980957960733' fill='none' stroke='#d48331' stroke-width='2.2'/><rect x='488' y='39' width='10' height='10' fill='#d48331'/><text x='504' y='48' class='legend'>예찰진단예산_소나무림ha당_log</text></svg>
+<h3>상관관계</h3>
+<h4>최종변수선정: 메인 변수 상관관계</h4><table><thead><tr><th>변수</th><th>대응자원투입예산_소나무림ha당_log</th><th>예찰진단예산_소나무림ha당_log</th></tr></thead><tbody><tr><th>대응자원투입예산_소나무림ha당_log</th><td style='background:hsl(205,55%,60%)'>1.00</td><td style='background:hsl(205,55%,75%)'>0.32</td></tr><tr><th>예찰진단예산_소나무림ha당_log</th><td style='background:hsl(205,55%,75%)'>0.32</td><td style='background:hsl(205,55%,60%)'>1.00</td></tr></tbody></table>
+<h3>VIF</h3>
+<table><thead><tr><th>변수</th><th>VIF</th><th>완전관측</th><th>판정</th></tr></thead><tbody><tr><td>대응자원투입예산_소나무림ha당_log</td><td>1.117</td><td>1686</td><td>양호</td></tr>
+<tr><td>예찰진단예산_소나무림ha당_log</td><td>1.117</td><td>1686</td><td>양호</td></tr></tbody></table>
+<p class="small">VIF는 <code>예산자료_사용가능여부=1</code> 표본에서 계산했다. 두 메인 변수의 중복성이 높지 않으면 같은 모형에 함께 넣을 수 있다.</p>
+
+<h2 id="main-validity">2. 최종변수선정 파일 외적타당성</h2>
+<p>외적타당성은 대응역량 변수가 발생·재발생 성과와 완전히 무관하지 않은지 확인하는 탐색적 절차다. 여기의 상관은 인과효과가 아니다.</p>
+<table><thead><tr><th>설명변수</th><th>성과변수</th><th>상관</th></tr></thead><tbody><tr><td>대응자원투입예산_소나무림ha당_log</td><td>당해_감염지점수</td><td>0.133</td></tr>
+<tr><td>대응자원투입예산_소나무림ha당_log</td><td>재발생지점수_300m</td><td>0.124</td></tr>
+<tr><td>대응자원투입예산_소나무림ha당_log</td><td>재발생률_300m</td><td>0.155</td></tr>
+<tr><td>대응자원투입예산_소나무림ha당_log</td><td>신규발생지비율_300m</td><td>-0.240</td></tr>
+<tr><td>예찰진단예산_소나무림ha당_log</td><td>당해_감염지점수</td><td>-0.117</td></tr>
+<tr><td>예찰진단예산_소나무림ha당_log</td><td>재발생지점수_300m</td><td>-0.146</td></tr>
+<tr><td>예찰진단예산_소나무림ha당_log</td><td>재발생률_300m</td><td>-0.104</td></tr>
+<tr><td>예찰진단예산_소나무림ha당_log</td><td>신규발생지비율_300m</td><td>0.098</td></tr></tbody></table>
+
+<h2 id="ext">3. 메인+확장 파일 EDA</h2>
+<p>이 파일은 메인 변수에 방제 인프라, 이동통제, 예산 배분구조, 반출금지구역 관련 변수를 더한 확장/민감도 분석용 파일이다.</p>
+<table><thead><tr><th>항목</th><th>값</th></tr></thead><tbody><tr><td>행 수</td><td>2000</td></tr>
+<tr><td>열 수</td><td>19</td></tr>
+<tr><td>시군구 수</td><td>250</td></tr>
+<tr><td>연도 범위</td><td>2016-2023</td></tr>
+<tr><td>연도&#215;시군구코드 중복</td><td>0</td></tr>
+<tr><td>확장변수 완전관측 행</td><td>857</td></tr>
+<tr><td>법인자료 최신성 주의 행</td><td>500</td></tr></tbody></table>
+<h3>기본 기술통계</h3>
+<table><thead><tr><th>변수</th><th>관측치</th><th>결측치</th><th>결측률</th><th>평균</th><th>표준편차</th><th>최소</th><th>Q1</th><th>중앙값</th><th>Q3</th><th>최대</th><th>왜도</th><th>영비율</th></tr></thead><tbody><tr><td>대응자원투입예산_소나무림ha당_log</td><td>1686</td><td>314</td><td>15.7</td><td>10.096</td><td>3.651</td><td>0.000</td><td>9.298</td><td>10.594</td><td>12.059</td><td>17.212</td><td>-1.524</td><td>8.7</td></tr>
+<tr><td>예찰진단예산_소나무림ha당_log</td><td>1686</td><td>314</td><td>15.7</td><td>6.179</td><td>4.993</td><td>0.000</td><td>0.000</td><td>8.226</td><td>9.929</td><td>16.050</td><td>-0.218</td><td>36.9</td></tr>
+<tr><td>방제법인수_소나무림1만ha당_log</td><td>1482</td><td>518</td><td>25.9</td><td>1.295</td><td>1.363</td><td>0.000</td><td>0.000</td><td>1.204</td><td>2.185</td><td>6.048</td><td>0.900</td><td>41.2</td></tr>
+<tr><td>이동통제예산_소나무림ha당_log</td><td>1686</td><td>314</td><td>15.7</td><td>2.455</td><td>4.091</td><td>0.000</td><td>0.000</td><td>0.000</td><td>7.081</td><td>14.412</td><td>1.196</td><td>72.4</td></tr>
+<tr><td>예찰진단예산비중</td><td>1552</td><td>448</td><td>22.4</td><td>0.213</td><td>0.252</td><td>0.000</td><td>0.000</td><td>0.124</td><td>0.331</td><td>1.000</td><td>1.296</td><td>31.2</td></tr>
+<tr><td>이동통제예산비중</td><td>1552</td><td>448</td><td>22.4</td><td>0.032</td><td>0.077</td><td>0.000</td><td>0.000</td><td>0.000</td><td>0.023</td><td>0.981</td><td>4.046</td><td>69.8</td></tr>
+<tr><td>반출금지구역_지정여부</td><td>1547</td><td>453</td><td>22.7</td><td>0.601</td><td>0.490</td><td>0.000</td><td>0.000</td><td>1.000</td><td>1.000</td><td>1.000</td><td>-0.410</td><td>39.9</td></tr>
+<tr><td>반출금지구역면적비율</td><td>1532</td><td>468</td><td>23.4</td><td>4.336</td><td>15.093</td><td>0.000</td><td>0.000</td><td>0.783</td><td>3.262</td><td>204.278</td><td>9.407</td><td>39.4</td></tr></tbody></table>
+<h3>연도별 평균 추세</h3>
+<svg viewBox='0 0 920 300' class='chart'><rect width='920' height='300' fill='#fff'/><text x='68' y='22' class='svg-title'>메인+확장: 후보 변수 연도별 평균</text><line x1='68' y1='34' x2='896' y2='34' stroke='#e7e2d9'/><text x='8' y='38' class='tick'>10.4</text><line x1='68' y1='90' x2='896' y2='90' stroke='#e7e2d9'/><text x='8' y='94' class='tick'>7.8</text><line x1='68' y1='146' x2='896' y2='146' stroke='#e7e2d9'/><text x='8' y='150' class='tick'>5.2</text><line x1='68' y1='202' x2='896' y2='202' stroke='#e7e2d9'/><text x='8' y='206' class='tick'>2.6</text><line x1='68' y1='258' x2='896' y2='258' stroke='#e7e2d9'/><text x='8' y='262' class='tick'>0.0</text><text x='54' y='286' class='tick'>2016</text><text x='172.285714285714' y='286' class='tick'>2017</text><text x='290.571428571429' y='286' class='tick'>2018</text><text x='408.857142857143' y='286' class='tick'>2019</text><text x='527.142857142857' y='286' class='tick'>2020</text><text x='645.428571428571' y='286' class='tick'>2021</text><text x='763.714285714286' y='286' class='tick'>2022</text><text x='882' y='286' class='tick'>2023</text><circle cx='68' cy='45.7478753286025' r='3' fill='#2f6f9f'/><circle cx='186.285714285714' cy='45.5883187714906' r='3' fill='#2f6f9f'/><circle cx='304.571428571429' cy='41.5909891179677' r='3' fill='#2f6f9f'/><circle cx='422.857142857143' cy='40.1658591284417' r='3' fill='#2f6f9f'/><circle cx='541.142857142857' cy='40.1590726242865' r='3' fill='#2f6f9f'/><circle cx='659.428571428571' cy='43.1504711831335' r='3' fill='#2f6f9f'/><circle cx='777.714285714286' cy='39.0560889777137' r='3' fill='#2f6f9f'/><circle cx='896' cy='34' r='3' fill='#2f6f9f'/><polyline points='68,45.7478753286025 186.285714285714,45.5883187714906 304.571428571429,41.5909891179677 422.857142857143,40.1658591284417 541.142857142857,40.1590726242865 659.428571428571,43.1504711831335 777.714285714286,39.0560889777137 896,34' fill='none' stroke='#2f6f9f' stroke-width='2.2'/><rect x='78' y='39' width='10' height='10' fill='#2f6f9f'/><text x='94' y='48' class='legend'>대응자원투입예산_소나무림ha당_log</text><circle cx='68' cy='241.595486808537' r='3' fill='#d48331'/><circle cx='186.285714285714' cy='110.905150730888' r='3' fill='#d48331'/><circle cx='304.571428571429' cy='119.489126770587' r='3' fill='#d48331'/><circle cx='422.857142857143' cy='108.874984604605' r='3' fill='#d48331'/><circle cx='541.142857142857' cy='110.803220378343' r='3' fill='#d48331'/><circle cx='659.428571428571' cy='106.585644630591' r='3' fill='#d48331'/><circle cx='777.714285714286' cy='102.193496728814' r='3' fill='#d48331'/><circle cx='896' cy='102.563004385805' r='3' fill='#d48331'/><polyline points='68,241.595486808537 186.285714285714,110.905150730888 304.571428571429,119.489126770587 422.857142857143,108.874984604605 541.142857142857,110.803220378343 659.428571428571,106.585644630591 777.714285714286,102.193496728814 896,102.563004385805' fill='none' stroke='#d48331' stroke-width='2.2'/><rect x='488' y='39' width='10' height='10' fill='#d48331'/><text x='504' y='48' class='legend'>예찰진단예산_소나무림ha당_log</text><circle cx='68' cy='231.681809389532' r='3' fill='#4e8b5b'/><circle cx='186.285714285714' cy='231.488490761396' r='3' fill='#4e8b5b'/><circle cx='304.571428571429' cy='230.785327090001' r='3' fill='#4e8b5b'/><circle cx='422.857142857143' cy='230.051618789284' r='3' fill='#4e8b5b'/><circle cx='541.142857142857' cy='229.158828374836' r='3' fill='#4e8b5b'/><circle cx='659.428571428571' cy='228.131907944885' r='3' fill='#4e8b5b'/><polyline points='68,231.681809389532 186.285714285714,231.488490761396 304.571428571429,230.785327090001 422.857142857143,230.051618789284 541.142857142857,229.158828374836 659.428571428571,228.131907944885' fill='none' stroke='#4e8b5b' stroke-width='2.2'/><rect x='78' y='57' width='10' height='10' fill='#4e8b5b'/><text x='94' y='66' class='legend'>방제법인수_소나무림1만ha당_log</text><circle cx='68' cy='257.144580024154' r='3' fill='#8a5a9e'/><circle cx='186.285714285714' cy='204.819676246792' r='3' fill='#8a5a9e'/><circle cx='304.571428571429' cy='200.203708758283' r='3' fill='#8a5a9e'/><circle cx='422.857142857143' cy='201.310826086963' r='3' fill='#8a5a9e'/><circle cx='541.142857142857' cy='196.034337134377' r='3' fill='#8a5a9e'/><circle cx='659.428571428571' cy='195.501565071065' r='3' fill='#8a5a9e'/><circle cx='777.714285714286' cy='194.677272260363' r='3' fill='#8a5a9e'/><circle cx='896' cy='192.909677802104' r='3' fill='#8a5a9e'/><polyline points='68,257.144580024154 186.285714285714,204.819676246792 304.571428571429,200.203708758283 422.857142857143,201.310826086963 541.142857142857,196.034337134377 659.428571428571,195.501565071065 777.714285714286,194.677272260363 896,192.909677802104' fill='none' stroke='#8a5a9e' stroke-width='2.2'/><rect x='488' y='57' width='10' height='10' fill='#8a5a9e'/><text x='504' y='66' class='legend'>이동통제예산_소나무림ha당_log</text><circle cx='68' cy='257.537610496093' r='3' fill='#b04f5f'/><circle cx='186.285714285714' cy='251.132598373623' r='3' fill='#b04f5f'/><circle cx='304.571428571429' cy='253.537981783221' r='3' fill='#b04f5f'/><circle cx='422.857142857143' cy='253.455643672341' r='3' fill='#b04f5f'/><circle cx='541.142857142857' cy='253.280465302774' r='3' fill='#b04f5f'/><circle cx='659.428571428571' cy='252.649083277712' r='3' fill='#b04f5f'/><circle cx='777.714285714286' cy='252.818217479442' r='3' fill='#b04f5f'/><circle cx='896' cy='253.39120780042' r='3' fill='#b04f5f'/><polyline points='68,257.537610496093 186.285714285714,251.132598373623 304.571428571429,253.537981783221 422.857142857143,253.455643672341 541.142857142857,253.280465302774 659.428571428571,252.649083277712 777.714285714286,252.818217479442 896,253.39120780042' fill='none' stroke='#b04f5f' stroke-width='2.2'/><rect x='78' y='75' width='10' height='10' fill='#b04f5f'/><text x='94' y='84' class='legend'>예찰진단예산비중</text><circle cx='68' cy='258' r='3' fill='#566573'/><circle cx='186.285714285714' cy='257.541279625101' r='3' fill='#566573'/><circle cx='304.571428571429' cy='257.292926512839' r='3' fill='#566573'/><circle cx='422.857142857143' cy='257.336982977327' r='3' fill='#566573'/><circle cx='541.142857142857' cy='257.128992130415' r='3' fill='#566573'/><circle cx='659.428571428571' cy='257.144547329299' r='3' fill='#566573'/><circle cx='777.714285714286' cy='257.185233269276' r='3' fill='#566573'/><circle cx='896' cy='257.134724704375' r='3' fill='#566573'/><polyline points='68,258 186.285714285714,257.541279625101 304.571428571429,257.292926512839 422.857142857143,257.336982977327 541.142857142857,257.128992130415 659.428571428571,257.144547329299 777.714285714286,257.185233269276 896,257.134724704375' fill='none' stroke='#566573' stroke-width='2.2'/><rect x='488' y='75' width='10' height='10' fill='#566573'/><text x='504' y='84' class='legend'>이동통제예산비중</text><circle cx='68' cy='236.552308718929' r='3' fill='#9a6b28'/><circle cx='186.285714285714' cy='236.552308718929' r='3' fill='#9a6b28'/><circle cx='304.571428571429' cy='236.552308718929' r='3' fill='#9a6b28'/><circle cx='422.857142857143' cy='248.064576881551' r='3' fill='#9a6b28'/><circle cx='541.142857142857' cy='247.377277289753' r='3' fill='#9a6b28'/><circle cx='659.428571428571' cy='247.033627493854' r='3' fill='#9a6b28'/><circle cx='777.714285714286' cy='246.689977697955' r='3' fill='#9a6b28'/><circle cx='896' cy='246.689977697955' r='3' fill='#9a6b28'/><polyline points='68,236.552308718929 186.285714285714,236.552308718929 304.571428571429,236.552308718929 422.857142857143,248.064576881551 541.142857142857,247.377277289753 659.428571428571,247.033627493854 777.714285714286,246.689977697955 896,246.689977697955' fill='none' stroke='#9a6b28' stroke-width='2.2'/><rect x='78' y='93' width='10' height='10' fill='#9a6b28'/><text x='94' y='102' class='legend'>반출금지구역_지정여부</text><circle cx='68' cy='133.21311215736' r='3' fill='#1f8a83'/><circle cx='186.285714285714' cy='109.602074216795' r='3' fill='#1f8a83'/><circle cx='304.571428571429' cy='111.55788268842' r='3' fill='#1f8a83'/><circle cx='422.857142857143' cy='188.328767058564' r='3' fill='#1f8a83'/><circle cx='541.142857142857' cy='183.627785341275' r='3' fill='#1f8a83'/><circle cx='659.428571428571' cy='178.614361955974' r='3' fill='#1f8a83'/><circle cx='777.714285714286' cy='174.344439549493' r='3' fill='#1f8a83'/><circle cx='896' cy='156.680162780625' r='3' fill='#1f8a83'/><polyline points='68,133.21311215736 186.285714285714,109.602074216795 304.571428571429,111.55788268842 422.857142857143,188.328767058564 541.142857142857,183.627785341275 659.428571428571,178.614361955974 777.714285714286,174.344439549493 896,156.680162780625' fill='none' stroke='#1f8a83' stroke-width='2.2'/><rect x='488' y='93' width='10' height='10' fill='#1f8a83'/><text x='504' y='102' class='legend'>반출금지구역면적비율</text></svg>
+<h3>상관관계</h3>
+<h4>메인+확장: 후보 변수 상관관계</h4><table><thead><tr><th>변수</th><th>대응자원투입예산_소나무림ha당_log</th><th>예찰진단예산_소나무림ha당_log</th><th>방제법인수_소나무림1만ha당_log</th><th>이동통제예산_소나무림ha당_log</th><th>예찰진단예산비중</th><th>이동통제예산비중</th><th>반출금지구역_지정여부</th><th>반출금지구역면적비율</th></tr></thead><tbody><tr><th>대응자원투입예산_소나무림ha당_log</th><td style='background:hsl(205,55%,60%)'>1.00</td><td style='background:hsl(205,55%,75%)'>0.32</td><td style='background:hsl(205,55%,94%)'>0.01</td><td style='background:hsl(205,55%,81%)'>0.23</td><td style='background:hsl(18,55%,71%)'>-0.39</td><td style='background:hsl(18,55%,90%)'>-0.06</td><td style='background:hsl(205,55%,83%)'>0.18</td><td style='background:hsl(205,55%,79%)'>0.26</td></tr><tr><th>예찰진단예산_소나무림ha당_log</th><td style='background:hsl(205,55%,75%)'>0.32</td><td style='background:hsl(205,55%,60%)'>1.00</td><td style='background:hsl(205,55%,89%)'>0.09</td><td style='background:hsl(205,55%,81%)'>0.23</td><td style='background:hsl(205,55%,60%)'>0.63</td><td style='background:hsl(205,55%,90%)'>0.08</td><td style='background:hsl(18,55%,92%)'>-0.04</td><td style='background:hsl(205,55%,89%)'>0.09</td></tr><tr><th>방제법인수_소나무림1만ha당_log</th><td style='background:hsl(205,55%,94%)'>0.01</td><td style='background:hsl(205,55%,89%)'>0.09</td><td style='background:hsl(205,55%,60%)'>1.00</td><td style='background:hsl(205,55%,91%)'>0.06</td><td style='background:hsl(18,55%,94%)'>0.00</td><td style='background:hsl(18,55%,92%)'>-0.03</td><td style='background:hsl(205,55%,86%)'>0.14</td><td style='background:hsl(18,55%,89%)'>-0.09</td></tr><tr><th>이동통제예산_소나무림ha당_log</th><td style='background:hsl(205,55%,81%)'>0.23</td><td style='background:hsl(205,55%,81%)'>0.23</td><td style='background:hsl(205,55%,91%)'>0.06</td><td style='background:hsl(205,55%,60%)'>1.00</td><td style='background:hsl(18,55%,88%)'>-0.11</td><td style='background:hsl(205,55%,60%)'>0.68</td><td style='background:hsl(205,55%,83%)'>0.20</td><td style='background:hsl(205,55%,86%)'>0.14</td></tr><tr><th>예찰진단예산비중</th><td style='background:hsl(18,55%,71%)'>-0.39</td><td style='background:hsl(205,55%,60%)'>0.63</td><td style='background:hsl(18,55%,94%)'>0.00</td><td style='background:hsl(18,55%,88%)'>-0.11</td><td style='background:hsl(205,55%,60%)'>1.00</td><td style='background:hsl(18,55%,93%)'>-0.01</td><td style='background:hsl(18,55%,80%)'>-0.25</td><td style='background:hsl(18,55%,88%)'>-0.11</td></tr><tr><th>이동통제예산비중</th><td style='background:hsl(18,55%,90%)'>-0.06</td><td style='background:hsl(205,55%,90%)'>0.08</td><td style='background:hsl(18,55%,92%)'>-0.03</td><td style='background:hsl(205,55%,60%)'>0.68</td><td style='background:hsl(18,55%,93%)'>-0.01</td><td style='background:hsl(205,55%,60%)'>1.00</td><td style='background:hsl(18,55%,92%)'>-0.03</td><td style='background:hsl(18,55%,94%)'>0.00</td></tr><tr><th>반출금지구역_지정여부</th><td style='background:hsl(205,55%,83%)'>0.18</td><td style='background:hsl(18,55%,92%)'>-0.04</td><td style='background:hsl(205,55%,86%)'>0.14</td><td style='background:hsl(205,55%,83%)'>0.20</td><td style='background:hsl(18,55%,80%)'>-0.25</td><td style='background:hsl(18,55%,92%)'>-0.03</td><td style='background:hsl(205,55%,60%)'>1.00</td><td style='background:hsl(205,55%,81%)'>0.23</td></tr><tr><th>반출금지구역면적비율</th><td style='background:hsl(205,55%,79%)'>0.26</td><td style='background:hsl(205,55%,89%)'>0.09</td><td style='background:hsl(18,55%,89%)'>-0.09</td><td style='background:hsl(205,55%,86%)'>0.14</td><td style='background:hsl(18,55%,88%)'>-0.11</td><td style='background:hsl(18,55%,94%)'>0.00</td><td style='background:hsl(205,55%,81%)'>0.23</td><td style='background:hsl(205,55%,60%)'>1.00</td></tr></tbody></table>
+<h3>VIF</h3>
+<table><thead><tr><th>변수</th><th>VIF</th><th>완전관측</th><th>판정</th></tr></thead><tbody><tr><td>대응자원투입예산_소나무림ha당_log</td><td>1.896</td><td>857</td><td>양호</td></tr>
+<tr><td>예찰진단예산_소나무림ha당_log</td><td>2.098</td><td>857</td><td>양호</td></tr>
+<tr><td>방제법인수_소나무림1만ha당_log</td><td>1.126</td><td>857</td><td>양호</td></tr>
+<tr><td>이동통제예산_소나무림ha당_log</td><td>2.278</td><td>857</td><td>양호</td></tr>
+<tr><td>예찰진단예산비중</td><td>2.627</td><td>857</td><td>양호</td></tr>
+<tr><td>이동통제예산비중</td><td>2.100</td><td>857</td><td>양호</td></tr>
+<tr><td>반출금지구역_지정여부</td><td>1.338</td><td>857</td><td>양호</td></tr>
+<tr><td>반출금지구역면적비율</td><td>1.322</td><td>857</td><td>양호</td></tr></tbody></table>
+<p class="small">확장 VIF는 모든 후보 변수가 관측된 완전관측 표본 기준이다. 완전관측 수가 작거나 VIF가 높으면 변수를 한꺼번에 넣기보다 확장 사양을 나누는 편이 안전하다.</p>
+
+<h2 id="ext-validity">4. 메인+확장 파일 외적타당성</h2>
+<p>확장 변수는 이론적 설명 범위를 넓히지만, 일부 변수는 자료 최신성·내생성·극단값 문제가 있다. 특히 법인자료는 2022-2023년에 최신성 주의 플래그가 켜져 있고, 반출금지구역 변수는 발생 이후 지정되는 성격이 강하다.</p>
+<table><thead><tr><th>설명변수</th><th>성과변수</th><th>상관</th></tr></thead><tbody><tr><td>대응자원투입예산_소나무림ha당_log</td><td>당해_감염지점수</td><td>0.133</td></tr>
+<tr><td>대응자원투입예산_소나무림ha당_log</td><td>재발생지점수_300m</td><td>0.124</td></tr>
+<tr><td>대응자원투입예산_소나무림ha당_log</td><td>재발생률_300m</td><td>0.155</td></tr>
+<tr><td>대응자원투입예산_소나무림ha당_log</td><td>신규발생지비율_300m</td><td>-0.240</td></tr>
+<tr><td>예찰진단예산_소나무림ha당_log</td><td>당해_감염지점수</td><td>-0.117</td></tr>
+<tr><td>예찰진단예산_소나무림ha당_log</td><td>재발생지점수_300m</td><td>-0.146</td></tr>
+<tr><td>예찰진단예산_소나무림ha당_log</td><td>재발생률_300m</td><td>-0.104</td></tr>
+<tr><td>예찰진단예산_소나무림ha당_log</td><td>신규발생지비율_300m</td><td>0.098</td></tr>
+<tr><td>방제법인수_소나무림1만ha당_log</td><td>당해_감염지점수</td><td>0.116</td></tr>
+<tr><td>방제법인수_소나무림1만ha당_log</td><td>재발생지점수_300m</td><td>0.112</td></tr>
+<tr><td>방제법인수_소나무림1만ha당_log</td><td>재발생률_300m</td><td>0.017</td></tr>
+<tr><td>방제법인수_소나무림1만ha당_log</td><td>신규발생지비율_300m</td><td>-0.054</td></tr>
+<tr><td>이동통제예산_소나무림ha당_log</td><td>당해_감염지점수</td><td>0.134</td></tr>
+<tr><td>이동통제예산_소나무림ha당_log</td><td>재발생지점수_300m</td><td>0.145</td></tr>
+<tr><td>이동통제예산_소나무림ha당_log</td><td>재발생률_300m</td><td>0.033</td></tr>
+<tr><td>이동통제예산_소나무림ha당_log</td><td>신규발생지비율_300m</td><td>-0.122</td></tr>
+<tr><td>예찰진단예산비중</td><td>당해_감염지점수</td><td>-0.157</td></tr>
+<tr><td>예찰진단예산비중</td><td>재발생지점수_300m</td><td>-0.166</td></tr>
+<tr><td>예찰진단예산비중</td><td>재발생률_300m</td><td>-0.127</td></tr>
+<tr><td>예찰진단예산비중</td><td>신규발생지비율_300m</td><td>0.177</td></tr>
+<tr><td>이동통제예산비중</td><td>당해_감염지점수</td><td>-0.044</td></tr>
+<tr><td>이동통제예산비중</td><td>재발생지점수_300m</td><td>-0.039</td></tr>
+<tr><td>이동통제예산비중</td><td>재발생률_300m</td><td>-0.077</td></tr>
+<tr><td>이동통제예산비중</td><td>신규발생지비율_300m</td><td>0.040</td></tr>
+<tr><td>반출금지구역_지정여부</td><td>당해_감염지점수</td><td>0.165</td></tr>
+<tr><td>반출금지구역_지정여부</td><td>재발생지점수_300m</td><td>0.127</td></tr>
+<tr><td>반출금지구역_지정여부</td><td>재발생률_300m</td><td>0.015</td></tr>
+<tr><td>반출금지구역_지정여부</td><td>신규발생지비율_300m</td><td>0.012</td></tr>
+<tr><td>반출금지구역면적비율</td><td>당해_감염지점수</td><td>0.010</td></tr>
+<tr><td>반출금지구역면적비율</td><td>재발생지점수_300m</td><td>0.010</td></tr>
+<tr><td>반출금지구역면적비율</td><td>재발생률_300m</td><td>-0.033</td></tr>
+<tr><td>반출금지구역면적비율</td><td>신규발생지비율_300m</td><td>-0.004</td></tr></tbody></table>
+
+<h2 id="modeling">5. 모델링 전 최종 판단</h2>
+<table><thead><tr><th>구분</th><th>권장 사용</th><th>이유</th></tr></thead><tbody>
+<tr><td>주 모형</td><td><code>CH2_지자체대응역량_최종변수선정.csv</code>에서 예산 2개 사용</td><td>자료 품질이 가장 안정적이고, 예산 기반 대응역량이라는 개념이 명확하다.</td></tr>
+<tr><td>표본 필터</td><td><code>예산자료_사용가능여부=1</code></td><td>0값은 실제 관측된 0으로 유지하고, 사용가능여부 0인 행만 계산 불가로 제외한다.</td></tr>
+<tr><td>확장 분석</td><td>메인 변수 + <code>방제법인수_소나무림1만ha당_log</code></td><td>실제 방제 수행 인프라를 보완하지만 2022-2023 최신성 한계가 있어 주 모형보다 보조가 적절하다.</td></tr>
+<tr><td>민감도 분석</td><td>이동통제예산, 예산비중 변수</td><td>총량이 아닌 기능별·배분구조 해석에 유용하다.</td></tr>
+<tr><td>주의 분석</td><td>반출금지구역 지정여부/면적비율</td><td>정책 대응 조치이지만 발생 이후 지정되는 성격이 강해 내생성 주의가 필요하다.</td></tr>
+</tbody></table>
+<p><b>종합 판단:</b> 소나무재선충병 대응역량을 설명하기에는 메인 예산 2개만으로도 이론적 기본축은 충족한다. 다만 “현장 실행력”까지 주장하려면 확장 변수로 방제법인을 보조적으로 제시하는 것이 좋다. 따라서 본문 주 분석은 최종변수선정 파일, 부록 또는 강건성 분석은 메인+확장 파일을 쓰는 구성이 가장 방어 가능하다.</p>
+</main></body></html>
