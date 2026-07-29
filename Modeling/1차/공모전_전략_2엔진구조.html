@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>공모전 전략 — 2엔진 구조 (구조적 취약성지수 + 조기경보모형)</title>
+<style>
+  :root{
+    --bg:#ffffff; --text:#1b1f24; --muted:#5b6572; --border:#e2e5ea;
+    --accent:#1f6f4f; --accent-soft:#e8f5ef; --card:#f7f8fa;
+    --table-head:#eef1f4; --warn-bg:#fff6e9; --warn-border:#e8c583;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#14171b; --text:#e7e9ec; --muted:#9aa4b2; --border:#2a2f36;
+      --accent:#4cbf8e; --accent-soft:#173328; --card:#1b1f24;
+      --table-head:#20252b; --warn-bg:#2a2410; --warn-border:#7a5d1e;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:"Apple SD Gothic Neo","Malgun Gothic",-apple-system,BlinkMacSystemFont,sans-serif;
+    line-height:1.7; max-width:880px; margin:0 auto; padding:2.5rem 1.5rem 5rem;
+  }
+  h1{font-size:1.6rem; border-bottom:3px solid var(--accent); padding-bottom:0.6rem; margin-bottom:0.3rem;}
+  .subtitle{color:var(--muted); font-size:0.95rem; margin-bottom:2.2rem;}
+  h2{font-size:1.25rem; margin-top:2.6rem; margin-bottom:0.9rem; color:var(--accent);
+     border-left:5px solid var(--accent); padding-left:0.7rem;}
+  h3{font-size:1.05rem; margin-top:1.6rem; margin-bottom:0.6rem;}
+  p{margin:0.7rem 0;}
+  ul, ol{padding-left:1.4rem; margin:0.7rem 0;}
+  li{margin:0.35rem 0;}
+  code{
+    background:var(--card); border:1px solid var(--border); border-radius:4px;
+    padding:0.1rem 0.4rem; font-family:"SF Mono",Menlo,monospace; font-size:0.88em;
+  }
+  pre{
+    background:var(--card); border:1px solid var(--border); border-radius:8px;
+    padding:1rem 1.2rem; overflow-x:auto; font-family:"SF Mono",Menlo,monospace; font-size:0.9rem;
+  }
+  table{border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:0.93rem;}
+  caption{caption-side:top; text-align:left; font-weight:600; margin-bottom:0.4rem; color:var(--muted);}
+  th, td{border:1px solid var(--border); padding:0.65rem 0.8rem; text-align:left; vertical-align:top;}
+  th{background:var(--table-head); font-weight:700;}
+  .table-wrap{overflow-x:auto;}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:1.1rem 1.3rem; margin:1.1rem 0;
+  }
+  .callout{
+    background:var(--accent-soft); border:1px solid var(--accent); border-radius:8px;
+    padding:1rem 1.2rem; margin:1.2rem 0;
+  }
+  .quote-block{
+    background:var(--warn-bg); border:1px solid var(--warn-border); border-radius:8px;
+    padding:1rem 1.2rem; margin:1.2rem 0; font-style:italic;
+  }
+  .step-list{counter-reset:step;}
+  .step-list > li{list-style:none; position:relative; padding-left:2.1rem; margin:0.9rem 0;}
+  .step-list > li::before{
+    counter-increment:step; content:counter(step);
+    position:absolute; left:0; top:0; width:1.5rem; height:1.5rem;
+    background:var(--accent); color:#fff; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700;
+  }
+  .badge{
+    display:inline-block; background:var(--accent); color:#fff; font-size:0.72rem;
+    font-weight:700; padding:0.15rem 0.55rem; border-radius:999px; margin-left:0.4rem;
+    vertical-align:middle;
+  }
+  hr{border:none; border-top:1px solid var(--border); margin:2.5rem 0;}
+  footer{color:var(--muted); font-size:0.82rem; margin-top:3rem; border-top:1px solid var(--border); padding-top:1rem;}
+</style>
+</head>
+<body>
+
+<h1>공모전 전략 — 2엔진 구조</h1>
+<div class="subtitle">구조적 취약성지수(설명용) + 조기경보모형(검증용) · 정리일 2026-07-29</div>
+
+<h2>전체 아키텍처 — 왜 모형을 하나로 합치면 안 되는가</h2>
+
+<p>지수에 과거이력·공간확산을 넣으면 AUC는 0.97까지 뛰지만, 그 순간 지수는 "구조적으로 왜 취약한가"가
+아니라 "작년에 터진 곳이 올해도 터진다"는 걸 재확인하는 물건이 됩니다. 그러면 "취약성에 기여한 변수를
+바탕으로 맞춤형 예산을 설계한다"는 프로젝트의 핵심 스토리 자체가 무너집니다 — 기여 변수가 전부
+"작년 발생 여부"가 돼버리니 정책적으로 할 말이 없어집니다(예산을 더 준다고 작년 발생 이력이 바뀌진
+않으니까요). 그래서 <strong>역할을 분리한 2엔진 구조</strong>를 추천합니다.</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th></th><th>Model 1 — 구조적 취약성지수</th><th>Model 2 — 조기경보모형</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>투입변수</strong></td>
+    <td>노출도·기후·인위적확산·대응역량<br>(4도메인, 정책개입 가능한 변수만)</td>
+    <td>Model 1 + 전년도 발생이력·인접확산</td></tr>
+<tr><td><strong>AUC</strong></td>
+    <td>0.58~0.64 <span class="badge">낮지만 정직</span></td>
+    <td><strong>0.97</strong> <span class="badge">검증용</span></td></tr>
+<tr><td><strong>역할</strong></td>
+    <td>"왜 취약한가" 설명 → 정책 설계 엔진</td>
+    <td>"이 프레임워크가 실제로 맞다"는 신뢰성 과시</td></tr>
+<tr><td><strong>산출물</strong></td>
+    <td>시군구별 기여도 분해</td>
+    <td>발생확률 랭킹</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout">
+이렇게 하면 심사 발표에서 "AUC가 왜 낮냐"는 질문에 <em>"저희는 정책개입 가능한 구조변수만 썼고,
+여기에 과거이력을 더하면 AUC 0.97까지 나온다는 것도 검증했습니다 — 다만 그건 '작년에 터진 곳이
+또 터진다'는 당연한 결과라 정책설계엔 안 씁니다"</em>라고 <strong>먼저 선수치는 답변</strong>이
+가능해집니다. 이게 오히려 방법론적 성숙도를 어필하는 포인트가 됩니다.
+</div>
+
+<h2>Model 1이 실제로 하는 일 — 기여도 분해가 핵심</h2>
+
+<p>취약성지수 = 4개 도메인 점수의 가중합이므로, <strong>시군구별로 어느 도메인이 점수를
+밀어올렸는지 자동으로 분해</strong>됩니다.</p>
+
+<pre>지수_i = 0.25×노출도_i + 0.25×기후위험도_i + 0.25×인위적확산_i + 0.25×(-대응역량_i)</pre>
+
+<p>예를 들어 완도군의 지수가 높다면, 그게 "노출도 때문"인지 "대응역량이 낮아서"인지 도메인별
+기여분을 그대로 계산할 수 있습니다(가중치×도메인점수). 이걸 시군구마다 스택바 차트로 보여주면:</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>기여 우세 도메인</th><th>맞춤형 정책 방향</th></tr></thead>
+<tbody>
+<tr><td>노출도·기후 기여가 큰 곳</td><td>예찰·모니터링 예산(조기 발견 인프라)</td></tr>
+<tr><td>인위적확산 기여가 큰 곳</td><td>도로변/원목유통 관리 예산(이동경로 차단)</td></tr>
+<tr><td>대응역량(역방향) 기여가 큰 곳</td><td>기본 방제조직·인력 확충 예산</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout">
+"얼마를 더 줄까"가 아니라 <strong>"어떤 종류의 지원이 필요한가"까지 구분해서 제안</strong>하는 게
+됩니다. 이게 공모전에서 차별화 포인트입니다 — 대부분의 팀은 "취약한 곳에 예산 더"까지만 가고,
+이 유형 매칭까지 가는 팀은 드뭅니다.
+</div>
+
+<h2>정책 제안까지 이어지는 흐름 (이미 다 만들어 놓은 것들)</h2>
+
+<ol class="step-list">
+  <li><strong>취약성지수 산출</strong>(Model 1) → 시군구별 기여도 분해</li>
+  <li><strong>배분갭 진단</strong>(이미 완료) → "위험 대비 예산이 R²=4%밖에 설명 안 됨" =
+      현재 배분이 위험을 거의 반영 못한다는 문제 제기</li>
+  <li><strong>배분공식 시뮬레이션</strong>(이미 완료) → 완도군·의성군처럼 위험최상위인데
+      예산 0원인 곳을 구체적으로 지목, 재배분 시 어떤 변화가 생기는지 시뮬레이션</li>
+  <li><strong>기여도 기반 지원 유형 매핑</strong>(아직 미작성) → 같은 "부족" 판정이라도
+      지자체마다 다른 처방 제안</li>
+  <li><strong>조기경보모형</strong>(Model 2, AUC 0.97) → "이 프레임워크 전체가 실제로
+      검증됐다"는 신뢰도 보강용 부록</li>
+</ol>
+
+<h2>다음에 실제로 만들 것 (순서 추천)</h2>
+
+<ol>
+  <li>시군구별 기여도 분해표 + 상위 취약지역 스택바 시각화 — 코드로 바로 만들 수 있습니다
+      (지수 계산식이 이미 있어서 분해가 자동)</li>
+  <li>기여도 패턴별 지자체 군집화(예: 노출도-우세형 / 역량-부족형 / 인위적확산-우세형) →
+      유형별 정책 템플릿</li>
+  <li>조기경보모형(Model 2)을 정식 섹션으로 보고서에 추가</li>
+</ol>
+
+<footer>CH2 방제취약성지수 · 맞춤형 예산배분 모델링 프로젝트 — 공모전 전략 메모</footer>
+
+</body>
+</html>

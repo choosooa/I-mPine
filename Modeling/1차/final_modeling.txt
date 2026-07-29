@@ -1,0 +1,267 @@
+# -*- coding: utf-8 -*-
+"""
+CH2 최종 모델링
+1) 표본 정의(면적=0 16행 제외) + 핵심변수 결측 처리
+2) 방제취약성지수 산출: (a) 이론적 동일가중 (b) 실증가중(LMG, 예산도메인 제외 추정)
+3) 모형 A(지수 타당성 검증): 2부문모형(발생여부 로지스틱 + 발생시 크기 OLS), CRE(Mundlak)+군집표준오차
+   - 훈련 2017-2020 / 홀드아웃 2021-2022, rolling-origin으로 2023 추가 검증
+입력: output/CH2_전체병합패널_5도메인_2016_2023.csv, output/변수사전_역할태그.csv
+출력: output/모델링/*.csv, *.txt
+"""
+import itertools
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+from scipy import stats
+from sklearn.metrics import roc_auc_score
+
+pd.set_option("display.width", 200)
+pd.set_option("display.max_columns", 50)
+
+OUTDIR = "/Users/chanhaeng17/Desktop/최종 CH2 EDA/병합패널/output"
+MODELDIR = f"{OUTDIR}/모델링"
+PANEL = f"{OUTDIR}/CH2_전체병합패널_5도메인_2016_2023.csv"
+
+LOG = []
+def log(msg):
+    print(msg)
+    LOG.append(str(msg))
+
+# =========================================================
+# 1. 데이터 로드 + 표본 정의
+# =========================================================
+df = pd.read_csv(PANEL)
+log(f"[원본] {df.shape}")
+
+excl = df.loc[df["log_소나무림면적"].isna(), ["시도", "시군구"]].drop_duplicates()
+log(f"[제외단위] 소나무림면적=0(진짜 0, GIS 재검증됨) 시군구: {excl.to_dict('records')}")
+df = df.merge(excl.assign(_excl=1), on=["시도", "시군구"], how="left")
+df = df[df["_excl"].isna()].drop(columns="_excl").reset_index(drop=True)
+log(f"[표본정의 후] {df.shape} (16행 제외 확인: {1832-len(df)}행 제외됨)")
+
+Y = "log_피해밀도_본per_ha"
+CORE = {
+    "노출도": ["소나무류_면적비율(%)"],
+    "기후위험도": ["연강수량_mm", "평균풍속_ms", "GDD_솔수염하늘소_base11.9", "SPI3_최저월(최심가뭄)"],
+    "지자체대응역량": ["대응자원투입예산_소나무림ha당_log_재선충명시", "예찰사업_재선충명시_존재_flag"],
+    "인위적확산": ["도로소나무비율_500m", "log1p_원목생산업체수"],
+}
+AREA = "log_소나무림면적"  # 인위적확산 동반 필수 통제
+ALL_CORE = [v for vs in CORE.values() for v in vs] + [AREA, Y]
+
+before = len(df)
+model_df = df.dropna(subset=ALL_CORE).copy()
+log(f"\n[핵심변수 listwise deletion] {before} -> {len(model_df)}행 "
+    f"({(before-len(model_df))/before*100:.1f}% 손실)")
+
+# =========================================================
+# 2. 방향성 확인 (부호 체크)
+# =========================================================
+log("\n=== 핵심변수 vs Y 상관 (방향성 확인) ===")
+sign_check = {}
+for dom, vs in CORE.items():
+    for v in vs:
+        r = model_df[[v, Y]].corr().iloc[0, 1]
+        sign_check[v] = r
+        log(f"  [{dom}] {v}: r={r:+.3f}")
+
+# =========================================================
+# 3. 인위적확산 변수 - 면적 통제 잔차화(residualize)
+# =========================================================
+Xa = sm.add_constant(model_df[AREA])
+model_df["도로소나무비율_resid"] = sm.OLS(model_df["도로소나무비율_500m"], Xa).fit().resid
+model_df["원목업체_resid"] = sm.OLS(model_df["log1p_원목생산업체수"], Xa).fit().resid
+
+r_road = model_df[["도로소나무비율_resid", Y]].corr().iloc[0, 1]
+r_wood = model_df[["원목업체_resid", Y]].corr().iloc[0, 1]
+log(f"\n[면적통제 후 재해석] 도로소나무비율_resid vs Y: r={r_road:+.3f} (사전 명시: +)")
+log(f"[면적통제 후 재해석] 원목업체_resid vs Y: r={r_wood:+.3f} (사전 명시: -)")
+
+# =========================================================
+# 4. 도메인 z-score (within-year) 산출 + 방향 정렬
+# =========================================================
+def within_year_z(frame, col):
+    return frame.groupby("연도")[col].transform(lambda s: (s - s.mean()) / s.std(ddof=0))
+
+INDEX_INPUTS = {
+    "노출도": [("소나무류_면적비율(%)", +1)],
+    "기후위험도": [
+        ("연강수량_mm", np.sign(sign_check["연강수량_mm"]) or 1),
+        ("평균풍속_ms", np.sign(sign_check["평균풍속_ms"]) or 1),
+        ("GDD_솔수염하늘소_base11.9", np.sign(sign_check["GDD_솔수염하늘소_base11.9"]) or 1),
+        ("SPI3_최저월(최심가뭄)", np.sign(sign_check["SPI3_최저월(최심가뭄)"]) or 1),
+    ],
+    "지자체대응역량": [
+        ("대응자원투입예산_소나무림ha당_log_재선충명시", -1),  # 이론적 강제(역인과 위험 대응)
+        ("예찰사업_재선충명시_존재_flag", -1),
+    ],
+    "인위적확산": [
+        ("도로소나무비율_resid", +1),
+        ("원목업체_resid", -1),
+    ],
+}
+
+domain_score_cols = {}
+for dom, items in INDEX_INPUTS.items():
+    zs = []
+    for col, direction in items:
+        z = within_year_z(model_df, col) * direction
+        zs.append(z)
+    domain_score_cols[dom] = pd.concat(zs, axis=1).mean(axis=1)
+    model_df[f"{dom}_점수"] = domain_score_cols[dom]
+
+log("\n=== 도메인 점수 상호상관 ===")
+dom_cols = [f"{d}_점수" for d in CORE.keys()]
+log(model_df[dom_cols].corr().round(3).to_string())
+
+# =========================================================
+# 5. 지수(A) 이론적 동일가중
+# =========================================================
+model_df["취약성지수_동일가중"] = model_df[dom_cols].mean(axis=1)
+
+# =========================================================
+# 6. 지수(B) 실증가중(LMG, 예산도메인 제외 추정) — 2017-2020 훈련
+# =========================================================
+train_mask = model_df["연도"].between(2017, 2020)
+lmg_vars = ["노출도_점수", "기후위험도_점수", "인위적확산_점수"]  # 지자체대응역량 제외(역인과 위험)
+
+def lmg_shares(frame, y, xs):
+    """Lindeman-Merenda-Gold: 부분집합 평균으로 R^2를 변수별로 공정 분해."""
+    n = len(xs)
+    shares = {x: 0.0 for x in xs}
+    subsets_by_size = {k: list(itertools.combinations(xs, k)) for k in range(n + 1)}
+    r2_cache = {}
+
+    def r2(subset):
+        if subset in r2_cache:
+            return r2_cache[subset]
+        if len(subset) == 0:
+            r2_cache[subset] = 0.0
+            return 0.0
+        X = sm.add_constant(frame[list(subset)])
+        r2v = sm.OLS(frame[y], X).fit().rsquared
+        r2_cache[subset] = r2v
+        return r2v
+
+    for x in xs:
+        others = [v for v in xs if v != x]
+        total = 0.0
+        cnt = 0
+        for k in range(len(others) + 1):
+            for subset in itertools.combinations(others, k):
+                subset = tuple(sorted(subset))
+                with_x = tuple(sorted(subset + (x,)))
+                total += r2(with_x) - r2(subset)
+                cnt += 1
+        shares[x] = total / cnt
+    return shares
+
+train_df = model_df[train_mask].dropna(subset=lmg_vars + [Y])
+shares = lmg_shares(train_df, Y, lmg_vars)
+total_r2 = sum(shares.values())
+log(f"\n=== LMG 분해(훈련 2017-2020, n={len(train_df)}) — 지자체대응역량 도메인 제외 추정 ===")
+for k, v in shares.items():
+    log(f"  {k}: R² 기여 {v:.4f} (비중 {v/total_r2*100:.1f}%)")
+log(f"  총 R² = {total_r2:.4f}")
+
+# 가중치: LMG 3개 도메인 비중 + 지자체대응역량은 이론적 고정치(3개 도메인 평균)
+w = {k.replace("_점수", ""): v / total_r2 for k, v in shares.items()}
+w_gov_theoretical = np.mean(list(w.values()))
+w["지자체대응역량"] = w_gov_theoretical
+w_sum = sum(w.values())
+w = {k: v / w_sum for k, v in w.items()}
+log(f"\n[실증가중 최종] {w} (지자체대응역량은 3개 도메인 평균으로 이론적 고정, 부호는 이미 -1 반영됨)")
+
+model_df["취약성지수_실증가중"] = sum(w[d] * model_df[f"{d}_점수"] for d in CORE.keys())
+
+rank_corr = stats.spearmanr(model_df["취약성지수_동일가중"], model_df["취약성지수_실증가중"]).correlation
+log(f"\n[두 지수 순위상관] Spearman rho = {rank_corr:.3f}")
+
+# =========================================================
+# 7. 모형 A: CRE(Mundlak) + 2부문모형 (발생여부 로지스틱 / 발생시 크기 OLS)
+# =========================================================
+model_df["Y_bin"] = (model_df[Y] > 0).astype(int)
+model_df["지자체_key"] = model_df["시도"] + model_df["시군구"]
+
+def add_cre_terms(frame, xcols, group_col="지자체_key"):
+    frame = frame.copy()
+    for c in xcols:
+        gm = frame.groupby(group_col)[c].transform("mean")
+        frame[f"{c}_gm"] = gm
+    return frame
+
+def run_two_part(frame, index_col, label):
+    xcols = [index_col]
+    frame = add_cre_terms(frame, xcols)
+    Xvars = xcols + [f"{c}_gm" for c in xcols]
+
+    log(f"\n----- 모형A [{label}] (CRE, n={len(frame)}) -----")
+
+    # (1) 발생여부: 로지스틱, 군집표준오차(지자체)
+    Xb = sm.add_constant(frame[Xvars])
+    logit = sm.GLM(frame["Y_bin"], Xb, family=sm.families.Binomial()).fit(
+        cov_type="cluster", cov_kwds={"groups": frame["지자체_key"]}
+    )
+    log("[발생여부 로지스틱]")
+    log(logit.summary2().tables[1].round(4).to_string())
+
+    pred_p = logit.predict(Xb)
+    auc = roc_auc_score(frame["Y_bin"], pred_p)
+    rho = stats.spearmanr(frame[index_col], frame[Y]).correlation
+    log(f"  AUC(발생여부 판별) = {auc:.3f}")
+    log(f"  Spearman rho(지수 vs Y) = {rho:.3f}")
+
+    # (2) 발생시 크기: OLS, 군집표준오차, Y>0 서브샘플
+    pos = frame[frame["Y_bin"] == 1]
+    Xp = sm.add_constant(pos[Xvars])
+    ols = sm.OLS(pos[Y], Xp).fit(cov_type="cluster", cov_kwds={"groups": pos["지자체_key"]})
+    log("[발생시 크기 OLS]")
+    log(ols.summary2().tables[1].round(4).to_string())
+
+    # 십분위 실적표
+    frame["_decile"] = pd.qcut(frame[index_col], 10, labels=False, duplicates="drop") + 1
+    decile_tab = frame.groupby("_decile").agg(
+        n=("Y_bin", "size"), 발생률=("Y_bin", "mean"), 평균Y=(Y, "mean")
+    )
+    log("[십분위 실적표]")
+    log(decile_tab.round(3).to_string())
+
+    return {"auc": auc, "spearman": rho, "logit": logit, "ols": ols, "decile": decile_tab}
+
+train = model_df[model_df["연도"].between(2017, 2020)]
+holdout = model_df[model_df["연도"].between(2021, 2022)]
+
+results = {}
+for idx_col, label in [("취약성지수_동일가중", "동일가중지수"), ("취약성지수_실증가중", "실증가중지수")]:
+    log(f"\n{'='*70}\n[훈련표본 2017-2020] {label}\n{'='*70}")
+    results[(label, "train")] = run_two_part(train, idx_col, f"{label}/훈련")
+    log(f"\n{'='*70}\n[홀드아웃 2021-2022] {label}\n{'='*70}")
+    results[(label, "holdout")] = run_two_part(holdout, idx_col, f"{label}/홀드아웃")
+
+# =========================================================
+# 8. Rolling-origin (2023)
+# =========================================================
+log(f"\n{'='*70}\nRolling-origin 표본외 검증\n{'='*70}")
+for train_end, test_year in [(2020, 2021), (2021, 2022), (2022, 2023)]:
+    tr = model_df[model_df["연도"] <= train_end]
+    te = model_df[model_df["연도"] == test_year]
+    for idx_col, label in [("취약성지수_동일가중", "동일가중"), ("취약성지수_실증가중", "실증가중")]:
+        Xtr = sm.add_constant(tr[[idx_col]])
+        m = sm.GLM(tr["Y_bin"], Xtr, family=sm.families.Binomial()).fit()
+        Xte = sm.add_constant(te[[idx_col]], has_constant="add")
+        pred = m.predict(Xte)
+        auc = roc_auc_score(te["Y_bin"], pred)
+        log(f"  train<={train_end} -> test={test_year} [{label}] AUC={auc:.3f} (test n={len(te)})")
+
+# =========================================================
+# 저장
+# =========================================================
+import os
+os.makedirs(MODELDIR, exist_ok=True)
+out_cols = ["연도", "시도", "시군구", Y, "Y_bin"] + dom_cols + ["취약성지수_동일가중", "취약성지수_실증가중"]
+model_df[out_cols].to_csv(f"{MODELDIR}/방제취약성지수_산출결과.csv", index=False, encoding="utf-8-sig")
+
+with open(f"{MODELDIR}/모형A_로그.txt", "w", encoding="utf-8") as f:
+    f.write("\n".join(LOG))
+
+log(f"\n저장 완료: {MODELDIR}/방제취약성지수_산출결과.csv, {MODELDIR}/모형A_로그.txt")

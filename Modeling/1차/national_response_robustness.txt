@@ -1,0 +1,161 @@
+# -*- coding: utf-8 -*-
+"""
+국가대응수준 보조모형 (로버스트니스 전용)
+설계 원칙:
+  - 31개 시군구(n=248, 2016-2023 balanced)는 selection-on-outcome 표본(사전 t-검정으로 확인:
+    이 표본의 피해발생률 77.8% vs 전체 48.7% - 피해가 심해 국가관리 대상이 된 곳으로 추정).
+    -> 대표성 없음. 정책결론에 쓰지 않고 "메인 결과가 왜곡되지 않았는가"만 확인.
+  - 비교는 "248행 표본 내에서" 국가대응수준 유/무 두 버전 (표본변경효과와 변수추가효과 분리).
+  - 군집 31개로 표준 cluster-robust SE(CR1)는 asymptotic 근거가 약함 -> 군집 페어 부트스트랩 병기.
+입력: output/CH2_전체병합패널_5도메인_2016_2023.csv, output/모델링/방제취약성지수_산출결과.csv
+출력: output/모델링/국가대응수준_보조모형_로그.txt
+"""
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+from scipy import stats
+
+pd.set_option("display.width", 200)
+pd.set_option("display.max_columns", 50)
+rng = np.random.default_rng(42)
+
+OUTDIR = "/Users/chanhaeng17/Desktop/최종 CH2 EDA/병합패널/output"
+MODELDIR = f"{OUTDIR}/모델링"
+PANEL = f"{OUTDIR}/CH2_전체병합패널_5도메인_2016_2023.csv"
+IDXFILE = f"{MODELDIR}/방제취약성지수_산출결과.csv"
+
+LOG = []
+def log(msg):
+    print(msg)
+    LOG.append(str(msg))
+
+# =========================================================
+# 1. 표본 구성
+# =========================================================
+panel = pd.read_csv(PANEL)
+idx = pd.read_csv(IDXFILE)
+
+nat_units = panel.loc[panel["국가대응수준_관측포함"] == 1, ["시도", "시군구"]].drop_duplicates()
+log(f"[국가대응수준 실측 시군구] {len(nat_units)}개")
+
+# selection-on-outcome 재확인
+full_bin = (panel["log_피해밀도_본per_ha"] > 0).astype(int)
+in_nat = panel.merge(nat_units.assign(_in=1), on=["시도", "시군구"], how="left")["_in"].notna()
+t, p = stats.ttest_ind(full_bin[in_nat], full_bin[~in_nat], equal_var=False)
+log(f"[selection-on-outcome 확인] 발생률: 국가대응 포함집단={full_bin[in_nat].mean():.3f}, "
+    f"미포함집단={full_bin[~in_nat].mean():.3f}, t={t:.2f}, p={p:.4f}")
+log("  -> 대표성 없는(피해심한 쪽으로 선택된) 표본. 아래 결과는 정책결론이 아니라 강건성 확인용.\n")
+
+nat_panel = panel.merge(nat_units.assign(_in=1), on=["시도", "시군구"], how="left")
+nat_panel = nat_panel[nat_panel["_in"].notna()].drop(columns="_in")
+nat_panel = nat_panel[nat_panel["연도"].between(2017, 2022)]  # 메인분석표본과 동일 연도창
+
+df = idx.merge(
+    nat_panel[["연도", "시도", "시군구", "log_국비지원액_최종_per_ha"]],
+    on=["연도", "시도", "시군구"], how="inner"
+)
+df = df.dropna(subset=["log_국비지원액_최종_per_ha", "취약성지수_동일가중"]).copy()
+df["key"] = df["시도"] + df["시군구"]
+log(f"[248표본 중 2017-2022 & 국비변수 결측 제외 후] n={len(df)}, 시군구수={df['key'].nunique()}")
+
+# =========================================================
+# 2. CRE(Mundlak) 항 생성
+# =========================================================
+def add_gm(frame, cols, group="key"):
+    frame = frame.copy()
+    for c in cols:
+        frame[f"{c}_gm"] = frame.groupby(group)[c].transform("mean")
+    return frame
+
+df = add_gm(df, ["취약성지수_동일가중", "log_국비지원액_최종_per_ha"])
+
+# =========================================================
+# 3. 모형 (i) 취약성지수만 vs (ii) + 국가대응수준 - 동일 248표본 내 비교
+# =========================================================
+def fit_logit(frame, xcols):
+    X = sm.add_constant(frame[xcols])
+    return sm.GLM(frame["Y_bin"], X, family=sm.families.Binomial()).fit(
+        cov_type="cluster", cov_kwds={"groups": frame["key"]}
+    )
+
+def fit_ols_pos(frame, xcols):
+    pos = frame[frame["Y_bin"] == 1]
+    X = sm.add_constant(pos[xcols])
+    return sm.OLS(pos["log_피해밀도_본per_ha"], X).fit(
+        cov_type="cluster", cov_kwds={"groups": pos["key"]}
+    )
+
+xcols_i = ["취약성지수_동일가중", "취약성지수_동일가중_gm"]
+xcols_ii = xcols_i + ["log_국비지원액_최종_per_ha", "log_국비지원액_최종_per_ha_gm"]
+
+log("=" * 70)
+log("모형 (i): 취약성지수만 (국가대응수준 제외) - n=248표본")
+log("=" * 70)
+logit_i = fit_logit(df, xcols_i)
+log("[발생여부 로지스틱] (군집SE, CR1 - 31군집이라 asymptotic 근거 약함, 참고용)")
+log(logit_i.summary2().tables[1].round(4).to_string())
+ols_i = fit_ols_pos(df, xcols_i)
+log("\n[발생시 크기 OLS]")
+log(ols_i.summary2().tables[1].round(4).to_string())
+
+log("\n" + "=" * 70)
+log("모형 (ii): 취약성지수 + 국가대응수준(log_국비지원액_최종_per_ha) - 동일 n=248표본")
+log("=" * 70)
+logit_ii = fit_logit(df, xcols_ii)
+log("[발생여부 로지스틱]")
+log(logit_ii.summary2().tables[1].round(4).to_string())
+ols_ii = fit_ols_pos(df, xcols_ii)
+log("\n[발생시 크기 OLS]")
+log(ols_ii.summary2().tables[1].round(4).to_string())
+
+log(f"\n[계수 안정성] 취약성지수_gm 계수(발생여부 로지스틱): (i) {logit_i.params['취약성지수_동일가중_gm']:.4f} "
+    f"-> (ii) {logit_ii.params['취약성지수_동일가중_gm']:.4f}")
+log(f"[계수 안정성] 취약성지수_gm 계수(발생시 크기 OLS): (i) {ols_i.params['취약성지수_동일가중_gm']:.4f} "
+    f"-> (ii) {ols_ii.params['취약성지수_동일가중_gm']:.4f}")
+
+# =========================================================
+# 4. 군집 페어 부트스트랩 (31개 군집 - 소표본 군집 추론 보정)
+# =========================================================
+def cluster_bootstrap_coef(frame, xcols, model_fn, coef_name, B=999):
+    units = frame["key"].unique()
+    n_units = len(units)
+    boot_coefs = []
+    for b in range(B):
+        sampled_units = rng.choice(units, size=n_units, replace=True)
+        pieces = []
+        for i, u in enumerate(sampled_units):
+            sub = frame[frame["key"] == u].copy()
+            sub["key"] = f"{u}__{i}"  # 재추출 단위 구분(그룹평균 재계산 방지용, 이미 계산된 gm 재사용)
+            pieces.append(sub)
+        boot_df = pd.concat(pieces, ignore_index=True)
+        try:
+            m = model_fn(boot_df, xcols)
+            boot_coefs.append(m.params.get(coef_name, np.nan))
+        except Exception:
+            boot_coefs.append(np.nan)
+    return np.array(boot_coefs)
+
+log("\n" + "=" * 70)
+log("군집 페어 부트스트랩 (B=999, 31개 시군구 단위 재추출)")
+log("=" * 70)
+
+for label, model_fn, xcols, coef in [
+    ("모형(i) 발생여부-취약성지수_gm", lambda f, x: fit_logit(f, x), xcols_i, "취약성지수_동일가중_gm"),
+    ("모형(ii) 발생여부-취약성지수_gm", lambda f, x: fit_logit(f, x), xcols_ii, "취약성지수_동일가중_gm"),
+    ("모형(ii) 발생여부-국가대응_gm", lambda f, x: fit_logit(f, x), xcols_ii, "log_국비지원액_최종_per_ha_gm"),
+]:
+    boots = cluster_bootstrap_coef(df, xcols, model_fn, coef, B=999)
+    boots = boots[~np.isnan(boots)]
+    point = {"모형(i) 발생여부-취약성지수_gm": logit_i, "모형(ii) 발생여부-취약성지수_gm": logit_ii,
+             "모형(ii) 발생여부-국가대응_gm": logit_ii}[label].params[coef]
+    lo, hi = np.percentile(boots, [2.5, 97.5])
+    p_boot = 2 * min((boots > 0).mean(), (boots < 0).mean())
+    log(f"  [{label}] 점추정={point:.4f}, 부트스트랩 95% CI=[{lo:.4f}, {hi:.4f}], "
+        f"부트스트랩 p(양측)={p_boot:.4f}  (유효 replication={len(boots)}/999)")
+
+# =========================================================
+# 저장
+# =========================================================
+with open(f"{MODELDIR}/국가대응수준_보조모형_로그.txt", "w", encoding="utf-8") as f:
+    f.write("\n".join(LOG))
+log(f"\n저장 완료: {MODELDIR}/국가대응수준_보조모형_로그.txt")

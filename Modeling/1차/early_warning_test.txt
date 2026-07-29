@@ -1,0 +1,67 @@
+# -*- coding: utf-8 -*-
+"""
+조기경보모형 실험: t-1 확산이력/공간시차 추가 시 AUC 변화 확인
+- 순환논리 회피: 연속발생연수·집단발생여부·log_인접시군_피해밀도를 '동시기'가 아니라
+  1년 시차(t-1)로 lag 처리하여 예측변수로 사용(표준적 시계열 예측, 순환논리 아님).
+- 구조적 취약성지수(final_modeling.py)와는 목적이 다른 별도 모형이므로 지수 자체에는
+  병합하지 않음 - 조기경보/단기 예찰자원 배치용 참고모형.
+입력: output/CH2_전체병합패널_5도메인_2016_2023.csv, output/모델링/방제취약성지수_산출결과.csv
+"""
+import pandas as pd
+import statsmodels.api as sm
+from sklearn.metrics import roc_auc_score
+
+OUTDIR = "/Users/chanhaeng17/Desktop/최종 CH2 EDA/병합패널/output"
+PANEL = f"{OUTDIR}/CH2_전체병합패널_5도메인_2016_2023.csv"
+IDXFILE = f"{OUTDIR}/모델링/방제취약성지수_산출결과.csv"
+
+panel = pd.read_csv(PANEL)
+idx = pd.read_csv(IDXFILE)
+
+LAG_VARS = ["연속발생연수", "집단발생여부", "log_인접시군_피해밀도_본per_ha"]
+
+# 동시기 상관 확인(참고용 - 순환위험 때문에 지수에서 제외했던 근거)
+for c in LAG_VARS:
+    r = panel[[c, "log_피해밀도_본per_ha"]].corr().iloc[0, 1]
+    print(f"[동시기 상관 참고] {c}: r={r:.3f}")
+
+p = panel[["연도", "시도", "시군구"] + LAG_VARS].copy()
+p["key"] = p["시도"] + p["시군구"]
+p = p.sort_values(["key", "연도"])
+for c in LAG_VARS:
+    p[f"{c}_L1"] = p.groupby("key")[c].shift(1)
+
+df = idx.merge(
+    p[["연도", "시도", "시군구"] + [f"{c}_L1" for c in LAG_VARS]],
+    on=["연도", "시도", "시군구"], how="left"
+)
+df["key"] = df["시도"] + df["시군구"]
+df = df.dropna(subset=[f"{c}_L1" for c in LAG_VARS] + ["취약성지수_동일가중"]).copy()
+
+def add_gm(frame, cols):
+    frame = frame.copy()
+    for c in cols:
+        frame[f"{c}_gm"] = frame.groupby("key")[c].transform("mean")
+    return frame
+
+base_x = ["취약성지수_동일가중"]
+lag_x = [f"{c}_L1" for c in LAG_VARS]
+allx = base_x + lag_x
+df = add_gm(df, allx)
+Xcols_full = allx + [f"{c}_gm" for c in allx]
+Xcols_base = base_x + [f"{base_x[0]}_gm"]
+
+train = df[df["연도"].between(2017, 2020)]
+hold = df[df["연도"].between(2021, 2022)]
+
+for label, xcols in [
+    ("기존(구조적 위험지수만)", Xcols_base),
+    ("위험지수 + t-1 확산이력/공간시차(조기경보)", Xcols_full),
+]:
+    Xtr = sm.add_constant(train[xcols])
+    m = sm.GLM(train["Y_bin"], Xtr, family=sm.families.Binomial()).fit()
+    Xho = sm.add_constant(hold[xcols], has_constant="add")
+    pred_tr, pred_ho = m.predict(Xtr), m.predict(Xho)
+    print(f"[{label}] train n={len(train)}, holdout n={len(hold)}")
+    print(f"  train AUC={roc_auc_score(train['Y_bin'], pred_tr):.3f}  "
+          f"holdout AUC={roc_auc_score(hold['Y_bin'], pred_ho):.3f}")
