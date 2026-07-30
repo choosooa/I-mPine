@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>CH2 도로소나무비율_500m — TierA/TierB 검증 전체 정리</title>
+<style>
+  body { font-family: -apple-system, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; max-width: 980px; margin: 40px auto; padding: 0 20px; line-height: 1.65; color: #1a1a1a; background:#fafafa; }
+  h1 { font-size: 26px; border-bottom: 3px solid #2c5f2d; padding-bottom: 12px; }
+  h2 { font-size: 20px; margin-top: 40px; color: #2c5f2d; border-left: 5px solid #2c5f2d; padding-left: 10px; }
+  h3 { font-size: 16px; margin-top: 24px; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; background:#fff; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+  th { background: #2c5f2d; color: #fff; }
+  tr:nth-child(even) { background: #f5f5f5; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:12px; font-weight:bold; }
+  .tierb { background:#fde2e2; color:#a33; }
+  .tiera { background:#e2f0e2; color:#2c5f2d; }
+  .warn { background:#fff8e1; border-left:4px solid #f0ad4e; padding:10px 14px; margin:12px 0; }
+  .fact { background:#eef4ff; border-left:4px solid #4a76c8; padding:10px 14px; margin:12px 0; }
+  .conclusion { background:#e2f0e2; border-left:4px solid #2c5f2d; padding:14px 18px; margin:16px 0; font-weight:500; }
+  code { background:#eee; padding:1px 5px; border-radius:3px; font-size:13px; }
+  .timeline { border-left: 3px solid #ccc; margin-left: 10px; padding-left: 20px; }
+  .timeline-item { margin-bottom: 16px; position:relative; }
+  .timeline-item::before { content:''; position:absolute; left:-25px; top:6px; width:9px; height:9px; border-radius:50%; background:#2c5f2d; }
+  .small { font-size: 12px; color: #777; }
+  .neg { color:#c0392b; font-weight:bold; }
+  .pos { color:#2c5f2d; font-weight:bold; }
+</style>
+</head>
+<body>
+
+<h1>CH2 도로소나무비율_500m — TierA/TierB 검증 전체 정리</h1>
+<p class="small">작성일: 2026-07-30 · I-m_Pine 공모전 CH2(소나무재선충병) Model1 인위적확산 도메인 검증 기록</p>
+
+<h2>1. 문제의 시작</h2>
+<p>기존 최종패널(<code>최종보정.csv</code>, 이하 <span class="tag tierb">TierB</span>)의 <code>도로소나무비율_500m</code> 변수가 2023년 도로 데이터를 8년 내내 고정 복사한 값이었고, ROAD_RANK 104등급을 포함한 도로망 데이터의 소스 변경으로 2019→2020년 전국평균이 <strong>0.28 → 0.34(+22%)</strong>로 튀는 레벨시프트가 있었음을 확인함. 이를 바로잡기 위해 <span class="tag tiera">TierA</span>(104등급 제외, 연도별 재계산)를 새로 계산함.</p>
+
+<h2>2. TierA/TierB 정의</h2>
+<table>
+<tr><th>항목</th><th class="tierb">TierB</th><th class="tiera">TierA</th></tr>
+<tr><td>도로 데이터</td><td>2023년 1개년만 사용, 104등급 포함</td><td>2016~2023 매년 재계산, 104등급 제외</td></tr>
+<tr><td>임상도(분모) 기준</td><td>2024년 임상도 고정</td><td>2016~2019: 2019임상도 / 2020~2023: 2024임상도 (팀 규정)</td></tr>
+<tr><td>시간 변동</td><td>없음(시군구별 8년 동일값)</td><td>있음(연도별 실제 변동)</td></tr>
+<tr><td>공간 단위</td><td>229 통합코드 그대로</td><td>250 세부코드로 계산 후 크로스워크로 229 집계</td></tr>
+</table>
+
+<h2>3. 작업 타임라인</h2>
+<div class="timeline">
+  <div class="timeline-item"><b>① Tier A 최초 계산</b> — 도로 데이터 8개년 재계산(2.4시간 소요, 104등급 제외), 결과: <code>도로소나무비율_TierA_104제외_전체8개년.csv</code></div>
+  <div class="timeline-item"><b>② 250→229 병합 시도 → 112개 결측 발생</b> — 14개 다구시(수원·성남·안양·안산·고양·용인·청주·천안·전주·포항·창원 등) × 8년에서 결측. 원인: TierA는 250개 세부코드 기준인데 패널은 229개 통합코드 기준이라 병합 실패.</div>
+  <div class="timeline-item"><b>③ 크로스워크로 88행 복구</b> — <code>CH2_crosswalk_250to229.csv</code>로 11개 통합시(32개 세부코드) 면적가중 합산(분자·분모 각각 sum 후 나눔). 88행(11곳×8년) 전부 채움. 나머지 24행(동구·영등포구·중구, 원래 소나무 없음)은 그대로 결측 유지.</div>
+  <div class="timeline-item"><b>④ 임상도 연도 기준 오류 발견</b> — 최초 TierA 계산이 분모(pine_ha)를 2024년 임상도로 8년 내내 고정 사용한 것이 발견됨. 팀 규정은 "2016~2019는 2019임상도, 2020~2023은 2024임상도"였음. 도로 교차면적(분자)은 연도별로 이미 정확했으므로, 분모만 연도별로 재매칭하여 재계산.</div>
+  <div class="timeline-item"><b>⑤ 강화군 구조적 결측 확인</b> — 2019 임상도에서 강화군 pine_ha=0으로 기록(2024엔 228.8ha). 최종보정3의 <code>소나무림면적_원자료_ha</code> 자체도 2016~2019 강화군을 0으로 이미 정의하고 있었음 → 이번 병합에서 새로 생긴 오류가 아니라 기존 패널 컨벤션을 따른 결과. 2016~2019 4행만 결측 유지 결정.</div>
+  <div class="timeline-item"><b>⑥ 최종 파일 확정</b> — <code>최종보정4.csv</code>(2차 폴더, 98컬럼) = 최종보정3(TierB+기후메타3컬럼) 위에 도로소나무비율_500m만 TierA로 교체. 전체 결측 28행(기존24+강화군4).</div>
+  <div class="timeline-item"><b>⑦ Model1 v4 실행 및 부호반전 발견</b> — 팀원이 TierA 반영 후 도로비율의 Y와의 상관이 <span class="pos">+0.023</span> → <span class="neg">-0.040</span>으로 반전, 면적통제 후 잔차상관도 거의 0으로 붕괴됨을 발견. 인위적확산 도메인에서 제외 검토 시작.</div>
+  <div class="timeline-item"><b>⑧ 순수 TierA 효과 격리 비교</b> — 평균풍속 등 다른 조건은 동일하게 고정하고 TierB/TierA만 교체하여 재실행, 효과를 순수하게 분리 확인.</div>
+</div>
+
+<h2>4. 핵심 발견 — 부호반전 및 도메인 오염</h2>
+<table>
+<tr><th>지표</th><th class="tierb">TierB</th><th class="tiera">TierA</th><th>해석</th></tr>
+<tr><td>raw corr(도로비율, Y)</td><td class="pos">+0.0234</td><td class="neg">-0.0403</td><td>부호 반전</td></tr>
+<tr><td>면적통제 후 잔차상관</td><td class="pos">+0.2243</td><td>+0.0147</td><td>거의 0으로 붕괴</td></tr>
+<tr><td>도메인상호상관(노출도↔인위적확산)</td><td>0.4163</td><td>0.2545</td><td>오염 감소</td></tr>
+</table>
+<div class="fact">
+<b>왜 이런 일이?</b> TierB는 (1)시군구당 8년 내내 같은 값이라 순수 지역간(between) 차이만 반영하고, (2)104등급 데이터 아티팩트가 섞여있고, (3)면적통제가 불완전해서 "인위적확산" 점수가 사실상 "노출도(소나무면적)" 점수를 다시 재는 것에 가까웠음(상호상관 0.416이 그 증거). TierA로 세 가지를 바로잡으니 도메인 오염이 줄고(0.416→0.255), 도로변수의 진짜 신호는 사실상 없다는 게 드러남.
+</div>
+
+<h2>5. Model1 비교 — 순수 TierA 효과 (평균풍속 등 동일조건 고정)</h2>
+<p class="small">검증: TierB 재현값이 기존 <code>Model1_v3_로그.txt</code>(AUC 0.617/0.622, rho 0.267/0.277)와 완전히 일치함을 확인 후 비교 진행.</p>
+<table>
+<tr><th>지표</th><th class="tierb">TierB</th><th class="tiera">TierA</th><th>변화</th></tr>
+<tr><td>AUC 훈련(2017-2020)</td><td>0.6172</td><td>0.5994</td><td>-0.0178</td></tr>
+<tr><td>AUC 홀드아웃(2021-2022)</td><td>0.6222</td><td>0.6129</td><td>-0.0093</td></tr>
+<tr><td>Spearman rho 훈련</td><td>0.2675</td><td>0.2319</td><td>-0.0356</td></tr>
+<tr><td>Spearman rho 홀드아웃</td><td>0.2771</td><td>0.2544</td><td>-0.0227</td></tr>
+<tr><td>모델표본 n</td><td>1749</td><td>1745</td><td>-4</td></tr>
+</table>
+<p>성능 저하는 AUC 기준 0.01~0.02 수준으로 미미함. (참고: 팀원이 처음 본 v4 결과에서 AUC가 더 크게 떨어진 것처럼 보였는데, 이는 TierA 효과와 <b>평균풍속 제거 효과가 섞인 것</b>이었고, 이번 격리비교로 순수 TierA 효과는 훨씬 작다는 게 확인됨.)</p>
+
+<h3>상위 20개 시군구 변화</h3>
+<table style="font-size:13px;">
+<tr><th>순위</th><th class="tierb">TierB</th><th>지수</th><th class="tiera">TierA</th><th>지수</th></tr>
+<tr><td>1</td><td>부산 해운대구</td><td>0.878</td><td>경남 남해군</td><td>0.900</td></tr>
+<tr><td>2</td><td>경남 남해군</td><td>0.872</td><td>경남 고성군</td><td>0.845</td></tr>
+<tr><td>3</td><td>경남 고성군</td><td>0.850</td><td>경남 통영시</td><td>0.838</td></tr>
+<tr><td>4</td><td>경남 거제시</td><td>0.818</td><td>부산 해운대구</td><td>0.833</td></tr>
+<tr><td>5</td><td>경남 통영시</td><td>0.818</td><td>경남 거제시</td><td>0.833</td></tr>
+<tr><td>6</td><td>전남 완도군</td><td>0.817</td><td>전남 완도군</td><td>0.804</td></tr>
+<tr><td>7</td><td>부산 금정구</td><td>0.815</td><td>경북 고령군</td><td>0.713</td></tr>
+<tr><td>8</td><td>경남 합천군</td><td>0.765</td><td>부산 금정구</td><td>0.709</td></tr>
+<tr><td>9</td><td>경북 울진군</td><td>0.759</td><td>경남 합천군</td><td>0.709</td></tr>
+<tr><td>10</td><td>부산 기장군</td><td>0.744</td><td>경북 울진군</td><td>0.697</td></tr>
+<tr><td>11</td><td>경남 의령군</td><td>0.717</td><td>경남 의령군</td><td>0.696</td></tr>
+<tr><td>12</td><td>경북 고령군</td><td>0.692</td><td>부산 기장군</td><td>0.657</td></tr>
+<tr><td>13</td><td>경남 사천시</td><td>0.637</td><td>강원 양양군</td><td>0.646</td></tr>
+<tr><td>14</td><td>경남 진주시</td><td>0.621</td><td>경남 사천시</td><td>0.644</td></tr>
+<tr><td>15</td><td>강원 삼척시</td><td>0.620</td><td>경남 산청군</td><td>0.605</td></tr>
+<tr><td>16</td><td>경남 산청군</td><td>0.619</td><td>경남 진주시</td><td>0.595</td></tr>
+<tr><td>17</td><td>강원 양양군</td><td>0.610</td><td>경남 창녕군</td><td>0.548</td></tr>
+<tr><td>18</td><td>대구 동구</td><td>0.607</td><td>강원 삼척시</td><td>0.540</td></tr>
+<tr><td>19</td><td>광주 동구</td><td>0.595</td><td>인천 옹진군</td><td>0.537</td></tr>
+<tr><td>20</td><td>인천 옹진군</td><td>0.589</td><td>경북 의성군</td><td>0.527</td></tr>
+</table>
+<p><b>탈락:</b> 대구 동구, 광주 동구 &nbsp;&nbsp; <b>신규진입:</b> 경남 창녕군, 경북 의성군</p>
+<p>상위 6~11위권 핵심 지역(해운대구·남해군·고성군·거제시·통영시·완도군·금정구·합천군·울진군·의령군)은 그대로 유지 — 순위는 재배열되지만 <b>"가장 취약한 지역"이라는 핵심 결론은 바뀌지 않음.</b></p>
+
+<h2>6. 강화군 구조적 결측 (참고사항)</h2>
+<table>
+<tr><th>연도</th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th></tr>
+<tr><td>도로소나무비율_500m</td><td>NaN</td><td>NaN</td><td>NaN</td><td>NaN</td><td>0.0536</td><td>0.0536</td><td>0.0536</td><td>0.0536</td></tr>
+</table>
+<p>2019 임상도에서 강화군 pine_ha=0으로 기록되어 있고, 최종보정3의 <code>소나무림면적_원자료_ha</code>도 이미 2016~2019 강화군을 0으로 정의하고 있었음. TierA 병합에서 새로 생긴 오류가 아니라 기존 패널의 면적 기준(2016~2019/2020~2023 임상도 분리)을 일관 적용한 결과이므로 그대로 결측 유지하기로 결정.</p>
+
+<h2>7. 최종 결론 및 권고</h2>
+<div class="conclusion">
+<p><b>① TierA를 최종 기준으로 채택.</b> TierB는 104등급 아티팩트, 시간불변, 임상도 규정 미준수라는 세 가지 결함이 있었고, TierB가 보여준 "약한 양의 신호(+0.023)"는 이 결함들이 만든 허상일 가능성이 높음. TierA는 이 결함을 모두 바로잡은 올바른 데이터.</p>
+<p><b>② 도로소나무비율_500m을 인위적확산 도메인에서 제외.</b> TierA 기준으로 면적통제 후 잔차상관이 여러 통제방식에서 공통적으로 |r|&lt;0.07로 붕괴하고 부호도 불안정 — "도로 인접 소나무숲이 많을수록 위험이 높다"는 이론적 가설을 지지할 근거가 사라짐. 인위적확산 도메인은 <code>원목생산업체수</code> 단일 변수로 재구성 권장(이 변수는 잔차상관 -0.19로 방향과 크기 모두 이론과 부합).</p>
+<p><b>③ TierA 전환과 변수 제외는 별개의 결정.</b> TierA 전환(104등급/임상도규정/집계오류 수정)은 이 변수를 최종모델에 쓰든 안 쓰든 항상 옳은 데이터 정합성 작업이고, 변수 제외는 "정확한 데이터로 검증한 결과" 내려진 결정. TierB(오염된 데이터)로 뺐다면 근거가 빈약했겠지만, TierA로 검증 후 뺐기 때문에 방어 가능한 스토리가 됨.</p>
+<p><b>④ 성능 영향은 미미.</b> 순수 TierA 효과만 놓고 보면 AUC -0.01~-0.02 수준이고, 핵심 상위권 취약지역 목록은 흔들리지 않음. 데이터 정확성을 얻는 대가로 치를 만한 손실.</p>
+</div>
+
+<h2>8. 관련 파일 위치</h2>
+<table style="font-size:13px;">
+<tr><th>파일</th><th>경로</th></tr>
+<tr><td>최종 패널(TierA 반영)</td><td><code>Modeling/2차/CH2_전체병합패널_5도메인_2016_2023_최종보정4.csv</code></td></tr>
+<tr><td>TierA 원시계산(연도별 임상도 반영)</td><td><code>Modeling/1차/data/도로소나무비율_TierA_104제외_전체8개년_연도별임상도.csv</code></td></tr>
+<tr><td>250→229 크로스워크</td><td><code>data/CH2/CH2data/CH2_crosswalk_250to229.csv</code></td></tr>
+<tr><td>임상도 원자료(2019/2024)</td><td><code>data/CH2/1. 환경/인위적 확산/자료/임상도/전국임상도/{2019,2024}_sgg_pine_forest.csv</code></td></tr>
+<tr><td>Model1 v4(TierA) 실행결과</td><td><code>Modeling/2차/Model1_v4_TierA_로그.txt</code>, <code>Model1_기여도분해_유형화_v4_TierA.csv</code></td></tr>
+<tr><td>순수 TierA vs TierB 비교</td><td><code>Modeling/비교_TierA_vs_TierB/</code> (전체 스크립트·로그·CSV)</td></tr>
+</table>
+
+<h2>9. 다음 단계</h2>
+<p>도로소나무비율_500m을 제외한 v5 재실행 권장 — 인위적확산 도메인을 원목생산업체수 단일변수로 재구성 후 전체 모형(2×3 매트릭스, 기여도분해, 배분갭) 재산출.</p>
+
+</body>
+</html>
