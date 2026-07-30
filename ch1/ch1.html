@@ -347,7 +347,7 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
       <b>격자 해상도</b> — 주 분석단위는 100m(산림청 100m×100m 630만 셀 관리체계 참고). 500m·1km는 민감도 비교, 10m(국가지점번호 실제 해상도)는 진단용이며 확산 근거로 사용하지 않습니다.<br><br>
       <b>좌표계</b> — 원자료 좌표계는 후보 비교 검증을 통해 EPSG:5186(축 X,Y)으로 확정했습니다.<br><br>
       <b>순위 신뢰기준</b> — 누적 피해부담은 소나무류 300ha↑·누적 1,000건↑, 반복관측비율은 격자 30개↑ 지역만 순위에 포함합니다. Wilson 95% 참고구간은 공간 자기상관을 반영하지 않는 순위 안정성 참고값입니다.<br><br>
-      <b>소나무류 면적 자료</b> — 임업통계 기준 특정 시점 자료이며, 2016.5~2022.4 누적 피해자료와 시간 기준이 다릅니다.
+      <b>소나무류 면적 자료</b> — 강원 14개 시군은 임상도(1:5,000)+임업통계연보(2024) 기반, 그 외 지역은 기존 임업통계 기준. 민통선 이북 4개 군(철원·화천·양구·고성)은 임상도 미제작으로 과소집계 — 지도에는 표시하되 통계·회귀에서 제외.
     </div>
   </div>
 </div>
@@ -383,7 +383,7 @@ window.addEventListener('load', ()=> setTimeout(()=>{
 // ═══════════════════════ SECTION 01 ═══════════════════════
 const latest = D.official.find(r=>r.공식연도===2026);
 const kpis = [
-  ['r','피해고사목', (latest.피해고사목_본/10000).toFixed(0)+'만 그루', `<span class="chg up">전년비 +28만</span> 2025.6~2026.5`],
+  ['r','피해고사목', (latest.피해고사목_본/10000).toFixed(0)+'만 그루', `2025.6~2026.5 · 전년도는 조사기간 13개월로 직접비교 불가(월평균 환산 시 약 +29%)`],
   ['b','발생 시군구', latest.발생시군구수+'개', '전국 16개 시·도'],
   ['t','고피해 시군구', latest.심이상시군구수+'개', `극심 6 + 심 21 · 피해의 <b>81%</b> 집중`],
   ['a','조사기간', latest.조사개월수+'개월', latest.조사기간+' · 산림청 '+latest.발표일+' 발표'],
@@ -472,6 +472,10 @@ document.getElementById('hl-long').textContent = fmt(D.headline.장기지속격�
 // ── 3-1. 조사연도 선택 지도 ──────────────────────────────────────────────
 const STATUS_LABEL = {'신규':'신규관측','지속':'연속관측','재발':'공백 후 재관측','없음':'미관측'};
 const STATUS_COLOR = {'신규':'#2a78d6','지속':'#1baf7a','재발':'#eda100','없음':'#e8e8e0'};
+// 강원특별자치도 출범(2023.6) 코드 개편: CH1_GEOJSON은 구 강원도 코드(42xxx)를 쓰고
+// 데이터(timelineByCode/burdenMap)는 신 강원특별자치도 코드(51xxx)를 씀 → 18곳 강원 전부 미표시되던 문제.
+// 뒤 3자리가 동일하므로 42xxx를 51xxx로 변환해 데이터 맵 키와 맞춘다.
+function resolveSggCode(code){ const s=String(code); return s.startsWith('42') ? '51'+s.slice(2) : s; }
 const timelineByCode = {}; D.cycleTimeline.rows.forEach(r=>timelineByCode[r.시군구코드]=r);
 const cyc = D.cycleTimeline.cycles;
 const TOTAL_SGG_ANALYZED = D.cycleTimeline.rows.length;
@@ -480,7 +484,7 @@ let cycIdx = cyc.length - 1;
 map3c = L.map('map3c',{scrollWheelZoom:false}).setView([36.3,127.8],7);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:12}).addTo(map3c);
 function styleCyc(f){
-  const r = timelineByCode[f.properties.sgg_cd];
+  const r = timelineByCode[resolveSggCode(f.properties.sgg_cd)];
   const s = r ? r.상태[cycIdx] : null;
   return {fillColor: s ? STATUS_COLOR[s] : '#eeeeee', weight:.5, color:'#999', fillOpacity:.85};
 }
@@ -491,7 +495,7 @@ const geo3c = L.geoJSON(CH1_GEOJSON,{style:styleCyc, onEachFeature:(f,l)=>{
 function renderCycle(){
   geo3c.eachLayer(l=>{
     l.setStyle(styleCyc(l.feature));
-    const r = timelineByCode[l.feature.properties.sgg_cd];
+    const r = timelineByCode[resolveSggCode(l.feature.properties.sgg_cd)];
     const s = r ? r.상태[cycIdx] : null;
     l.setTooltipContent(`<b>${r?r.시도명:''} ${r?r.시군구명:l.feature.properties.sgg_cd}</b><br>${cyc[cycIdx]}: <b>${s?STATUS_LABEL[s]:'분석대상 아님'}</b>`);
   });
@@ -541,8 +545,8 @@ const LAYERS = {
     state:b=> b.누적피해고사목==null ? 'nodata' : (b.누적피해고사목===0 ? 'zero' : 'ranked'),
     note:'2016.5~2022.4 누적 피해고사목 등록건수(원자료 기준). 발생 확률이 아니라 과거 누적량입니다.'},
   area: {label:'소나무류 면적', field:'원본_소나무류면적_ha', colors:BLUES, unit:'ha',
-    state:b=> b.자료없음_산림 ? 'nodata' : (b.실측0_소나무 ? 'zero' : (b.원본_소나무류면적_ha==null ? 'nodata' : 'ranked')),
-    note:'임업통계 기준 특정 시점 자료입니다. 짙은 회색은 산림 자료 자체가 없는 지역, 옅은 회색은 산림은 있으나 소나무류가 0으로 실측된 지역입니다.'},
+    state:b=> b.민북과소집계 ? 'undercount' : (b.자료없음_산림 ? 'nodata' : (b.실측0_소나무 ? 'zero' : (b.원본_소나무류면적_ha==null ? 'nodata' : 'ranked'))),
+    note:'강원 14개 시군은 임상도(1:5,000)+임업통계연보(2024) 기반. 짙은 회색은 산림 자료 자체가 없는 지역, 옅은 회색은 산림은 있으나 소나무류가 0으로 실측된 지역, 빗금은 민통선 이북 임상도 미제작으로 과소집계된 지역(수치를 순위에 넣지 마십시오)입니다.'},
   burden: {label:'100ha당 누적 피해부담', field:'누적피해부담_100ha', colors:ORRD, unit:'/100ha',
     state:b=>{
       if(b.누적피해고사목===0) return 'zero';
@@ -575,6 +579,7 @@ function styleFor(b, k){
   const Ldef = LAYERS[k];
   if(!b) return {fillColor:COL_NODATA, weight:.5, color:'#bbb', fillOpacity:.5};
   const st = Ldef.state(b);
+  if(st==='undercount') return {fillColor:'#f4d9a0', weight:1, color:'#c9862a', fillOpacity:.55, dashArray:'4,3'};
   if(st==='nodata') return {fillColor:COL_NODATA, weight:.5, color:'#bbb', fillOpacity:.5};
   if(st==='zero')   return {fillColor:COL_ZERO,   weight:.5, color:'#ccc', fillOpacity:.6};
   if(st==='below')  return {fillColor:COL_BELOW,  weight:1,  color:'#aaa', fillOpacity:.6, dashArray:'2,2'};
@@ -585,6 +590,7 @@ const STATE_LABEL = {
   nodata:'자료없음 (계산 불가)',
   zero:'실측값 0 (관측기간 내 미발생 등 · 자료없음 아님)',
   below:'표본 부족 — 순위에서는 제외, 실측값 참고',
+  undercount:'민통선 이북 임상도 미제작 — 과소집계(참고용, 순위·통계 제외)',
 };
 function tooltipMain(b, k){
   if(!b) return '자료없음 (원자료 미등장)';
@@ -594,7 +600,9 @@ function tooltipMain(b, k){
   if(k==='area'){
     if(st==='nodata') lines.push('산림 자료 없음');
     else lines.push(`소나무류 면적: ${fmt(Math.round(b.원본_소나무류면적_ha))}ha`,
-                    st==='zero' ? '(산림은 있으나 소나무류 0으로 실측)' : `산림면적: ${fmt(Math.round(b.원본_산림면적_ha))}ha`);
+                    st==='zero' ? '(산림은 있으나 소나무류 0으로 실측)' :
+                    st==='undercount' ? '⚠ 민통선 이북 임상도 미제작 — 실제보다 과소집계됨' :
+                    `산림면적: ${fmt(Math.round(b.원본_산림면적_ha))}ha`);
   } else {
     const v = b[Ldef.field];
     if(st==='nodata') lines.push(`${Ldef.label}: 자료없음`);
@@ -602,15 +610,15 @@ function tooltipMain(b, k){
   }
   return lines.join('<br>');
 }
-const geoMain = L.geoJSON(CH1_GEOJSON,{style:f=>styleFor(burdenMap[f.properties.sgg_cd],curLayer), onEachFeature:(f,l)=>{
+const geoMain = L.geoJSON(CH1_GEOJSON,{style:f=>styleFor(burdenMap[resolveSggCode(f.properties.sgg_cd)],curLayer), onEachFeature:(f,l)=>{
     l.bindTooltip('', {className:'gu-tooltip', sticky:true});
-    l.on({mouseover:e=>e.target.setStyle({weight:2,color:'#222'}), mouseout:e=>l.setStyle(styleFor(burdenMap[f.properties.sgg_cd],curLayer))});
+    l.on({mouseover:e=>e.target.setStyle({weight:2,color:'#222'}), mouseout:e=>l.setStyle(styleFor(burdenMap[resolveSggCode(f.properties.sgg_cd)],curLayer))});
   }}).addTo(mapMain);
 
 function renderMain(){
   const Ldef = LAYERS[curLayer];
   geoMain.eachLayer(l=>{
-    const b = burdenMap[l.feature.properties.sgg_cd];
+    const b = burdenMap[resolveSggCode(l.feature.properties.sgg_cd)];
     l.setStyle(styleFor(b, curLayer));
     l.setTooltipContent(tooltipMain(b, curLayer));
   });
