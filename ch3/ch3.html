@@ -4,9 +4,9 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>I'mPine — CH3 우선지원 전략 설계</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="../ch1/vendor/leaflet/leaflet.css">
+<script src="../ch1/vendor/leaflet/leaflet.js"></script>
+<script src="../ch1/vendor/chart.umd.js"></script>
 <script src="../ch1/data.js"></script>
 <script src="../ch2/data.js"></script>
 <script src="data.js"></script>
@@ -146,16 +146,16 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
   <div class="krow" id="kpi-row-01"></div>
 
   <div class="card" style="position:relative">
-    <div class="ct">우선지원 순위 지도 <span class="cap">취약성지수 − 배분갭</span></div>
+    <div class="ct">우선지원 순위 지도 <span class="cap">RiskPct(위험지수 백분위) 단독</span></div>
     <div class="g3">
       <div style="position:relative"><div id="mapPriority" class="lmap" style="height:400px"></div>
         <div class="legend-box" id="legPriority"></div></div>
       <div><table class="rtbl" id="top15-priority-tbl"></table></div>
     </div>
-    <div class="note">순위 = 취약성지수 − 배분갭(취약성지수가 높을수록, 배분갭이 과소배분(음수)일수록 높아짐). 참고로 산림청이 실제 지정한 특별방제구역은 <b id="special-zone-ref">–</b>곳입니다.</div>
+    <div class="note">순위 = RiskPct(위험지수의 백분위, 대응역량 제외). 배분갭·재발위험확률은 산식에 포함하지 않고 참고용으로만 표시합니다(이유: §3-10 참조). 참고로 산림청이 실제 지정한 특별방제구역은 <b id="special-zone-ref">–</b>곳입니다.</div>
   </div>
 
-  <div class="concl"><div class="lbl">해석</div>취약성지수 상위이면서 현행 배분관행 대비 과소배분된 지역이 우선지원 순위 상단에 배치됩니다. 상위권에는 완도군·옹진군·신안군 등 CH2 배분갭 "부족" 목록과 겹치는 지역이 다수 포함됩니다.</div>
+  <div class="concl"><div class="lbl">해석 — [옵션 A: 인위적확산 부호 반전 적용]</div>우선순위는 위험지수(노출도·기후위험도·인위적확산, 대응역량 제외) 백분위만으로 산출합니다 — 배분갭은 산식에서 의도적으로 제외했습니다("병이 없어 예산 0인 지역"이 "과소배분"으로 오판되는 문제 방지). 이 변형에서는 인위적확산 도메인 부호를 이론대로 +1(원목업체 多=확산위험 高)로 반전해 재계산했습니다. 그 결과 <b>완도군은 1위→96위(중위권)로 이동</b>했고, TOP15는 노출도·인위적확산 실제 위험이 큰 내륙·연안 지역(강릉·거제·통영·해운대구 등) 위주로 재편됐습니다. 다만 이 도메인의 원래 이론적 상관은 −0.196(잔차 기준)으로 관측돼 있어, 부호 반전이 실제 피해량과의 지수 설명력을 다소 낮춘다는 트레이드오프가 있습니다(§3-10 B안 비교 참조).</div>
 </section>
 <div class="sec-divider"></div>
 
@@ -286,13 +286,15 @@ if(NO_CH2){
 } else {
   const kpis01 = [
     ['gl','배분갭 "부족" 시군구', D.simulation.underfundedCount+'개', 'CH2 축B_배분적정성=부족 기준'],
-    ['wa','산출 기준', '취약성지수 − 배분갭', '취약할수록 · 과소배분일수록 상위'],
+    ['wa','산출 기준', 'RiskPct 단독', '위험지수(대응역량 제외) 백분위 · 배분갭/재발확률은 산식에서 제외'],
     ['b','참고 규모', D.meta.special_zone_ref+'곳', '산림청 실제 특별방제구역 지정 개수'],
     ['t','CH2 연동', D.meta.ch2_linked?'연결됨(실측)':'미연결', 'ch2/data.js(6차 재구현) 실측값 사용'],
   ];
   document.getElementById('kpi-row-01').innerHTML = kpis01.map(([c,l,v,s])=>
     `<div class="kpi ${c}"><div class="kl">${l}</div><div class="kv">${v}</div><div class="ks">${s}</div></div>`).join('');
 
+  // 강원특별자치도 코드 개편(42xxx→51xxx) 대응 — CH1_GEOJSON은 구코드, 데이터는 신코드
+  function resolveSggCode(code){ const s=String(code); return s.startsWith('42') ? '51'+s.slice(2) : s; }
   const priMap = {}; D.prioritySggList.forEach(r=>{ (r.sgg_codes||[]).forEach(code=>{ priMap[code]=r; }); });
   const ORRD = ['#fbe0da','#f2b3a2','#e37f63','#c9503a','#8f2a17'];
   function quantileColor(v, arr, colors){
@@ -304,27 +306,27 @@ if(NO_CH2){
   }
   const priorityVals = D.prioritySggList.map(r=>r.priority_score);
   function stylePriority(f){
-    const b = priMap[f.properties.sgg_cd];
+    const b = priMap[resolveSggCode(f.properties.sgg_cd)];
     if(!b) return {fillColor:'#e3e3e3', weight:.5, color:'#bbb', fillOpacity:.5};
     return {fillColor: quantileColor(b.priority_score, priorityVals, ORRD), weight:.5, color:'#999', fillOpacity:.85};
   }
   mapPriority = L.map('mapPriority',{scrollWheelZoom:false}).setView([36.3,127.8],7);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:12}).addTo(mapPriority);
   const geoPriority = (typeof CH1_GEOJSON!=='undefined') ? L.geoJSON(CH1_GEOJSON,{style:stylePriority, onEachFeature:(f,l)=>{
-      const b = priMap[f.properties.sgg_cd];
-      l.bindTooltip(b ? `<b>${b.시도명} ${b.시군구명}</b><br>순위 ${b.priority_rank}/${D.prioritySggList.length}<br>취약성지수 ${b.index_main.toFixed(3)} · 배분갭 ${b.배분갭!=null?b.배분갭.toFixed(2):'–'}<br>추천정책: <b>${b.recommended_policy}</b>`
+      const b = priMap[resolveSggCode(f.properties.sgg_cd)];
+      l.bindTooltip(b ? `<b>${b.시도명} ${b.시군구명}</b><br>순위 ${b.priority_rank}/${D.prioritySggList.length} (등급 ${b.grade})<br>RiskPct ${(b.priority_score*100).toFixed(1)}% · 취약성지수 ${b.index_main.toFixed(3)}<br>참고: 배분갭 ${b.배분갭!=null?b.배분갭.toFixed(2):'–'}(산식 미포함) · 재발확률 ${b.재발위험확률!=null?b.재발위험확률.toFixed(3):'–'}(urgentList 전용)<br>추천정책: <b>${b.recommended_policy}</b>`
         : `<b>${f.properties.sgg_cd}</b><br>분석대상 아님`, {className:'gu-tooltip', sticky:true});
       l.on({mouseover:e=>e.target.setStyle({weight:2,color:'#222'}), mouseout:e=>l.setStyle(stylePriority(f))});
     }}).addTo(mapPriority) : null;
-  document.getElementById('legPriority').innerHTML = `<b>우선지원 순위 점수</b>` +
+  document.getElementById('legPriority').innerHTML = `<b>우선지원 순위 (RiskPct)</b>` +
     ORRD.map((c,i)=>`<div class="legend-row"><span class="legend-sw" style="background:${c}"></span>${i===0?'낮음(후순위)':i===ORRD.length-1?'높음(최우선)':''}</div>`).join('') +
-    `<div class="legend-cap">취약성지수 − 배분갭 기준 5분위</div>`;
+    `<div class="legend-cap">위험지수(대응역량 제외) 백분위 5분위 · 배분갭·재발확률은 산식에 미포함</div>`;
 
   const top15 = D.prioritySggList.slice(0, 15);
   document.getElementById('top15-priority-tbl').innerHTML =
-    '<tr><th>순위</th><th>시군구</th><th class="num">취약성지수</th><th>추천정책</th></tr>' +
-    top15.map(r=>`<tr><td><span class="rk">${r.priority_rank}</span></td><td>${r.시도명} ${r.시군구명}</td>
-      <td class="num">${r.index_main.toFixed(3)}</td><td>${r.recommended_policy}</td></tr>`).join('');
+    '<tr><th>순위</th><th>등급</th><th>시군구</th><th class="num">RiskPct</th><th>추천정책</th></tr>' +
+    top15.map(r=>`<tr><td><span class="rk">${r.priority_rank}</span></td><td>${r.grade}</td><td>${r.시도명} ${r.시군구명}</td>
+      <td class="num">${(r.priority_score*100).toFixed(1)}%</td><td>${r.recommended_policy}</td></tr>`).join('');
 }
 
 // ═══════════════════════ SECTION 02 ═══════════════════════

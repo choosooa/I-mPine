@@ -4,9 +4,9 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>I'mPine — CH2 방제취약성지수 및 예산배분 모델링</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="../ch1/vendor/leaflet/leaflet.css">
+<script src="../ch1/vendor/leaflet/leaflet.js"></script>
+<script src="../ch1/vendor/chart.umd.js"></script>
 <script src="../ch1/data.js"></script>
 <script src="data.js"></script>
 <style>
@@ -272,7 +272,7 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
     </div>
   </div>
 
-  <div class="concl"><div class="lbl">해석</div>현행 배분과 구조적 위험지수의 상관은 R²=2.4% 수준으로, 현재 예산 배분이 구조적 위험을 거의 반영하지 못하고 있음을 보여줍니다. 아래 "과소배분" 상위 지역을 CH3(정책추천) 우선지원 후보로 연결합니다.</div>
+  <div class="concl"><div class="lbl">해석 [옵션A 재적합]</div>현행 배분과 구조적 위험지수의 상관은 R²=4.8% 수준(원본부호 B안은 3.4%)으로, 부호 반전 후에도 여전히 낮아 현재 예산 배분이 구조적 위험을 거의 반영하지 못하고 있음을 보여줍니다. 아래 "과소배분" 상위 지역을 CH3(정책추천) 우선지원 후보로 연결합니다.</div>
 </section>
 <div class="sec-divider"></div>
 
@@ -311,8 +311,8 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
 
   <div class="krow">
     <div class="kpi t"><div class="kl">표본 (핵심변수 완비)</div><div class="kv">1,753행</div><div class="ks">1832→1816→1804→1753, 222개 시군구 · 3회 독립 재현 일치</div></div>
-    <div class="kpi b"><div class="kl">Model 1 AUC (훈련/홀드아웃)</div><div class="kv">0.581 / 0.564</div><div class="ks">구조타당성 검증용 · 공정비교용은 0.581/0.621(평가설계 다름, 각주 확인)</div></div>
-    <div class="kpi gl"><div class="kl">Model 2 AUC (훈련/홀드아웃)</div><div class="kv">0.976 / 0.947</div><div class="ks">연속발생연수 단독으로도 0.918 — 상습발생 이력 의존 높음</div></div>
+    <div class="kpi b"><div class="kl">Model 1 AUC (훈련/홀드아웃) [옵션A 재적합]</div><div class="kv">0.600 / 0.616</div><div class="ks">인위적확산 부호반전+v4 파이프라인 재적합값 · 원본부호(B안) 동일 파이프라인 대비 홀드아웃 0.594→0.616 개선</div></div>
+    <div class="kpi gl"><div class="kl">Model 2 AUC (훈련/홀드아웃)</div><div class="kv">0.976 / 0.911</div><div class="ks">연속발생연수 단독(0.918)이 오히려 근소 우세 — 상습발생 이력만으로 충분</div></div>
     <div class="kpi wa"><div class="kl">도로비율 면적통제 후 편상관</div><div class="kv">0.15~0.23 → 0.01~0.06</div><div class="ks">보고서 원문 "0.19→0.0008"은 원본 스크립트 미확보로 정밀 소수점 미검증 (docx에 코멘트 표시함)</div></div>
   </div>
 
@@ -321,7 +321,7 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
       <div class="ct">강점 <span class="realbadge">데이터분석 부문 심사 관점</span></div>
       <ul class="swlist strength">
         <li><b>표본정의·QA 이력이 투명함</b> — GIS 임상도 판전환, flag 모순, 도로변수 TierA/TierB 재계산까지 전부 문서화. "숫자만 있고 근거 없음"이라는 흔한 감점 사유와 정반대.</li>
-        <li><b>Model1/Model2 역할을 정직하게 구분</b> — Model2의 높은 AUC(0.947)가 상습발생 이력에서 나온다는 것을 숨기지 않고 명시.</li>
+        <li><b>Model1/Model2 역할을 정직하게 구분</b> — Model2 전체모형(0.911)이 연속발생연수 단독(0.918)보다 오히려 낮다는 것을 숨기지 않고 명시하고, "복잡한 모형이 필요 없다"는 결론으로 서술.</li>
         <li><b>공간전파 변수 비유의(p=0.28~0.41)를 그대로 보고</b> — 원하는 결과가 안 나와도 숨기지 않음.</li>
         <li><b>부트스트랩 해석범위를 명확히 한정</b> — 국가대응수준 모형에서 발생여부/발생규모 검증범위를 구분해 과장 방지.</li>
         <li><b>예산배분 시뮬레이션 버그 2건 실제 발견·수정</b> — 총액누수·상한재위반을 water-filling 알고리즘으로 검증까지 완료.</li>
@@ -407,6 +407,10 @@ let curIndexLayer = 'index_main';
 document.getElementById('maptoggle').innerHTML = Object.entries(INDEX_LAYERS).map(([k,v])=>
   `<button class="mtbtn ${k===curIndexLayer?'on':''}" data-k="${k}">${v.label}</button>`).join('');
 
+// 강원특별자치도 출범(2023.6) 코드 개편: CH1_GEOJSON은 구 강원도 코드(42xxx)를 쓰고
+// CH2 데이터(sgg_codes)는 신 강원특별자치도 코드(51xxx)를 씀 → 18곳 강원 전부 미표시되던 문제.
+// 뒤 3자리가 동일하므로 42xxx를 51xxx로 변환해 데이터 맵 키와 맞춘다.
+function resolveSggCode(code){ const s=String(code); return s.startsWith('42') ? '51'+s.slice(2) : s; }
 const sggMap = {}; // sgg_cd(5자리 코드) -> 실측 레코드. 다구시는 여러 코드가 같은 레코드를 가리킴.
 D.sggIndex.forEach(r=>{ (r.sgg_codes||[]).forEach(code=>{ sggMap[code]=r; }); });
 const ORRD = ['#fff3d6','#fcd88a','#f2a93c','#d9720e','#a34a00'];
@@ -420,7 +424,7 @@ function quantileColor(v, arr, colors){
 }
 function indexVals(k){ return D.sggIndex.map(r=>r[k]).filter(v=>v!=null); }
 function styleIndex(f, k){
-  const b = sggMap[f.properties.sgg_cd];
+  const b = sggMap[resolveSggCode(f.properties.sgg_cd)];
   if(!b || b[k]==null) return {fillColor:'#e3e3e3', weight:.5, color:'#bbb', fillOpacity:.5};
   return {fillColor: quantileColor(b[k], indexVals(k), ORRD), weight:.5, color:'#999', fillOpacity:.85};
 }
@@ -440,7 +444,7 @@ function renderIndexMap(){
     `<span class="realbadge">실측</span> 6차(최종판) 실제 계산 결과 · 경계는 ../ch1/data.js의 CH1_GEOJSON(sgg_cd 기준) 사용.`;
   if(!geoIndex) return;
   geoIndex.eachLayer(l=>{
-    const b = sggMap[l.feature.properties.sgg_cd];
+    const b = sggMap[resolveSggCode(l.feature.properties.sgg_cd)];
     l.setStyle(styleIndex(l.feature, curIndexLayer));
     if(b){
       l.setTooltipContent(`<b>${b.시도명} ${b.시군구명}</b><br>${INDEX_LAYERS[curIndexLayer].label}: <b>${b[curIndexLayer].toFixed(3)}</b> (순위 ${b.rank_within}/${D.meta.n_sgg})<br>
@@ -552,14 +556,14 @@ document.querySelector('#sec03 .callout .tx').innerHTML =
 const GAPCOLORS = ['#c0392b','#e8836f','#f4d9c8','#cfe0f4','#2a78d6']; // 과소(적색)→과다(청색)
 function gapVals(){ return D.sggIndex.map(r=>r.배분갭); }
 function styleGap(f){
-  const b = sggMap[f.properties.sgg_cd];
+  const b = sggMap[resolveSggCode(f.properties.sgg_cd)];
   if(!b) return {fillColor:'#e3e3e3', weight:.5, color:'#bbb', fillOpacity:.5};
   return {fillColor: quantileColor(b.배분갭, gapVals(), GAPCOLORS), weight:.5, color:'#999', fillOpacity:.85};
 }
 mapGap = L.map('mapGap',{scrollWheelZoom:false}).setView([36.3,127.8],7);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:12}).addTo(mapGap);
 const geoGap = (typeof CH1_GEOJSON!=='undefined') ? L.geoJSON(CH1_GEOJSON,{style:styleGap, onEachFeature:(f,l)=>{
-    const b = sggMap[f.properties.sgg_cd];
+    const b = sggMap[resolveSggCode(f.properties.sgg_cd)];
     l.bindTooltip(b ? `<b>${b.시도명} ${b.시군구명}</b><br>취약성지수: ${b.index_main.toFixed(3)}<br>예산(ha당log): ${b.평균예산_log.toFixed(2)}<br>배분갭: <b>${b.배분갭.toFixed(2)}</b> (${b.축B_배분적정성})`
       : `<b>${f.properties.sgg_cd}</b><br>분석대상 아님`, {className:'gu-tooltip', sticky:true});
     l.on({mouseover:e=>e.target.setStyle({weight:2,color:'#222'}), mouseout:e=>l.setStyle(styleGap(f))});
