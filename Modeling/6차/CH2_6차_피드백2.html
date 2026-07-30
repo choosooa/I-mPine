@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CH2 6차 보고서 · 최종 크로스체크</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --border: #e4e2df;
+  --text: #1c1917;
+  --text-sub: #57534e;
+  --text-dim: #a8a29e;
+  --pass: #166534;
+  --pass-bg: #dcfce7;
+  --pass-border: #86efac;
+  --warn: #92400e;
+  --warn-bg: #fef3c7;
+  --warn-border: #fcd34d;
+  --fail: #991b1b;
+  --fail-bg: #fee2e2;
+  --fail-border: #fca5a5;
+  --info: #1e40af;
+  --info-bg: #dbeafe;
+  --info-border: #93c5fd;
+  --accent: #2563eb;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Noto Sans KR', -apple-system, sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 860px; margin: 0 auto; padding: 48px 24px 96px; }
+header { margin-bottom: 48px; padding-bottom: 32px; border-bottom: 2px solid var(--text); }
+header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+header .meta { font-size: 13px; color: var(--text-sub); }
+header .meta span { display: inline-block; margin-right: 16px; }
+
+.verdict {
+  padding: 20px 24px;
+  border-radius: 8px;
+  margin-bottom: 40px;
+  font-size: 15px;
+}
+.verdict.pass { background: var(--pass-bg); border: 1px solid var(--pass-border); }
+.verdict.pass strong { color: var(--pass); }
+.verdict.warn { background: var(--warn-bg); border: 1px solid var(--warn-border); }
+.verdict.warn strong { color: var(--warn); }
+
+h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 48px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+h3 { font-size: 15px; font-weight: 600; margin: 28px 0 10px; }
+p, li { margin-bottom: 8px; }
+ul { padding-left: 20px; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0 24px;
+  font-size: 14px;
+}
+th, td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+th {
+  background: #f5f5f4;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+td:first-child { white-space: nowrap; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+.badge.ok { background: var(--pass-bg); color: var(--pass); border: 1px solid var(--pass-border); }
+.badge.open { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+.badge.fixed { background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border); }
+
+code, .mono {
+  font-family: var(--mono);
+  font-size: 13px;
+  background: #f5f5f4;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+.num { font-family: var(--mono); font-weight: 500; }
+
+.callout {
+  padding: 16px 20px;
+  border-radius: 6px;
+  margin: 16px 0;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.callout.info { background: var(--info-bg); border-left: 3px solid var(--accent); }
+.callout.warn { background: var(--warn-bg); border-left: 3px solid var(--warn); }
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 16px 0;
+}
+.compare-grid .cell {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+.compare-grid .cell .label {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 4px;
+}
+.compare-grid .cell .value {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 600;
+}
+.compare-grid .cell .value.match { color: var(--pass); }
+
+.section-label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+footer {
+  margin-top: 64px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>CH2 6차 보고서 · 최종 크로스체크</h1>
+  <div class="meta">
+    <span>검토일 2026-07-30</span>
+    <span>대상 CH2_분석보고서_6차.docx</span>
+    <span>데이터 CH2_전체병합패널_5도메인_2016_2023_최종보정4.csv</span>
+  </div>
+</header>
+
+<div class="verdict pass">
+  <strong>최종 판정: 제출 가능</strong> — 핵심 수치 6개를 독립 재현해 전부 일치했고, 피드백 8개 항목 중 6개가 정확히 반영됐습니다. 남은 2개는 보고서 자체의 결론에 영향 없는 문서정리 사안입니다.
+</div>
+
+
+<h2>1. 핵심 수치 독립 재현</h2>
+
+<p>최종보정4.csv에서 보고서와 동일한 로직(표본정의 → within-year z → 동일가중 → CRE 로지스틱)으로 처음부터 재구성해, 보고서 수치와 소수점 셋째자리까지 일치를 확인했습니다.</p>
+
+<table>
+  <thead>
+    <tr><th>수치</th><th>보고서</th><th>독립 재계산</th><th>판정</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>표본 카스케이드</td>
+      <td class="mono">1832→1816→1804→1753</td>
+      <td class="mono">1832→1816→1804→1753</td>
+      <td><span class="badge ok">일치</span></td>
+    </tr>
+    <tr>
+      <td>시군구 수</td>
+      <td class="mono">222</td>
+      <td class="mono">222</td>
+      <td><span class="badge ok">일치</span></td>
+    </tr>
+    <tr>
+      <td>Model 1 훈련 between / AUC</td>
+      <td class="mono">1.138 (p=0.002) / 0.581</td>
+      <td class="mono">1.138 (p=0.002) / 0.581</td>
+      <td><span class="badge ok">일치</span></td>
+    </tr>
+    <tr>
+      <td>Model 1 홀드아웃 between / AUC</td>
+      <td class="mono">1.200 (p=0.020) / 0.564</td>
+      <td class="mono">1.200 (p=0.020) / 0.564</td>
+      <td><span class="badge ok">일치</span></td>
+    </tr>
+    <tr>
+      <td>도로비율 면적통제 후 편상관 (TierA)</td>
+      <td class="mono">0.0008</td>
+      <td class="mono">0.0008 (p=0.973)</td>
+      <td><span class="badge ok">일치</span></td>
+    </tr>
+    <tr>
+      <td>원목업체수 면적통제 후 상관</td>
+      <td class="mono">−0.196</td>
+      <td class="mono">−0.198</td>
+      <td><span class="badge ok">일치 (반올림 차)</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="compare-grid">
+  <div class="cell">
+    <div class="label">TierB(보정전) 편상관</div>
+    <div class="value">0.1528</div>
+  </div>
+  <div class="cell">
+    <div class="label">TierA(최종) 편상관</div>
+    <div class="value match">0.0008</div>
+  </div>
+</div>
+<p style="font-size:13px; color:var(--text-sub);">log_소나무림면적 통제, 1753행 표본 기준. 도로변수 제외 결정의 핵심 근거인 "면적통제 후 신호 소멸"이 재확인됨.</p>
+
+
+<h2>2. 피드백 반영 체크</h2>
+
+<table>
+  <thead>
+    <tr><th>#</th><th>피드백 항목</th><th>6차 보고서 반영</th><th>상태</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>①</td>
+      <td>원목업체수 단독 구성 — QA 필요</td>
+      <td>도메인 변경 사유 명시, 면적통제 상관 −0.196 기재</td>
+      <td><span class="badge ok">반영</span></td>
+    </tr>
+    <tr>
+      <td>②</td>
+      <td><code>0.19→0.0008</code> 재현</td>
+      <td>§1 갱신사항에 인용, 부록 재현으로 해소</td>
+      <td><span class="badge ok">반영</span></td>
+    </tr>
+    <tr>
+      <td>③</td>
+      <td>AUC 이중표기 (0.581/0.564 vs 0.621)</td>
+      <td>§4에 "§5.2의 0.621은 평가설계가 다르다" 각주 삽입</td>
+      <td><span class="badge ok">반영</span></td>
+    </tr>
+    <tr>
+      <td>④</td>
+      <td>메모-보고서 수치 불일치 (편상관·AUC 계보)</td>
+      <td>—</td>
+      <td><span class="badge open">아래 참고</span></td>
+    </tr>
+    <tr>
+      <td>⑤</td>
+      <td>flag=1 × 값=NaN 정합성 모순</td>
+      <td>최종보정4에서 3개 구 모두 <strong>flag=0으로 수정 완료</strong></td>
+      <td><span class="badge ok">수정 확인</span></td>
+    </tr>
+    <tr>
+      <td>⑥</td>
+      <td>배분 서술 프레이밍 ("사후/선행" 이분법 위험)</td>
+      <td>§6.3 "정책목표가 다른 두 배분" 문구 삽입, "예방형 예산 재배분 시나리오" 명칭 통일</td>
+      <td><span class="badge ok">반영</span></td>
+    </tr>
+    <tr>
+      <td>⑦</td>
+      <td>부트스트랩 해석 범위 한정</td>
+      <td>§7에 "발생여부 로지스틱 모형의 계수에 대해서만" 명시</td>
+      <td><span class="badge ok">반영</span></td>
+    </tr>
+    <tr>
+      <td>⑧</td>
+      <td>결론 문단 (Model 1/2 역할 구분)</td>
+      <td>§10.1~10.3에 역할 구분, 한계, 향후과제 반영</td>
+      <td><span class="badge ok">반영</span></td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2>3. 남은 이슈 2개</h2>
+
+<h3>④ TierB 편상관 수치가 문서마다 다름</h3>
+
+<div class="callout warn">
+  결론에 영향 없음 — 문서정리 사안
+</div>
+
+<table>
+  <thead><tr><th>출처</th><th>TierB 편상관</th><th>통제변수 추정</th></tr></thead>
+  <tbody>
+    <tr><td>6차 보고서 본문</td><td class="mono">0.19</td><td>log_소나무림면적, 1749행(도로결측 제외)</td></tr>
+    <tr><td>HTML 작업 메모</td><td class="mono">0.2243</td><td>소나무류_면적비율(%), 별도 표본</td></tr>
+    <tr><td>이번 독립 재계산</td><td class="mono">0.1528</td><td>log_소나무림면적, 1753행(도로제외 후 표본)</td></tr>
+    <tr><td>이전 세션 재계산</td><td class="mono">0.1916</td><td>log_소나무림면적, 1746행(이전 표본)</td></tr>
+  </tbody>
+</table>
+
+<p>수치가 흔들리는 이유: 표본 정의(어느 변수로 listwise)와 통제변수(면적비율 vs log면적 vs 원면적)가 문서마다 달랐기 때문입니다. 어떤 조합으로 해도 <strong>TierA는 0 수렴·비유의</strong>라는 결론은 동일하므로 결론 자체는 안전합니다. 보고서의 "0.19"가 어느 표본·통제변수 조합인지 각주 한 줄 추가를 권장합니다.</p>
+
+<h3>AUC 버전 계보 정리</h3>
+
+<div class="callout info">
+  발표 슬라이드에 숫자를 옮길 때 반드시 어느 쌍인지 라벨을 같이 옮길 것
+</div>
+
+<table>
+  <thead><tr><th>버전</th><th>훈련 AUC</th><th>홀드아웃 AUC</th><th>비고</th></tr></thead>
+  <tbody>
+    <tr><td>v3 (TierB, 풍속 포함)</td><td class="mono">0.617</td><td class="mono">0.622</td><td>HTML 메모 기준</td></tr>
+    <tr><td>v4 (TierB, 풍속 제외)</td><td class="mono">0.600</td><td class="mono">0.594</td><td>구조타당성 검증</td></tr>
+    <tr><td>v4 frozen-gm</td><td class="mono">0.600</td><td class="mono">0.633</td><td>Model 2 공정비교</td></tr>
+    <tr><td style="font-weight:600;">최종 (TierA, 도로 제외)</td><td class="mono" style="font-weight:600;">0.581</td><td class="mono" style="font-weight:600;">0.564</td><td style="font-weight:600;">§4 구조타당성 검증 ← 보고서 메인</td></tr>
+    <tr><td>최종 frozen-gm</td><td class="mono">0.581</td><td class="mono">0.621</td><td>§5.2 Model 2 비교표</td></tr>
+  </tbody>
+</table>
+
+<p>6차 보고서 §4와 §5.2에서 이 둘을 구분하는 각주가 이미 달려 있어 <strong>보고서 자체는 문제없습니다</strong>. 다만 발표 슬라이드에 숫자만 떼서 가면 "0.564랑 0.621이 왜 다르냐"에 즉답이 안 됩니다.</p>
+
+
+<h2>4. 추가 발견: 인천 동구 불균형 복귀</h2>
+
+<div class="callout info">
+  보고서 §2.1에 각주 한 줄 권장
+</div>
+
+<p>도로변수를 핵심변수에서 제외하면서 인천 동구가 표본에 복귀해 n이 1749→1753으로 늘었다고 보고서에 정확히 기재되어 있습니다. 다만 동구는 <strong>2016~2019 4행만 복귀</strong>했고 2020~2023은 <code>log_소나무림면적=NaN</code>(임상도 판전환으로 원자료가 0)이라 여전히 빠져있습니다. 즉 <strong>절반만 복귀한 불균형 상태</strong>인데 이 사실이 보고서에 안 적혀있으니 §2.1에 한 줄 넣어두시면 좋겠습니다.</p>
+
+
+<h2>5. 이전 세션에서 지적했던 사항 — 최종 반영 확인</h2>
+
+<table>
+  <thead><tr><th>세션</th><th>지적 사항</th><th>6차 보고서 반영</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>CH1 계획서</td>
+      <td>지자체대응역량 역방향 부호</td>
+      <td><span class="badge ok">§2.2에 "역방향 부호 반영" 명시</span></td>
+    </tr>
+    <tr>
+      <td>CH2 전략노트</td>
+      <td>hhh4 인용 표현 과대</td>
+      <td><span class="badge ok">"개념적 분해를 차용" 표현으로 변경</span></td>
+    </tr>
+    <tr>
+      <td>2차 EDA</td>
+      <td>SPI3 ICC=0, 도메인에서 제외 권장</td>
+      <td><span class="badge ok">제외 완료</span></td>
+    </tr>
+    <tr>
+      <td>2차 EDA</td>
+      <td>평균풍속 Spearman 0.14, 제외 재검토</td>
+      <td><span class="badge ok">교란효과(관측소 공유) 확인 후 제외</span></td>
+    </tr>
+    <tr>
+      <td>GitHub 검토</td>
+      <td>early_warning_test.txt 데이터 leakage</td>
+      <td><span class="badge ok">Model 2 최종 로그에 "v1 버그: 전체기간에서 _gm" 명시, frozen-gm으로 수정</span></td>
+    </tr>
+    <tr>
+      <td>GitHub 검토</td>
+      <td>LMG 가중치 하드코딩 불일치</td>
+      <td><span class="badge fixed">도로제외로 LMG 자체가 재계산됨, 메인은 동일가중</span></td>
+    </tr>
+    <tr>
+      <td>v4 검토서</td>
+      <td>총예산 보존 오류 (2017~2019, −1.8~2.1%)</td>
+      <td><span class="badge ok">water-filling 알고리즘 재구현, v5에서 0원 오차 확인</span></td>
+    </tr>
+    <tr>
+      <td>v4 검토서</td>
+      <td>±30% 상한 위반 (2019년 110건 등)</td>
+      <td><span class="badge ok">위반 0건 확인, 2022년 상한 완화 투명 처리</span></td>
+    </tr>
+    <tr>
+      <td>v4 검토서</td>
+      <td>배분갭 회귀식 표기 (위험~예산 → 예산~위험)</td>
+      <td><span class="badge ok">§4.1에서 정정</span></td>
+    </tr>
+    <tr>
+      <td>v4 검토서</td>
+      <td>"모든 계수가 유의성 상실" 과대 주장</td>
+      <td><span class="badge ok">§7에서 발생여부 모형 한정, 발생규모 보류 명시</span></td>
+    </tr>
+    <tr>
+      <td>TierA 검증</td>
+      <td>도로 TierB ICC=1.0 → 설계상 1.0 각주 필요</td>
+      <td><span class="badge fixed">도로제외로 ICC 보고 자체가 불필요해짐</span></td>
+    </tr>
+    <tr>
+      <td>피드백 PDF</td>
+      <td>flag=1 × 값=NaN 모순 (3개 구)</td>
+      <td><span class="badge ok">최종보정4에서 flag=0으로 수정 확인</span></td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2>6. 최종 제출 전 체크리스트</h2>
+
+<table>
+  <thead><tr><th>순서</th><th>할 일</th><th>소요</th><th>필수 여부</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="mono">1</td>
+      <td>발표 슬라이드에 AUC 옮길 때 "구조타당성 0.581/0.564" vs "공정비교 0.581/0.621" 라벨 동반</td>
+      <td>5분</td>
+      <td><strong>필수</strong></td>
+    </tr>
+    <tr>
+      <td class="mono">2</td>
+      <td>§2.1에 인천 동구 2020~2023 불균형 복귀 각주 추가</td>
+      <td>3분</td>
+      <td>권장</td>
+    </tr>
+    <tr>
+      <td class="mono">3</td>
+      <td>"0.19(구버전)" 표본·통제변수 각주 추가</td>
+      <td>3분</td>
+      <td>권장</td>
+    </tr>
+    <tr>
+      <td class="mono">4</td>
+      <td>AUC 5쌍 계보표를 부록에 1회 고정</td>
+      <td>10분</td>
+      <td>권장</td>
+    </tr>
+    <tr>
+      <td class="mono">5</td>
+      <td>GitHub <code>Modeling/1차/code/</code> 경로 정리 — 최종 스크립트명은 <code>model1_final.py</code> 등으로 바뀌었는데 옛 파일(.txt)이 그대로 남아있음</td>
+      <td>10분</td>
+      <td>권장</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<footer>
+  입력 파일: CH2_전체병합패널_5도메인_2016_2023_최종보정4.csv (1,832행 × 98열) · CH2_분석보고서_6차.docx · CH2_분석보고서_피드백_결과해석_정리.pdf<br>
+  검증 방식: CSV에서 동일 로직(표본정의→잔차화→within-year z→동일가중→CRE 로지스틱)을 처음부터 재구성해 독립 실행. 보고서 문구는 pandoc 변환 후 키워드 대조.
+</footer>
+
+</div>
+</body>
+</html>
