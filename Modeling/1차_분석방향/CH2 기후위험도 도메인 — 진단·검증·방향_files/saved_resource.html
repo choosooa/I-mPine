@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<!-- saved from url=(0253)https://269e971d-6e27-4d2a-a54d-e0ae55470bfb.frame.claudeusercontent.com/_f/1785349036-33ec/?__frame_t=wdBjxI3DztsSpbNo8x318gJL.e1d05cfc-dbd5-4128-a031-4b67902f4e23.605a4aad-6afa-461a-829a-5f4cd28696b3.1785354875&__frame_v=manifest.ec369d2e020e53f6.json -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><!-- frame-runtime --><!--<base href="/_f/1785349036-33ec/">--><base href="."><script>window.__FRAME_PREAMBLE={"capabilities":{"downloads":"downloads.BABDwU1K.js","mcp":"mcp.hoz5jxDa.js","permissions":"permissions.ByA9Fd8x.js","self":"self.D3u1zjZe.js","user":"user.Cp1-RnjB.js"},"transforms":"_transforms.DYk1Ltlh.js","comments":"_comments.DiwQajF_.js","translate":"_translate.C5leZL2A.js"}</script><script>(function(){"use strict";const Ee="modulepreload",we=function(e){return"/"+e},Se={},ee=function(t,n,l){let i=Promise.resolve();function s(f){const c=new Event("vite:preloadError",{cancelable:!0});if(c.payload=f,window.dispatchEvent(c),!c.defaultPrevented)throw f}return i.then(f=>{for(const c of f||[])c.status==="rejected"&&s(c.reason);return t().catch(s)})},te=["light","dark","system"];function ne(e){if(e===null||typeof e!="object")return!1;const t=e.__frame_init;return t!==null&&typeof t=="object"}function W(e){return e!==null&&typeof e=="object"&&e.__frame_size_poke===!0}function re(e){if(e===null||typeof e!="object")return!1;const t=e.__frame_theme;if(t===null||typeof t!="object")return!1;const n=t.theme;return typeof n=="string"&&te.includes(n)}function se(e){try{typeof reportError=="function"?reportError(e):setTimeout(()=>{throw e},0)}catch{}}const oe=Object.freeze(Object.assign(Object.create(null),{user:Object.freeze(Object.assign(Object.create(null),{id:null,isOwner:!1,canEdit:!1,name:null,avatarUrl:null,email:null}))}));function Y(e){if(window===top||e.type==="auxclick"&&e.button!==1)return;const t=e.composedPath?e.composedPath():[e.target];let n=null;for(let f=0;f<t.length;f++){const c=t[f];if(c&&c.matches&&c.matches("a[href],area[href]")){n=c;break}}if(!n&&e.target&&e.target.closest&&(n=e.target.closest("a[href],area[href]")),!n)return;const l=n.getAttribute("href");if(!l)return;let i,s;try{i=new URL(l,document.baseURI),s=new URL(document.baseURI).origin}catch{return}(i.protocol==="http:"||i.protocol==="https:")&&i.origin!==s&&(e.preventDefault(),parent.postMessage({__frame_nav:!0,url:i.href},"*"))}const K={};function D(e){if(window===top)return;const t=Date.now();t-(K[e]||0)<500||(K[e]=t,parent.postMessage({__frame_engaged:!0,kind:e},"*"))}const ie=2e3,x=["wheel","touchstart","touchmove","keydown","pointerdown"];let J=0;function ae(e){e.isTrusted&&(J=Date.now())}function ce(){addEventListener("click",Y,!0),addEventListener("auxclick",Y,!0)}function le(){for(let e=0;e<x.length;e++)addEventListener(x[e],ae,{capture:!0,passive:!0});addEventListener("scroll",e=>{e.isTrusted&&Date.now()-J<ie&&D("scroll")},{capture:!0,passive:!0}),addEventListener("pointermove",e=>{e.isTrusted&&D("pointer")},{capture:!0,passive:!0}),addEventListener("click",e=>{e.isTrusted&&D("click")},{capture:!0,passive:!0})}const I="__frame_scroll",ue=150,fe=310,de=160,me=3e4;function pe(){let e=0,t=!1,n=!1,l=!1,i=0;const s=a=>{try{sessionStorage.setItem(I,JSON.stringify({y:a}))}catch{}},f=()=>{if(t){t=!1;return}n=!0,clearTimeout(e),e=setTimeout(()=>s(scrollY),ue)};try{addEventListener("scroll",f,{passive:!0}),addEventListener("pagehide",()=>{clearTimeout(e),s(scrollY)})}catch{}const c=()=>{let a;try{a=sessionStorage.getItem(I)}catch{return null}if(a===null)return null;let _;try{_=JSON.parse(a)}catch{_=null}const m=_?.y;if(!(typeof m=="number"&&Number.isFinite(m)&&m>=0)){try{sessionStorage.removeItem(I)}catch{}return null}return m};let g=!1;const p=a=>{try{const _=scrollY;scrollTo({top:a,left:0,behavior:"instant"}),i=a,l=!0,s(a);const m=scrollY;m!==_&&(t=!0),m!==a&&!g&&(g=!0,addEventListener("load",()=>{try{if(scrollY===m){const y=c();p(y!==null?y:i)}}catch{}},{once:!0}))}catch{}},o=()=>{try{return!!location.hash}catch{return!0}};let u=!1;const d=()=>{try{if(u||innerWidth>fe||innerHeight>de)return;u=!0;const a=Date.now(),_=()=>{try{removeEventListener("resize",_)}catch{}if(Date.now()-a>me||n||o())return;const m=c();p(m!==null?m:i)};addEventListener("resize",_)}catch{}};let h=!1,b=!1;return{restore(){if(h||(h=!0,o()))return;const a=c();a!==null&&(p(a),d())},promoted(){if(b||(b=!0,o()))return;const a=c();a!==null?(p(a),d()):l&&p(i)}}}function he(e,t,n){const l=[...t.values()].filter(i=>i.targets.some(s=>s.startsWith(e+".")));return{wrap(i,s){const f=`${e}.${i}`,c=l.filter(g=>g.targets.includes(f));return c.length===0?(...g)=>{try{return s(...g)}catch(p){return Promise.reject(p)}}:(...g)=>{let p=g;for(const u of c){const d=u.module.parameters;if(d)try{p=d(p)}catch{return Promise.reject({code:"transform_error",id:u.id,scope:e,message:"parameters transform failed"})}}let o;try{o=s(...p)}catch(u){o=Promise.reject(u)}return o.then(u=>{for(let d=c.length-1;d>=0;d--){const h=c[d],b=h.module.returns;if(b)try{u=b(u)}catch{return n({id:h.id,scope:e,leg:"returns"}),u}}return u},u=>{for(let d=c.length-1;d>=0;d--){const h=c[d],b=h.module.throws;if(b)try{u=b(u)}catch{return n({id:h.id,scope:e,leg:"throws"}),Promise.reject(u)}}return Promise.reject(u)})}}}}function ge(e,t,n,l=()=>{}){const i=new Set(e.changes??[]),s=new Map;for(const f of i){const c=t[f];c&&s.set(f,c)}return{contract:e.contract,changes:i,flags:new Set(e.flags??[]),capabilities:e.capabilities??{},capBudgets:e.capBudgets??{},transforms:s,shellOrigin:n.shellOrigin,mount:n.mount,pipe:f=>he(f,s,l)}}(function(){const e=Object.defineProperty,t=globalThis,n=["RTCPeerConnection","webkitRTCPeerConnection","RTCDataChannel","RTCIceCandidate","RTCSessionDescription","RTCRtpSender","RTCRtpReceiver"];let l=0;for(let i=0;i<n.length;i++){const s=n[i];try{e(t,s,{value:void 0,writable:!1,configurable:!1})}catch{try{delete t[s]}catch{}try{e(t,s,{value:void 0,writable:!1,configurable:!0})}catch{}}typeof t[s]=="function"&&l++}if(l&&window!==top)try{parent.postMessage({__frame_rtc_lockdown_failed:l},"*")}catch{}})();const _e=1e4,ye=Object.freeze([...window.__FRAME_PREAMBLE?.origins??["https://claude.ai","https://preview.claude.ai"]]);function G(e){for(const t of ye)if(t.endsWith(":*"))try{const n=new URL(e);if(`${n.protocol}//${n.hostname}:*`===t)return!0}catch{}else if(e===t)return!0;return!1}const R=Object.freeze({...window.__FRAME_PREAMBLE?.capabilities}),U=window.__FRAME_PREAMBLE?.transforms,z=window.__FRAME_PREAMBLE?.comments,$=window.__FRAME_PREAMBLE?.translate,T=/^[\w.-]+\.js$/,be=/^[a-z][a-z0-9_-]{0,63}$/;let V=null,j=null;function q(e,t,n){try{Object.defineProperty(e,t,{value:n,writable:!1,configurable:!1,enumerable:!0})}catch{try{Object.defineProperty(e,t,{value:n,writable:!1,configurable:!0,enumerable:!0})}catch{}}}let B=!1;function X(e){const t=document.documentElement;e==="light"||e==="dark"?(t.dataset.theme=e,t.style.colorScheme=e,B=!0):B&&(delete t.dataset.theme,t.style.colorScheme="",B=!1)}const A=Object.assign(Object.create(null),{mcp:Object.assign(Object.create(null),{watchTool:{handlerArg:3}})}),M=new Map;function Q(e,t){const n=M.get(e);if(!n)return;const l=Object.assign(Object.create(null),t);Object.assign(n.impl,l),n.impl.__settled=()=>Promise.reject({code:"capability_removed",message:`${e}: method not in this runtime`});const i=n.queue;n.queue=[];for(const s of i){const f=l[s.method];if(f)if(A[e]?.[s.method])try{s.resolve(f(...s.args))}catch{k(s,A[e][s.method].handlerArg,{code:"transform_error",message:`${e}.${s.method} rejected its arguments`})}else f(...s.args).then(s.resolve,s.reject);else{const c={code:"capability_removed",message:`${e}.${s.method} is not in this runtime`},g=A[e]?.[s.method];if(g){k(s,g.handlerArg,c);continue}s.reject(c)}}}function ve(e,t){const n=M.get(e);if(!n)return;n.impl.__settled=()=>Promise.reject(t);const l=n.queue;n.queue=[];for(const i of l){const s=A[e]?.[i.method];if(s){k(i,s.handlerArg,t);continue}i.reject(t)}}function N(e,t){const n=oe[e];if(!n){ve(e,t);return}Q(e,Object.fromEntries(Object.entries(n).map(([l,i])=>[l,()=>Promise.resolve(i)])))}function k(e,t,n){if(e.syncState?.dead)return;const l=e.args[t];typeof l=="function"&&queueMicrotask(()=>{if(!e.syncState?.dead)try{l({type:"error",error:n})}catch(i){se(i)}})}const F=Object.getOwnPropertyDescriptor(window,"claude");if(window!==top&&!(F&&F.writable===!1)){ce(),le();let e=null;try{e=pe()}catch{}const t=F?.value??{};q(window,"claude",t);const n=o=>{const u={impl:Object.create(null),queue:[]};M.set(o,u);const d=u.impl,h=new Proxy(d,{get:(b,a)=>{if(typeof a!="string"||a==="then"||a==="toJSON"||a==="valueOf")return;if(a==="toString")return Object.prototype.toString;const _=A[o]?.[a];return _?(...m)=>{if(typeof m[_.handlerArg]!="function")throw new TypeError(`${o}.${a} requires a handler function`);const y=d[a];if(y)return y(...m);if(d.__settled){const v={dead:!1},P={args:[...m],syncState:v};return d.__settled().catch(C=>k(P,_.handlerArg,C)),()=>{v.dead=!0}}let E=null;const S={dead:!1};return u.queue.push({method:a,args:m,resolve:v=>{E=typeof v=="function"?v:null,S.dead&&E?.()},reject:()=>{},syncState:S}),()=>{S.dead=!0,E?.()}}:(...m)=>{const y=d[a]??d.__settled;return y?y(...m):new Promise((E,S)=>{u.queue.push({method:a,args:m,resolve:E,reject:S})})}},set:()=>!1});q(t,o,h)};for(const o of Object.keys(R)){if(t[o]!==void 0){q(t,o,t[o]);continue}n(o)}let l=null,i=null,s=0;const f=o=>{o.source!==parent||!G(o.origin)||ne(o.data)&&(l=o.data.__frame_init,j=o.origin,removeEventListener("message",f),clearTimeout(s),i?.())};addEventListener("message",f),parent.postMessage({__frame_connect:!0},"*");const c=new Promise(o=>{i=o,s=setTimeout(()=>{removeEventListener("message",f),o()},_e)}),g=document.readyState==="loading"?new Promise(o=>document.addEventListener("DOMContentLoaded",()=>o(),{once:!0})):Promise.resolve();g.then(()=>{try{e?.restore()}catch{}});const p=o=>{if(!(o.source!==parent||!G(o.origin))&&W(o.data)){removeEventListener("message",p);try{e?.promoted()}catch{}}};addEventListener("message",p),c.then(async()=>{if(!l||!j){for(const r of M.keys())N(r,{code:"not_granted",message:"frame initialization did not arrive - capability unavailable"});return}X(l.theme);const o=j;let u=!1,d=!1;addEventListener("message",r=>{if(r.source!==parent||r.origin!==o)return;re(r.data)&&X(r.data.__frame_theme.theme);const w=r.data?.__fc_mode;w&&typeof w=="object"&&!u&&z&&T.test(z)&&(u=!0,h(z).then(H=>H.install?.(o,w.on===!0)).catch(()=>{}));const O=r.data?.__ft_cmd;O&&typeof O=="object"&&!d&&$&&T.test($)&&(d=!0,h($).then(H=>H.install?.(o,O)).catch(()=>{}))});const h=r=>ee(()=>import("/_runtime/"+r),void 0),b=Object.keys(l.capabilities??{});for(const r of b)Object.hasOwn(R,r)||be.test(r)&&t[r]===void 0&&(n(r),N(r,{code:"capability_disabled",message:"capability not in this runtime generation"}));const a=b.filter(r=>Object.hasOwn(R,r)).map(r=>[r,R[r]]).filter(r=>typeof r[1]=="string"&&T.test(r[1])),[_,...m]=await Promise.allSettled([U&&T.test(U)?h(U):Promise.resolve({}),...a.map(([,r])=>h(r))]),y=j;V=ge(l,_.status==="fulfilled"&&_.value?.TRANSFORMS||{},{shellOrigin:y,mount:Q},r=>parent.postMessage({__frame_cap_telemetry:r},y));const E=r=>parent.postMessage({__frame_cap_telemetry:{kind:"cap-load-error",cap:r}},y),S=V;m.forEach((r,w)=>{const O=a[w][0];if(r.status!=="fulfilled"){E(O);return}try{r.value?.install?.(S)}catch{E(O)}});for(const[r,w]of M)if(!(w.queue.length===0&&Object.keys(w.impl).length>0)){if(b.includes(r)){N(r,{code:"capability_disabled",message:"capability not available in this session"});continue}N(r,{code:"not_granted",message:"capability not available in this session"})}await g,parent.postMessage({__frame_ready:!0},j);let v=-1,P=0;const C=()=>{P=0;const r=Math.max(document.documentElement.scrollHeight,document.body?document.body.scrollHeight:0);r!==v&&(v=r,parent.postMessage({__frame_size:!0,h:r},y))},L=()=>{P||(P=setTimeout(C,200))},Z=new ResizeObserver(L);Z.observe(document.documentElement),document.body&&Z.observe(document.body),document.addEventListener("load",L,!0),document.fonts?.ready.then(L,()=>{}),addEventListener("beforeprint",()=>{v=-1,C()}),L(),addEventListener("message",r=>{if(!(r.source!==parent||r.origin!==y)&&W(r.data)){try{e?.promoted()}catch{}v=-1,L()}})})}})();</script><!-- /frame-runtime --><meta name="viewport" content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>CH2 기후위험도 도메인 — 진단·검증·방향</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:        #f2f3ec;
+    --surface:     #fbfbf8;
+    --surface-2:   #f6f7f0;
+    --ink:         #171b13;
+    --ink-soft:    #52564a;
+    --muted:       #8b8d7e;
+    --line:        #dcded1;
+    --line-strong: #c3c6b5;
+    --accent:      #2f6b4f;
+    --accent-ink:  #1f4d38;
+    --accent-soft: #e3ece2;
+    --m2:          #b8790a;
+    --m2-soft:     #fbeed3;
+    --m2-ink:      #8a5c07;
+    --good:        #0ca30c;
+    --warning:     #b8790a;
+    --warning-bg:  #fbeed3;
+    --critical:    #d03b3b;
+    --critical-bg: #f9dedb;
+    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+    --shadow: 0 1px 2px rgba(23,27,19,0.06), 0 8px 24px -12px rgba(23,27,19,0.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page:#14160f; --surface:#1b1e15; --surface-2:#20241a;
+      --ink:#eef0e6; --ink-soft:#c7c9ba; --muted:#8f9184;
+      --line:#2e3226; --line-strong:#3a3f30;
+      --accent:#7cc39e; --accent-ink:#a6dec0; --accent-soft:#1e2a20;
+      --m2:#e0a758; --m2-soft:#3a2c0c; --m2-ink:#f0c98a;
+      --warning-bg:#3a2c0c; --critical-bg:#3a1c1a;
+      --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:#14160f; --surface:#1b1e15; --surface-2:#20241a;
+    --ink:#eef0e6; --ink-soft:#c7c9ba; --muted:#8f9184;
+    --line:#2e3226; --line-strong:#3a3f30;
+    --accent:#7cc39e; --accent-ink:#a6dec0; --accent-soft:#1e2a20;
+    --m2:#e0a758; --m2-soft:#3a2c0c; --m2-ink:#f0c98a;
+    --warning-bg:#3a2c0c; --critical-bg:#3a1c1a;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page:#f2f3ec; --surface:#fbfbf8; --surface-2:#f6f7f0;
+    --ink:#171b13; --ink-soft:#52564a; --muted:#8b8d7e;
+    --line:#dcded1; --line-strong:#c3c6b5;
+    --accent:#2f6b4f; --accent-ink:#1f4d38; --accent-soft:#e3ece2;
+    --m2:#b8790a; --m2-soft:#fbeed3; --m2-ink:#8a5c07;
+    --warning-bg:#fbeed3; --critical-bg:#f9dedb;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font-family: Pretendard, -apple-system, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    font-size: 15.5px; line-height: 1.7; -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace; font-variant-numeric: tabular-nums; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 52px 24px 100px; }
+
+  header.doc-head { margin-bottom: 36px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent-ink); font-weight: 700; margin-bottom: 14px; }
+  .eyebrow::before { content: ""; width: 18px; height: 2px; background: var(--accent); display: inline-block; }
+  h1 { font-size: 30px; line-height: 1.24; font-weight: 800; margin: 0 0 12px; letter-spacing: -0.01em; text-wrap: balance; }
+  .subtitle { color: var(--ink-soft); font-size: 15.5px; max-width: 66ch; margin: 0 0 20px; }
+  .meta-row { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 13px; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 26px 0 8px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .stat .n { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .stat .l { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  @media (max-width: 640px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+  nav.toc { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0 8px; }
+  nav.toc a { display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 9px 10px; font-size: 11.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none; }
+  nav.toc a span { display: block; font-size: 9.5px; color: var(--muted); font-weight: 700; margin-bottom: 2px; }
+  @media (max-width: 700px) { nav.toc { grid-template-columns: repeat(2, 1fr); } }
+
+  section { margin-top: 52px; }
+  section > h2 { font-size: 20px; font-weight: 800; margin: 0 0 6px; letter-spacing: -0.005em; display: flex; align-items: baseline; gap: 10px; scroll-margin-top: 20px; }
+  section > h2 .idx { color: var(--accent); font-family: ui-monospace, Consolas, monospace; font-size: 15px; font-weight: 700; }
+  .section-desc { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 20px; max-width: 68ch; }
+  h3 { font-size: 15px; font-weight: 800; margin: 26px 0 10px; }
+  p { margin: 0 0 14px; }
+  ul, ol { margin: 0 0 14px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  strong { font-weight: 700; }
+  code { font-family: ui-monospace, Consolas, monospace; background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; font-size: 0.9em; }
+
+  .chip { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; padding: 3px 10px 3px 6px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); white-space: nowrap; margin: 2px 4px 2px 0; }
+  .chip .dot { width: 14px; height: 14px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .chip.good .dot { background: var(--good); }
+  .chip.critical .dot { background: var(--critical); }
+  .chip.warn .dot { background: var(--warning); }
+
+  .callout { border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 16px 0; font-size: 14.5px; }
+  .callout.critical { border-color: var(--critical); background: var(--critical-bg); }
+  .callout.warn { border-color: var(--warning); background: var(--warning-bg); }
+  .callout .ct-label { font-weight: 800; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; display: block; }
+  .callout.critical .ct-label { color: var(--critical); }
+  .callout.warn .ct-label { color: var(--warning); }
+
+  .tblwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); margin: 14px 0 20px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 13.3px; min-width: 460px; }
+  thead th { text-align: left; font-size: 10.8px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 700; padding: 9px 13px; border-bottom: 1px solid var(--line-strong); background: var(--surface-2); white-space: nowrap; }
+  tbody td { padding: 8px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, Consolas, monospace; }
+
+  .chart-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px 14px; box-shadow: var(--shadow); margin: 16px 0 20px; }
+  .chart-title { font-size: 12.5px; font-weight: 800; margin-bottom: 2px; }
+  .chart-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .barrow { display: grid; grid-template-columns: 150px 1fr 56px; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .barrow .rl { font-size: 12px; color: var(--ink-soft); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bartrack { position: relative; height: 14px; background: var(--surface-2); border-radius: 4px; }
+  .barfill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 4px; }
+  .barrow .rv { font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .chart-legend { display: flex; gap: 14px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); flex-wrap: wrap; font-size: 11.5px; color: var(--ink-soft); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+
+  .verdict-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0; }
+  @media (max-width: 640px) { .verdict-grid { grid-template-columns: 1fr; } }
+  .vcard { border-radius: 10px; padding: 14px 16px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .vcard.yes { background: var(--accent-soft); }
+  .vcard.no { background: var(--surface-2); }
+  .vcard .vtag { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .vcard.yes .vtag { color: var(--accent-ink); }
+  .vcard.no .vtag { color: var(--muted); }
+  .vcard h4 { margin: 0 0 6px; font-size: 14.5px; font-weight: 800; }
+  .vcard p { font-size: 13px; margin: 0; color: var(--ink-soft); }
+
+  .flow { counter-reset: step; margin: 18px 0; }
+  .flow li { list-style: none; position: relative; padding: 4px 0 16px 34px; border-left: 2px solid var(--line); margin-left: 14px; }
+  .flow li:last-child { border-color: transparent; padding-bottom: 0; }
+  .flow li::before {
+    counter-increment: step; content: counter(step);
+    position: absolute; left: -15px; top: 2px; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 12.5px; font-weight: 800;
+  }
+  .flow li b { display: block; margin-bottom: 3px; }
+  .flow li .tag { font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; margin-left: 8px; }
+  .flow li .tag.done { background: var(--accent-soft); color: var(--accent-ink); }
+  .flow li .tag.todo { background: var(--warning-bg); color: var(--warning); }
+  .flow li .tag.optional { background: var(--surface-2); color: var(--muted); }
+
+  .divider { border: none; border-top: 1px solid var(--line); margin: 50px 0; }
+  footer.docfoot { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+</style>
+
+<div class="wrap">
+
+  <header class="doc-head">
+    <div class="eyebrow">기후위험도 도메인 진단 · 결론</div>
+    <h1>기후 도메인, 뭐가 문제였고 평년값은 해야 하나</h1>
+    <p class="subtitle">ICC 발견부터 계산방식 검증, 원자료 품질 이슈(결측·관측소 거리·재사용), 평년값 대안 실측 테스트까지 — 이번 세션에서 오간 기후 관련 논의를 전부 한 문서로 정리했습니다.</p>
+    <div class="meta-row">기준 파일: <code>CH2_전체병합패널_5도메인_2016_2023_최종보정.csv</code> · 분석표본 1,746행</div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="n">0.000</div><div class="l">SPI3 ICC(ANOVA 방식) — between신호 사실상 없음</div></div>
+    <div class="stat"><div class="n">30개</div><div class="l">관측소 1곳(stnId=108)이 동시배정된 시군구 수</div></div>
+    <div class="stat"><div class="n">73.9km</div><div class="l">옹진군-관측소 거리(전체 평균 11.9km)</div></div>
+    <div class="stat"><div class="n" style="color:var(--m2-ink)">보류</div><div class="l">평년값(기상청 신규자료) 도입 — 결론: 안 해도 됨</div></div>
+  </div>
+
+  <nav class="toc">
+    <a href="https://269e971d-6e27-4d2a-a54d-e0ae55470bfb.frame.claudeusercontent.com/_f/1785349036-33ec/#s1"><span>01</span>ICC 발견</a>
+    <a href="https://269e971d-6e27-4d2a-a54d-e0ae55470bfb.frame.claudeusercontent.com/_f/1785349036-33ec/#s2"><span>02</span>메커니즘</a>
+    <a href="https://269e971d-6e27-4d2a-a54d-e0ae55470bfb.frame.claudeusercontent.com/_f/1785349036-33ec/#s3"><span>03</span>자료품질</a>
+    <a href="https://269e971d-6e27-4d2a-a54d-e0ae55470bfb.frame.claudeusercontent.com/_f/1785349036-33ec/#s4"><span>04</span>평년값 검증</a>
+    <a href="https://269e971d-6e27-4d2a-a54d-e0ae55470bfb.frame.claudeusercontent.com/_f/1785349036-33ec/#s5"><span>05</span>최종 방향</a>
+  </nav>
+
+  <section id="s1">
+    <h2><span class="idx">01.</span> 시작 — ICC로 기후 도메인 약점을 확인</h2>
+    <p class="section-desc">2차 EDA에서 기후위험도 도메인의 실증가중(LMG) 기여가 0.5~0.7%로 거의 0이었던 이유를 ICC(between-분산 비중)로 확인하려 했습니다. 계산 도중 팀원이 같은 걸 다른 방식으로 재계산하면서 숫자 차이가 발견됐고, 그 과정에서 원인을 더 정확히 규명했습니다.</p>
+
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>변수</th><th class="num">ANOVA(내 방식)</th><th class="num">naive(그룹평균 분산비)</th><th>비고</th></tr></thead>
+        <tbody>
+          <tr><td>SPI3_최저월(최심가뭄)</td><td class="num">0.000</td><td class="num">0.056</td><td>격차 최대 — 팀원 재계산치(0.057)와 naive가 일치</td></tr>
+          <tr><td>연강수량_mm</td><td class="num">0.078</td><td class="num">0.199</td><td>팀원 재계산치 0.219와 근접</td></tr>
+          <tr><td>평균풍속_ms</td><td class="num">0.826</td><td class="num">0.910</td><td>팀원 재계산치 0.947과 근접</td></tr>
+          <tr><td>GDD_솔수염하늘소</td><td class="num">0.781</td><td class="num">0.837</td><td>팀원 재계산치 0.83~0.86과 거의 일치</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <span class="ct-label">검증됨 — 방식 차이, 방향은 동일</span>
+      naive 방식(그룹평균 분산/전체분산)은 표본노이즈로 인한 그룹평균 분산의 자연스러운 팽창분을 빼주지 않아 <strong>진짜 ICC가 낮을수록 더 크게 과대평가</strong>합니다(그래서 SPI3에서 격차가 가장 큼). ANOVA 기반 ICC(1)이 통계적으로 더 방어 가능한 값이지만, "기후위험도 안에서 SPI3·강수량만 유독 between신호가 약하다"는 <strong>방향 자체는 두 방식 모두 동일하게 확인</strong>됩니다.
+    </div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="idx">02.</span> 왜 이런 일이 생기나 — within-year 표준화의 함정</h2>
+    <p class="section-desc">팀원이 정확히 짚어준 핵심 메커니즘입니다.</p>
+    <p>도메인 점수는 <code>within_year_z()</code>로 <strong>연도별</strong> 표준화됩니다 — 그 해 229개 시군구 평균·표준편차로 각 값을 다시 스케일링합니다. 만약 어떤 변수가 <strong>"그 해 전국 공통 충격"</strong>(national shock)이라면, 이 연도별 표준화가 공통분을 통째로 지워버리고 <strong>그 해 안에서의 상대순위(대부분 관측오차·노이즈)만</strong> 남습니다.</p>
+    <p>SPI3·연강수량처럼 between-ICC가 낮은 변수는 이 표준화를 거치면 남는 게 거의 노이즈뿐이라, <strong>LMG 기여가 구조적으로 0에 가까울 수밖에 없습니다</strong> — 상관이 약해서가 아니라 측정 설계상 애초에 지자체를 줄세울 재료가 없었다는 뜻입니다.</p>
+  </section>
+
+  <section id="s3">
+    <h2><span class="idx">03.</span> 원자료 품질 — 검증 완료된 3가지 문제</h2>
+    <p class="section-desc">팀원이 원본 병합패널을 직접 뜯어서 찾은 문제들이고, 아래 수치 전부 이번 세션에서 재확인했습니다.</p>
+
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>문제</th><th>내용</th><th>검증 결과</th></tr></thead>
+        <tbody>
+          <tr><td>결측 9행</td><td>세종시·공주시 2016-2018(stnId=239 관측소가 2019년에야 개설, 연간관측일수=0)</td><td class="chip good"><span class="dot"></span>확인됨</td></tr>
+          <tr><td>관측소-시군구 거리 편차</td><td>89개 관측소가 229개 시군구에 배정, 평균 11.9km인데 옹진군은 74km 떨어진 관측소 사용(도서지역)</td><td class="chip good"><span class="dot"></span>확인됨(73.94km)</td></tr>
+          <tr><td>관측소 재사용</td><td>station 108 하나가 30개 시군구에 동시 배정 — 이 시군구들은 8년 내내 기후값 완전 동일</td><td class="chip good"><span class="dot"></span>확인됨(정확히 30개)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="ct-label">처리 방향 — 완벽 수정 대신 정책만 확정</span>
+      <p><strong>결측 9행</strong>: 이미 핵심변수 listwise deletion으로 자동 제외되고 있어 추가 조치 불필요 — "왜 빠졌는지" 각주만 추가하면 됩니다(세종시·공주시 관측소 개설 이전 시기).</p>
+      <p style="margin-bottom:0"><strong>거리·재사용 문제</strong>: 도서지역엔 관측소가 없다는 근본적 자료 한계라 지금 고칠 수 없습니다. (a) stnId로 표준오차 군집화 또는 (b) 기후변수 포함/제외 민감도 분석으로 결과가 흔들리는지 확인 → 흔들리면 한계로 명시, 안 흔들리면 그대로 진행. 인위적확산 도메인에서도 같은 방식(완벽 검증보다 이슈 인지 후 플래그)으로 처리했던 것과 동일한 결로 갑니다.</p>
+    </div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="idx">04.</span> 평년값 대안 — 실측으로 검증</h2>
+    <p class="section-desc">"기상청 1991-2020 평년값으로 바꾸면 between신호가 살아나지 않을까"라는 제안을 실제 데이터로 테스트했습니다. 진짜 평년값 대신, 같은 효과를 저비용으로 가늠할 수 있는 <strong>지자체 8년 평균</strong>(이미 있는 데이터, 새 자료 불필요)을 대리변수로 사용했습니다.</p>
+
+    <div class="chart-card">
+      <div class="chart-title">연도별 실측값 vs 지자체 8년평균(평년값 근사) — Y와의 상관</div>
+      <div class="chart-sub">평균풍속만 어느 쪽이든 신호가 없음 — 나머지는 평균 쪽이 더 강함</div>
+      <div id="chart-normal"><div class="barrow">
+        <div class="rl">GDD (연도별)</div>
+        <div class="bartrack">
+          <div class="barfill" style="width:76%; background:var(--s2)"></div>
+        </div>
+        <div class="rv">0.190</div>
+      </div><div class="barrow">
+        <div class="rl">GDD (8년평균)</div>
+        <div class="bartrack">
+          <div class="barfill" style="width:84.8%; background:var(--s3)"></div>
+        </div>
+        <div class="rv">0.212</div>
+      </div><div class="barrow">
+        <div class="rl">연강수량 (연도별)</div>
+        <div class="bartrack">
+          <div class="barfill" style="width:21.2%; background:var(--s2)"></div>
+        </div>
+        <div class="rv">0.053</div>
+      </div><div class="barrow">
+        <div class="rl">연강수량 (8년평균)</div>
+        <div class="bartrack">
+          <div class="barfill" style="width:40%; background:var(--s3)"></div>
+        </div>
+        <div class="rv">0.100</div>
+      </div><div class="barrow">
+        <div class="rl">평균풍속 (연도별)</div>
+        <div class="bartrack">
+          <div class="barfill" style="width:2%; background:var(--s2)"></div>
+        </div>
+        <div class="rv">0.004</div>
+      </div><div class="barrow">
+        <div class="rl">평균풍속 (8년평균)</div>
+        <div class="bartrack">
+          <div class="barfill" style="width:7.6%; background:var(--s3)"></div>
+        </div>
+        <div class="rv">0.019</div>
+      </div></div>
+      <div class="chart-legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--s2)"></span>연도별 실측값</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--s3)"></span>지자체 8년평균(근사)</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="ct-label">SPI3는 평년값으로 못 고침 — 정의상 예외</span>
+      SPI(표준강수지수)는 "그 기간이 평년 대비 얼마나 이상적인가"를 표준화한 지수라서, <strong>"SPI의 평년값" 자체가 개념적으로 항상 0에 수렴</strong>합니다. 평년값 치환으로 해결되는 변수가 아니라, (a) 도메인에서 제외하거나 (b) "연도별 공통 이상충격" 통제변수로 도메인 밖에서 따로 쓰는 게 맞습니다.
+    </div>
+  </section>
+
+  <section id="s5">
+    <h2><span class="idx">05.</span> 최종 결론 — 평년값, 해야 하나?</h2>
+
+    <div class="verdict-grid">
+      <div class="vcard no">
+        <div class="vtag">안 해도 됨</div>
+        <h4>기상청 진짜 평년값(신규 데이터 확보)</h4>
+        <p>GDD는 월별 정상기온으로부터 재도출까지 해야 하는 추가 공수가 필요한데, 이미 있는 데이터(지자체 8년평균)로 거의 같은 효과를 확인했습니다. 시간 대비 효과가 낮음.</p>
+      </div>
+      <div class="vcard yes">
+        <div class="vtag">해볼 가치 있음 · 향후</div>
+        <h4>GDD·연강수량을 지자체 8년평균 버전으로 교체</h4>
+        <p>새 자료 없이 바로 가능. GDD r=0.190→0.212, 연강수량 r=0.053→0.100(거의 2배)로 실측 개선 확인됨.</p>
+      </div>
+    </div>
+
+    <p><strong>한 줄 결론: 기상청 평년값을 새로 구해오는 건 안 해도 됩니다.</strong> 이미 가진 데이터의 지자체별 다년 평균만으로 평년값이 주려는 효과(연도별 표준화에도 살아남는 between 신호)를 이미 확인했고, 새 데이터 확보·GDD 재도출에 드는 공수 대비 이득이 크지 않습니다.</p>
+
+    <h3>변수별 최종 처리 방향</h3>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>변수</th><th>처리</th><th>근거</th></tr></thead>
+        <tbody>
+          <tr><td>GDD_솔수염하늘소</td><td>지자체 8년평균 버전으로 교체 검토(향후)</td><td>이미 최강 신호(r=0.190), 평균으로 소폭 개선(0.212)</td></tr>
+          <tr><td>연강수량_mm</td><td>지자체 8년평균 버전으로 교체 검토(향후)</td><td>평균 시 상관 거의 2배(0.053→0.100)</td></tr>
+          <tr><td>평균풍속_ms</td><td>제외 또는 비중 축소 고려</td><td>ICC 0.826으로 높지만 Y와 상관 사실상 0(0.003~0.019) — 진짜 지역특성인데 병 확산과 무관</td></tr>
+          <tr><td>SPI3_최저월</td><td>도메인에서 제외 또는 별도 통제변수로 분리</td><td>정의상 평년값 무의미, between신호 구조적으로 회복 불가</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>오늘/향후 액션아이템</h3>
+    <ol class="flow">
+      <li><b>결측 9행 처리방침 확정</b><span class="tag done">완료</span> 이미 자동 제외 중, 원인(세종·공주 관측소 개설 이전) 각주만 추가</li>
+      <li><b>거리·재사용 문제</b><span class="tag todo">진행 필요</span> stnId 군집 표준오차 또는 기후도메인 포함/제외 민감도 분석 1회 실행</li>
+      <li><b>ICC·within-year 메커니즘 설명</b><span class="tag done">완료</span> 보고서 §3.3에 근거 추가할 문단 확정</li>
+      <li><b>GDD·강수량 다년평균 버전 테스트</b><span class="tag optional">향후·선택</span> 새 데이터 불필요, 시간 되면 반영</li>
+      <li><b>풍속 제외/비중축소, SPI3 도메인 분리</b><span class="tag optional">향후·선택</span> 도메인 재구성 시 반영</li>
+      <li><b>기상청 진짜 평년값 확보</b><span class="tag optional">보류</span> 효과 대비 공수 낮아 이번 제출 범위에서 제외</li>
+    </ol>
+  </section>
+
+  <footer class="docfoot">
+    입력: <code>CH2_전체병합패널_5도메인_2016_2023_최종보정.csv</code>(1,746행) · ICC·상관 재계산은 final_modeling 로직(within-year z-score, listwise deletion) 그대로 사용.
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  function bar(container, rows, opts) {
+    opts = opts || {};
+    const max = opts.max || Math.max(...rows.map(r => r.value)) * 1.15;
+    rows.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'barrow';
+      const pct = Math.max(2, (r.value / max) * 100);
+      row.innerHTML = `
+        <div class="rl">${r.label}</div>
+        <div class="bartrack">
+          <div class="barfill" style="width:${pct}%; background:${r.color || 'var(--s1)'}"></div>
+        </div>
+        <div class="rv">${r.display}</div>
+      `;
+      container.appendChild(row);
+    });
+  }
+
+  bar(document.getElementById('chart-normal'), [
+    { label: 'GDD (연도별)', value: 0.190, display: '0.190', color: 'var(--s2)' },
+    { label: 'GDD (8년평균)', value: 0.212, display: '0.212', color: 'var(--s3)' },
+    { label: '연강수량 (연도별)', value: 0.053, display: '0.053', color: 'var(--s2)' },
+    { label: '연강수량 (8년평균)', value: 0.100, display: '0.100', color: 'var(--s3)' },
+    { label: '평균풍속 (연도별)', value: 0.004, display: '0.004', color: 'var(--s2)' },
+    { label: '평균풍속 (8년평균)', value: 0.019, display: '0.019', color: 'var(--s3)' },
+  ], { max: 0.25 });
+})();
+</script>
+
+</body></html>
