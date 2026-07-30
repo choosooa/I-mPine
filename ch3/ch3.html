@@ -88,11 +88,11 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:
 
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .g3{display:grid;grid-template-columns:2fr 1fr;gap:14px}
-.g23{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+.g23{display:grid;grid-template-columns:1fr 1.25fr;gap:10px}
 .cw{position:relative}
 
 table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
-.rtbl th{background:#f0f5ea;text-align:left;padding:6px 9px;font-weight:600;color:var(--mu);border-bottom:2px solid var(--bd)}
+.rtbl th{background:#f0f5ea;text-align:left;padding:6px 9px;font-weight:600;color:var(--mu);border-bottom:2px solid var(--bd);position:sticky;top:0;z-index:2}
 .rtbl td{padding:6px 9px;border-bottom:1px solid #eee}
 .rtbl td.num{text-align:right;font-family:'JetBrains Mono',monospace}
 .rtbl tr:hover td{background:#f8faf5}
@@ -187,9 +187,9 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
   <div class="card" style="position:relative">
     <div class="ct">우선지원 순위 지도 <span class="cap">우선지원 점수(RiskPct, 위험지수 백분위) 단독</span></div>
     <div class="g3">
-      <div style="position:relative"><div id="mapPriority" class="lmap" style="height:400px"></div>
+      <div style="position:relative"><div id="mapPriority" class="lmap" style="height:460px"></div>
         <div class="legend-box" id="legPriority"></div></div>
-      <div><table class="rtbl" id="top15-priority-tbl"></table></div>
+      <div style="height:460px;overflow-y:auto;border:1px solid var(--bd);border-radius:8px"><table class="rtbl" id="top15-priority-tbl"></table></div>
     </div>
     <div class="infobox"><b>참고용 지표(산식 미포함)</b> — 배분갭·재발위험확률은 지도 툴팁·표에는 표시되지만 순위 계산에는 들어가지 않습니다. "예산이 0인데 병이 없어서"인 지역이 "과소배분"으로 잘못 잡히는 걸 막기 위한 설계입니다.</div>
   </div>
@@ -217,10 +217,10 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
   <div class="g23">
     <div class="card">
       <div class="ct">우세 도메인별 시군구 분포 <span class="cap">어떤 원인이 가장 흔한가</span></div>
-      <div class="cw" style="height:230px"><canvas id="c_dominantDomain"></canvas></div>
-      <div class="warnbox" id="domain-caveat"></div>
+      <div class="cw" style="height:290px"><canvas id="c_dominantDomain"></canvas></div>
+      <div class="warnbox" id="domain-caveat" style="font-size:13px;line-height:1.7"></div>
     </div>
-    <div class="card" style="max-height:340px;overflow-y:auto">
+    <div class="card" style="max-height:400px;overflow-y:auto">
       <div class="ct">대표 정책 카드</div>
       <div id="policy-catalog-body"></div>
     </div>
@@ -460,7 +460,7 @@ if(!NO_CH2){
     options:{plugins:{legend:{position:'bottom',labels:{boxWidth:11,font:{size:9.5}}}}}
   });
   document.getElementById('domain-caveat').innerHTML =
-    `<b>주의</b> — "인위적확산-우세형"(${domCounts['인위적확산-우세형']||0}곳)은 원목업체가 많은 지역이 아니라 <b>적은 지역</b>입니다. 이름만 보고 반대로 해석하지 않도록 주의하십시오.`;
+    `<b>주의</b> — "인위적확산-우세형"(${domCounts['인위적확산-우세형']||0}곳)은 원목업체가 많은 지역이 아니라 <b>적은 지역</b>입니다.<br>이름만 보고 반대로 해석하지 않도록 주의하십시오.`;
 
   const top15b = [...D.prioritySggList].sort((a,b)=>a.priority_rank-b.priority_rank).slice(0, 15);
   document.getElementById('policy-match-tbl').innerHTML =

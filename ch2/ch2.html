@@ -175,7 +175,6 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
     <a class="tab" href="#sec02" data-i="1"><span class="n">02</span> 지수 신뢰도 검증</a>
     <a class="tab" href="#sec03" data-i="2"><span class="n">03</span> 예산배분 갭 진단</a>
     <a class="tab" href="#sec04" data-i="3"><span class="n">04</span> 강건성 확인</a>
-    <a class="tab" href="#sec05" data-i="4"><span class="n">05</span> 방법론·제출 체크</a>
   </div>
 </div>
 <div class="basisbar">
@@ -201,7 +200,7 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
 
   <div class="card">
     <div class="ct">도메인별 기여도 <span class="cap">취약성 상위 10개 시군구</span></div>
-    <div class="cw" style="height:260px"><canvas id="c_domainTop10"></canvas></div>
+    <div class="cw" style="height:220px"><canvas id="c_domainTop10"></canvas></div>
   </div>
 
   <div class="card">
@@ -233,7 +232,7 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
 
   <div class="krow" id="kpi-row-02"></div>
 
-  <div class="g3">
+  <div class="g2">
     <div class="card">
       <div class="ct">분위별 실제 피해 <span class="cap">지수 십분위별 발생률·평균 피해밀도</span></div>
       <div class="cw" style="height:230px"><canvas id="c_decile"></canvas></div>
@@ -319,19 +318,6 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
     </div>
   </div>
 </section>
-<div class="sec-divider"></div>
-
-<!-- ══════════ SECTION 05 · 방법론·제출 체크 ══════════ -->
-<section class="pg" id="sec05">
-  <div class="qhead"><h2>05. 방법론·제출 체크</h2><span class="q">심사 때 공격받을 수 있는 지점은 정리됐는가?</span></div>
-
-  <div class="card">
-    <div class="ct">제출 전 체크리스트</div>
-    <ul class="chklist" id="checklist"></ul>
-  </div>
-
-  <div class="concl"><div class="lbl">종합 판단</div>핵심 결론(지수 방향성, 예산배분 저설명력)은 여러 독립 재현에서 견고하게 확인됩니다. 세부 근거와 재현 이력은 별도 분석보고서를 참고하십시오.</div>
-</section>
 
 <!-- 분석 기준 및 사전확정 사양 모달 -->
 <div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
@@ -367,7 +353,7 @@ navTabs.forEach(a=>a.addEventListener('click', e=>{
   e.preventDefault();
   document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth', block:'start'});
 }));
-const sections = ['sec01','sec02','sec03','sec04','sec05'].map(id=>document.getElementById(id));
+const sections = ['sec01','sec02','sec03','sec04'].map(id=>document.getElementById(id));
 const spy = new IntersectionObserver((entries)=>{
   entries.forEach(en=>{
     if(en.isIntersecting){
@@ -616,18 +602,6 @@ document.getElementById('modal-appendix').innerHTML = document.getElementById('a
 document.getElementById('modal-sample').innerHTML =
   `표본: <b>${D.meta.n_sgg}개 시군구 · ${D.meta.period}</b><br>표준화: ${D.meta.standardization_main}`;
 document.getElementById('funnel-body').innerHTML = D.sampleFunnel.map(s=>`${s.step} → <b>${fmt(s.n)}행</b> (${s.note})`).join('<br>');
-
-// ═══════════════════════ SECTION 05 · 제출 체크리스트 (요약) ═══════════════════════
-const CHECKLIST = [
-  {ok:true, t:'표본정의·QA 이력 문서화', s:'임상도 판전환·flag 모순 등 재현 근거 확보'},
-  {ok:true, t:'Model1/Model2 역할 구분', s:'조기경보모형이 단순 이력변수보다 낫지 않음을 명시'},
-  {ok:false, t:'재현 스크립트 일부 미확보', s:'6차 산출 스크립트 부재 — 방법론 재구현으로 대체'},
-  {ok:false, t:'인위적확산 도메인 변수 1개', s:'구성이 단순하다는 지적 가능성 — 부호 근거는 확보'},
-  {ok:true, t:'배분갭 인과 해석 제한 명시', s:'"현행 관행 대비 편차"로만 해석, 최적 대비 아님'},
-];
-document.getElementById('checklist').innerHTML = CHECKLIST.map(c=>`
-  <li><div class="ico ${c.ok?'ok':'warn'}">${c.ok?'✓':'!'}</div>
-  <div><b>${c.t}</b><span class="sub">${c.s}</span></div></li>`).join('');
 </script>
 </body>
 </html>
