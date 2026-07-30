@@ -14,7 +14,7 @@ window.CH2_DATA = {
   ],
   "is_mock": false,
   "data_source": "CH2_전체병합패널_5도메인_2016_2023_최종보정4.csv (6차/최종판) — model1_final.py 원본 미확보로 검증된 방법론을 동일 표본정의로 재구현, 표본카스케이드·AUC·between계수·배분갭R²가 6차 보고서 수치와 정확히 일치함을 확인(재현 스크립트: Modeling/6차/model1_final_재구현_TierA_TierB_검증.py)"
- },
+},
  "variableList": {
   "Y": [
    {
