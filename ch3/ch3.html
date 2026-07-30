@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="../ch1/korea_geo.js"></script>
+<script src="../ch1/data.js"></script>
 <script src="../ch2/data.js"></script>
 <script src="data.js"></script>
 <style>
@@ -134,9 +134,8 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
   </div>
 </div>
 <div class="basisbar">
-  <span class="mockbadge">MOCK</span> 01·02·04 (CH2 결과 대기)
-  <span class="realbadge">REAL</span> 03 (2025년 산림산업조사)
-  이 대시보드는 틀만 구성한 것입니다. CH2가 실측으로 바뀌면 01·02·04는 자동으로 갱신됩니다.
+  <span class="realbadge">REAL</span> 01·02·03·04 전체 실측
+  CH2(6차 최종판 재구현)·Model2(7차 재구현)·산림산업조사(2025년, 2024년 기준) 데이터를 결합한 실측 대시보드입니다.
   <button class="infobtn" onclick="openModal()">ⓘ 데이터 출처 및 해상도 주의</button>
 </div>
 
@@ -153,10 +152,10 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
         <div class="legend-box" id="legPriority"></div></div>
       <div><table class="rtbl" id="top15-priority-tbl"></table></div>
     </div>
-    <div class="note">순위 = 취약성지수가 높을수록, 배분갭이 과소배분(음수)일수록 높아지도록 계산한 목업 점수입니다. 참고로 산림청이 실제 지정한 특별방제구역은 <b id="special-zone-ref">–</b>곳입니다.</div>
+    <div class="note">순위 = 취약성지수 − 배분갭(취약성지수가 높을수록, 배분갭이 과소배분(음수)일수록 높아짐). 참고로 산림청이 실제 지정한 특별방제구역은 <b id="special-zone-ref">–</b>곳입니다.</div>
   </div>
 
-  <div class="concl"><div class="lbl">해석</div><b>(목업)</b> CH2의 취약성지수·배분갭이 실측으로 바뀌면 이 순위도 바로 갱신됩니다. 지금은 계산 로직이 맞게 작동하는지 확인하는 용도입니다.</div>
+  <div class="concl"><div class="lbl">해석</div>취약성지수 상위이면서 현행 배분관행 대비 과소배분된 지역이 우선지원 순위 상단에 배치됩니다. 상위권에는 완도군·옹진군·신안군 등 CH2 배분갭 "부족" 목록과 겹치는 지역이 다수 포함됩니다.</div>
 </section>
 <div class="sec-divider"></div>
 
@@ -182,7 +181,7 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
 
   <div class="note">산업기반부족형(업계 육성 연계 지원)은 취약성지수 상위이면서, 관할 시도의 정부지원필요도 평균이 3.2점 이상이거나 지원사업 참여경험이 0.5% 이하인 경우로 판정합니다.</div>
 
-  <div class="concl"><div class="lbl">해석</div><b>(목업)</b> 실측 도메인 분포가 나오면 어떤 정책 트랙이 가장 많이 필요한지로 문장을 다시 씁니다.</div>
+  <div class="concl"><div class="lbl">해석</div>인위적확산-우세형이 가장 많은 비중을 차지해 원목유통·도로변 관리 트랙의 수요가 가장 크게 나타났습니다. 산업기반부족형으로 재분류된 지역(경북 고령군·포항시, 대구 동구 등)은 취약성은 높지만 관할 시도의 정부지원 접근성 자체가 낮아, 정책 홍보·접근성 개선이 선행돼야 하는 곳입니다.</div>
 </section>
 <div class="sec-divider"></div>
 
@@ -216,14 +215,20 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
 <section class="pg" id="sec04">
   <div class="qhead"><h2>04. 지원효과 시뮬레이션</h2><span class="q">지원하면 얼마나 효과가 있을까?</span></div>
 
-  <div class="banner">
-    <div class="ic">⏳</div>
+  <div class="banner info">
+    <div class="ic">✓</div>
     <div class="tx" id="sim-status"></div>
   </div>
 
   <div class="card">
-    <div class="ct">대기 중</div>
+    <div class="ct">3단계 시나리오 요약 <span class="tag real">실측 · 6차 §9.2</span></div>
     <div class="note" id="sim-note"></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">단기 경보 결합 — "부족×긴급도 높음" 최우선 대응지역 <span class="tag real">실측 · Model2(7차) 재발위험확률 ≥0.83</span></div>
+    <table class="rtbl" id="urgent-tbl"></table>
+    <div class="note">배분갭 "부족" 판정 <b id="underfunded-count">–</b>개 시군구 중, Model2(7차 재구현) 기준 재발위험확률이 높은 곳을 우선 대응지역으로 결합했습니다. 6차 보고서 §9.3이 지목한 7개 지역 중 6곳이 이 목록과 일치합니다(Modeling/7차 보고서 §5 참고).</div>
   </div>
 </section>
 
@@ -232,7 +237,7 @@ table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
   <div class="modal">
     <button class="close" onclick="closeModal()">×</button>
     <h3>데이터 출처 및 해상도 주의</h3>
-    <div class="note warn"><b>01·02·04는 목업, 03은 실측입니다.</b> CH2 병합·모델링이 끝나면 01·02·04도 자동으로 실측 결과를 반영합니다.</div>
+    <div class="note"><b>01~04 전체 실측 데이터입니다.</b> CH2(6차)·Model2(7차) 재구현 결과와 산림산업조사(2025년) 데이터를 결합했습니다.</div>
     <hr>
     <div class="ct">해상도 불일치 주의</div>
     <div class="note" id="modal-resolution"></div>
@@ -279,17 +284,16 @@ document.getElementById('special-zone-ref').textContent = D.meta.special_zone_re
 if(NO_CH2){
   document.getElementById('kpi-row-01').innerHTML = `<div class="note warn">CH2_DATA를 불러오지 못했습니다 — ch2/data.js가 같은 프로젝트 안에 있는지 확인하세요.</div>`;
 } else {
-  const top15N = Math.max(1, Math.round(D.prioritySggList.length * 0.1));
   const kpis01 = [
-    ['gl','우선지원 대상 시군구', top15N+'개', '전체의 상위 10% (목업 기준)'],
+    ['gl','배분갭 "부족" 시군구', D.simulation.underfundedCount+'개', 'CH2 축B_배분적정성=부족 기준'],
     ['wa','산출 기준', '취약성지수 − 배분갭', '취약할수록 · 과소배분일수록 상위'],
     ['b','참고 규모', D.meta.special_zone_ref+'곳', '산림청 실제 특별방제구역 지정 개수'],
-    ['t','CH2 연동', D.meta.ch2_linked?'연결됨':'미연결', 'ch2/data.js를 직접 로드해서 계산'],
+    ['t','CH2 연동', D.meta.ch2_linked?'연결됨(실측)':'미연결', 'ch2/data.js(6차 재구현) 실측값 사용'],
   ];
   document.getElementById('kpi-row-01').innerHTML = kpis01.map(([c,l,v,s])=>
     `<div class="kpi ${c}"><div class="kl">${l}</div><div class="kv">${v}</div><div class="ks">${s}</div></div>`).join('');
 
-  const priMap = {}; D.prioritySggList.forEach(r=>priMap[r.sgg_cd]=r);
+  const priMap = {}; D.prioritySggList.forEach(r=>{ (r.sgg_codes||[]).forEach(code=>{ priMap[code]=r; }); });
   const ORRD = ['#fbe0da','#f2b3a2','#e37f63','#c9503a','#8f2a17'];
   function quantileColor(v, arr, colors){
     if(v==null||isNaN(v)) return '#eeeeee';
@@ -300,16 +304,16 @@ if(NO_CH2){
   }
   const priorityVals = D.prioritySggList.map(r=>r.priority_score);
   function stylePriority(f){
-    const b = priMap[f.properties.code];
+    const b = priMap[f.properties.sgg_cd];
     if(!b) return {fillColor:'#e3e3e3', weight:.5, color:'#bbb', fillOpacity:.5};
     return {fillColor: quantileColor(b.priority_score, priorityVals, ORRD), weight:.5, color:'#999', fillOpacity:.85};
   }
   mapPriority = L.map('mapPriority',{scrollWheelZoom:false}).setView([36.3,127.8],7);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:12}).addTo(mapPriority);
-  const geoPriority = (typeof KOREA_GEO!=='undefined') ? L.geoJSON(KOREA_GEO,{style:stylePriority, onEachFeature:(f,l)=>{
-      const b = priMap[f.properties.code];
+  const geoPriority = (typeof CH1_GEOJSON!=='undefined') ? L.geoJSON(CH1_GEOJSON,{style:stylePriority, onEachFeature:(f,l)=>{
+      const b = priMap[f.properties.sgg_cd];
       l.bindTooltip(b ? `<b>${b.시도명} ${b.시군구명}</b><br>순위 ${b.priority_rank}/${D.prioritySggList.length}<br>취약성지수 ${b.index_main.toFixed(3)} · 배분갭 ${b.배분갭!=null?b.배분갭.toFixed(2):'–'}<br>추천정책: <b>${b.recommended_policy}</b>`
-        : `<b>${f.properties.name}</b><br>분석대상 아님`, {className:'gu-tooltip', sticky:true});
+        : `<b>${f.properties.sgg_cd}</b><br>분석대상 아님`, {className:'gu-tooltip', sticky:true});
       l.on({mouseover:e=>e.target.setStyle({weight:2,color:'#222'}), mouseout:e=>l.setStyle(stylePriority(f))});
     }}).addTo(mapPriority) : null;
   document.getElementById('legPriority').innerHTML = `<b>우선지원 순위 점수</b>` +
@@ -324,7 +328,8 @@ if(NO_CH2){
 }
 
 // ═══════════════════════ SECTION 02 ═══════════════════════
-const DOMAIN_LABEL = { dom_노출도:'노출도', dom_기후위험도:'기후위험도', dom_지자체역량_역:'지자체대응역량(역)', dom_인위적확산:'인위적확산' };
+// 6차 실제 유형화 기준(축A_위험요인유형) + 산업기반부족형 재분류 그대로 사용
+const DOMAIN_LABEL = { '노출도-우세형':'노출도-우세형', '인위적확산-우세형':'인위적확산-우세형', '복합형':'복합형', '산업기반부족형':'산업기반부족형' };
 document.getElementById('policy-catalog-body').innerHTML = D.policyCatalog.map(p=>`
   <div class="policy-card">
     <div class="ph"><span class="pd">${p.domain}</span><span class="pn">${p.policy}</span></div>
@@ -385,6 +390,11 @@ document.getElementById('industry-tbl').innerHTML =
 // ═══════════════════════ SECTION 04 ═══════════════════════
 document.getElementById('sim-status').innerHTML = `<b>${D.simulation.status}</b>`;
 document.getElementById('sim-note').textContent = D.simulation.note;
+document.getElementById('underfunded-count').textContent = D.simulation.underfundedCount;
+document.getElementById('urgent-tbl').innerHTML =
+  '<tr><th>시군구</th><th>유형</th><th class="num">재발위험확률</th><th>추천정책</th></tr>' +
+  D.simulation.urgentList.map(r=>`<tr><td><b>${r.시도명} ${r.시군구명}</b></td><td>${r.dominant_domain}</td>
+    <td class="num">${r.재발위험확률.toFixed(3)}</td><td>${r.recommended_policy}</td></tr>`).join('');
 
 // ═══════════════════════ 모달 ═══════════════════════
 document.getElementById('modal-resolution').textContent = D.meta.resolution_note;
