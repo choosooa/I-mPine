@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<!-- saved from url=(0253)https://2322570b-ec63-45e2-bd5d-884adf753618.frame.claudeusercontent.com/_f/1785437355-b1f7/?__frame_t=hDVMhooOlE6BE0_vzG6ULAqb.e1d05cfc-dbd5-4128-a031-4b67902f4e23.605a4aad-6afa-461a-829a-5f4cd28696b3.1785440982&__frame_v=manifest.ec369d2e020e53f6.json -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><!-- frame-runtime --><!--<base href="/_f/1785437355-b1f7/">--><base href="."><script>window.__FRAME_PREAMBLE={"capabilities":{"downloads":"downloads.BABDwU1K.js","mcp":"mcp.hoz5jxDa.js","permissions":"permissions.ByA9Fd8x.js","self":"self.D3u1zjZe.js","user":"user.Cp1-RnjB.js"},"transforms":"_transforms.DYk1Ltlh.js","comments":"_comments.DiwQajF_.js","translate":"_translate.C5leZL2A.js"}</script><script>(function(){"use strict";const Ee="modulepreload",we=function(e){return"/"+e},Se={},ee=function(t,n,l){let i=Promise.resolve();function s(f){const c=new Event("vite:preloadError",{cancelable:!0});if(c.payload=f,window.dispatchEvent(c),!c.defaultPrevented)throw f}return i.then(f=>{for(const c of f||[])c.status==="rejected"&&s(c.reason);return t().catch(s)})},te=["light","dark","system"];function ne(e){if(e===null||typeof e!="object")return!1;const t=e.__frame_init;return t!==null&&typeof t=="object"}function W(e){return e!==null&&typeof e=="object"&&e.__frame_size_poke===!0}function re(e){if(e===null||typeof e!="object")return!1;const t=e.__frame_theme;if(t===null||typeof t!="object")return!1;const n=t.theme;return typeof n=="string"&&te.includes(n)}function se(e){try{typeof reportError=="function"?reportError(e):setTimeout(()=>{throw e},0)}catch{}}const oe=Object.freeze(Object.assign(Object.create(null),{user:Object.freeze(Object.assign(Object.create(null),{id:null,isOwner:!1,canEdit:!1,name:null,avatarUrl:null,email:null}))}));function Y(e){if(window===top||e.type==="auxclick"&&e.button!==1)return;const t=e.composedPath?e.composedPath():[e.target];let n=null;for(let f=0;f<t.length;f++){const c=t[f];if(c&&c.matches&&c.matches("a[href],area[href]")){n=c;break}}if(!n&&e.target&&e.target.closest&&(n=e.target.closest("a[href],area[href]")),!n)return;const l=n.getAttribute("href");if(!l)return;let i,s;try{i=new URL(l,document.baseURI),s=new URL(document.baseURI).origin}catch{return}(i.protocol==="http:"||i.protocol==="https:")&&i.origin!==s&&(e.preventDefault(),parent.postMessage({__frame_nav:!0,url:i.href},"*"))}const K={};function D(e){if(window===top)return;const t=Date.now();t-(K[e]||0)<500||(K[e]=t,parent.postMessage({__frame_engaged:!0,kind:e},"*"))}const ie=2e3,x=["wheel","touchstart","touchmove","keydown","pointerdown"];let J=0;function ae(e){e.isTrusted&&(J=Date.now())}function ce(){addEventListener("click",Y,!0),addEventListener("auxclick",Y,!0)}function le(){for(let e=0;e<x.length;e++)addEventListener(x[e],ae,{capture:!0,passive:!0});addEventListener("scroll",e=>{e.isTrusted&&Date.now()-J<ie&&D("scroll")},{capture:!0,passive:!0}),addEventListener("pointermove",e=>{e.isTrusted&&D("pointer")},{capture:!0,passive:!0}),addEventListener("click",e=>{e.isTrusted&&D("click")},{capture:!0,passive:!0})}const I="__frame_scroll",ue=150,fe=310,de=160,me=3e4;function pe(){let e=0,t=!1,n=!1,l=!1,i=0;const s=a=>{try{sessionStorage.setItem(I,JSON.stringify({y:a}))}catch{}},f=()=>{if(t){t=!1;return}n=!0,clearTimeout(e),e=setTimeout(()=>s(scrollY),ue)};try{addEventListener("scroll",f,{passive:!0}),addEventListener("pagehide",()=>{clearTimeout(e),s(scrollY)})}catch{}const c=()=>{let a;try{a=sessionStorage.getItem(I)}catch{return null}if(a===null)return null;let _;try{_=JSON.parse(a)}catch{_=null}const m=_?.y;if(!(typeof m=="number"&&Number.isFinite(m)&&m>=0)){try{sessionStorage.removeItem(I)}catch{}return null}return m};let g=!1;const p=a=>{try{const _=scrollY;scrollTo({top:a,left:0,behavior:"instant"}),i=a,l=!0,s(a);const m=scrollY;m!==_&&(t=!0),m!==a&&!g&&(g=!0,addEventListener("load",()=>{try{if(scrollY===m){const y=c();p(y!==null?y:i)}}catch{}},{once:!0}))}catch{}},o=()=>{try{return!!location.hash}catch{return!0}};let u=!1;const d=()=>{try{if(u||innerWidth>fe||innerHeight>de)return;u=!0;const a=Date.now(),_=()=>{try{removeEventListener("resize",_)}catch{}if(Date.now()-a>me||n||o())return;const m=c();p(m!==null?m:i)};addEventListener("resize",_)}catch{}};let h=!1,b=!1;return{restore(){if(h||(h=!0,o()))return;const a=c();a!==null&&(p(a),d())},promoted(){if(b||(b=!0,o()))return;const a=c();a!==null?(p(a),d()):l&&p(i)}}}function he(e,t,n){const l=[...t.values()].filter(i=>i.targets.some(s=>s.startsWith(e+".")));return{wrap(i,s){const f=`${e}.${i}`,c=l.filter(g=>g.targets.includes(f));return c.length===0?(...g)=>{try{return s(...g)}catch(p){return Promise.reject(p)}}:(...g)=>{let p=g;for(const u of c){const d=u.module.parameters;if(d)try{p=d(p)}catch{return Promise.reject({code:"transform_error",id:u.id,scope:e,message:"parameters transform failed"})}}let o;try{o=s(...p)}catch(u){o=Promise.reject(u)}return o.then(u=>{for(let d=c.length-1;d>=0;d--){const h=c[d],b=h.module.returns;if(b)try{u=b(u)}catch{return n({id:h.id,scope:e,leg:"returns"}),u}}return u},u=>{for(let d=c.length-1;d>=0;d--){const h=c[d],b=h.module.throws;if(b)try{u=b(u)}catch{return n({id:h.id,scope:e,leg:"throws"}),Promise.reject(u)}}return Promise.reject(u)})}}}}function ge(e,t,n,l=()=>{}){const i=new Set(e.changes??[]),s=new Map;for(const f of i){const c=t[f];c&&s.set(f,c)}return{contract:e.contract,changes:i,flags:new Set(e.flags??[]),capabilities:e.capabilities??{},capBudgets:e.capBudgets??{},transforms:s,shellOrigin:n.shellOrigin,mount:n.mount,pipe:f=>he(f,s,l)}}(function(){const e=Object.defineProperty,t=globalThis,n=["RTCPeerConnection","webkitRTCPeerConnection","RTCDataChannel","RTCIceCandidate","RTCSessionDescription","RTCRtpSender","RTCRtpReceiver"];let l=0;for(let i=0;i<n.length;i++){const s=n[i];try{e(t,s,{value:void 0,writable:!1,configurable:!1})}catch{try{delete t[s]}catch{}try{e(t,s,{value:void 0,writable:!1,configurable:!0})}catch{}}typeof t[s]=="function"&&l++}if(l&&window!==top)try{parent.postMessage({__frame_rtc_lockdown_failed:l},"*")}catch{}})();const _e=1e4,ye=Object.freeze([...window.__FRAME_PREAMBLE?.origins??["https://claude.ai","https://preview.claude.ai"]]);function G(e){for(const t of ye)if(t.endsWith(":*"))try{const n=new URL(e);if(`${n.protocol}//${n.hostname}:*`===t)return!0}catch{}else if(e===t)return!0;return!1}const R=Object.freeze({...window.__FRAME_PREAMBLE?.capabilities}),U=window.__FRAME_PREAMBLE?.transforms,z=window.__FRAME_PREAMBLE?.comments,$=window.__FRAME_PREAMBLE?.translate,T=/^[\w.-]+\.js$/,be=/^[a-z][a-z0-9_-]{0,63}$/;let V=null,j=null;function q(e,t,n){try{Object.defineProperty(e,t,{value:n,writable:!1,configurable:!1,enumerable:!0})}catch{try{Object.defineProperty(e,t,{value:n,writable:!1,configurable:!0,enumerable:!0})}catch{}}}let B=!1;function X(e){const t=document.documentElement;e==="light"||e==="dark"?(t.dataset.theme=e,t.style.colorScheme=e,B=!0):B&&(delete t.dataset.theme,t.style.colorScheme="",B=!1)}const A=Object.assign(Object.create(null),{mcp:Object.assign(Object.create(null),{watchTool:{handlerArg:3}})}),M=new Map;function Q(e,t){const n=M.get(e);if(!n)return;const l=Object.assign(Object.create(null),t);Object.assign(n.impl,l),n.impl.__settled=()=>Promise.reject({code:"capability_removed",message:`${e}: method not in this runtime`});const i=n.queue;n.queue=[];for(const s of i){const f=l[s.method];if(f)if(A[e]?.[s.method])try{s.resolve(f(...s.args))}catch{k(s,A[e][s.method].handlerArg,{code:"transform_error",message:`${e}.${s.method} rejected its arguments`})}else f(...s.args).then(s.resolve,s.reject);else{const c={code:"capability_removed",message:`${e}.${s.method} is not in this runtime`},g=A[e]?.[s.method];if(g){k(s,g.handlerArg,c);continue}s.reject(c)}}}function ve(e,t){const n=M.get(e);if(!n)return;n.impl.__settled=()=>Promise.reject(t);const l=n.queue;n.queue=[];for(const i of l){const s=A[e]?.[i.method];if(s){k(i,s.handlerArg,t);continue}i.reject(t)}}function N(e,t){const n=oe[e];if(!n){ve(e,t);return}Q(e,Object.fromEntries(Object.entries(n).map(([l,i])=>[l,()=>Promise.resolve(i)])))}function k(e,t,n){if(e.syncState?.dead)return;const l=e.args[t];typeof l=="function"&&queueMicrotask(()=>{if(!e.syncState?.dead)try{l({type:"error",error:n})}catch(i){se(i)}})}const F=Object.getOwnPropertyDescriptor(window,"claude");if(window!==top&&!(F&&F.writable===!1)){ce(),le();let e=null;try{e=pe()}catch{}const t=F?.value??{};q(window,"claude",t);const n=o=>{const u={impl:Object.create(null),queue:[]};M.set(o,u);const d=u.impl,h=new Proxy(d,{get:(b,a)=>{if(typeof a!="string"||a==="then"||a==="toJSON"||a==="valueOf")return;if(a==="toString")return Object.prototype.toString;const _=A[o]?.[a];return _?(...m)=>{if(typeof m[_.handlerArg]!="function")throw new TypeError(`${o}.${a} requires a handler function`);const y=d[a];if(y)return y(...m);if(d.__settled){const v={dead:!1},P={args:[...m],syncState:v};return d.__settled().catch(C=>k(P,_.handlerArg,C)),()=>{v.dead=!0}}let E=null;const S={dead:!1};return u.queue.push({method:a,args:m,resolve:v=>{E=typeof v=="function"?v:null,S.dead&&E?.()},reject:()=>{},syncState:S}),()=>{S.dead=!0,E?.()}}:(...m)=>{const y=d[a]??d.__settled;return y?y(...m):new Promise((E,S)=>{u.queue.push({method:a,args:m,resolve:E,reject:S})})}},set:()=>!1});q(t,o,h)};for(const o of Object.keys(R)){if(t[o]!==void 0){q(t,o,t[o]);continue}n(o)}let l=null,i=null,s=0;const f=o=>{o.source!==parent||!G(o.origin)||ne(o.data)&&(l=o.data.__frame_init,j=o.origin,removeEventListener("message",f),clearTimeout(s),i?.())};addEventListener("message",f),parent.postMessage({__frame_connect:!0},"*");const c=new Promise(o=>{i=o,s=setTimeout(()=>{removeEventListener("message",f),o()},_e)}),g=document.readyState==="loading"?new Promise(o=>document.addEventListener("DOMContentLoaded",()=>o(),{once:!0})):Promise.resolve();g.then(()=>{try{e?.restore()}catch{}});const p=o=>{if(!(o.source!==parent||!G(o.origin))&&W(o.data)){removeEventListener("message",p);try{e?.promoted()}catch{}}};addEventListener("message",p),c.then(async()=>{if(!l||!j){for(const r of M.keys())N(r,{code:"not_granted",message:"frame initialization did not arrive - capability unavailable"});return}X(l.theme);const o=j;let u=!1,d=!1;addEventListener("message",r=>{if(r.source!==parent||r.origin!==o)return;re(r.data)&&X(r.data.__frame_theme.theme);const w=r.data?.__fc_mode;w&&typeof w=="object"&&!u&&z&&T.test(z)&&(u=!0,h(z).then(H=>H.install?.(o,w.on===!0)).catch(()=>{}));const O=r.data?.__ft_cmd;O&&typeof O=="object"&&!d&&$&&T.test($)&&(d=!0,h($).then(H=>H.install?.(o,O)).catch(()=>{}))});const h=r=>ee(()=>import("/_runtime/"+r),void 0),b=Object.keys(l.capabilities??{});for(const r of b)Object.hasOwn(R,r)||be.test(r)&&t[r]===void 0&&(n(r),N(r,{code:"capability_disabled",message:"capability not in this runtime generation"}));const a=b.filter(r=>Object.hasOwn(R,r)).map(r=>[r,R[r]]).filter(r=>typeof r[1]=="string"&&T.test(r[1])),[_,...m]=await Promise.allSettled([U&&T.test(U)?h(U):Promise.resolve({}),...a.map(([,r])=>h(r))]),y=j;V=ge(l,_.status==="fulfilled"&&_.value?.TRANSFORMS||{},{shellOrigin:y,mount:Q},r=>parent.postMessage({__frame_cap_telemetry:r},y));const E=r=>parent.postMessage({__frame_cap_telemetry:{kind:"cap-load-error",cap:r}},y),S=V;m.forEach((r,w)=>{const O=a[w][0];if(r.status!=="fulfilled"){E(O);return}try{r.value?.install?.(S)}catch{E(O)}});for(const[r,w]of M)if(!(w.queue.length===0&&Object.keys(w.impl).length>0)){if(b.includes(r)){N(r,{code:"capability_disabled",message:"capability not available in this session"});continue}N(r,{code:"not_granted",message:"capability not available in this session"})}await g,parent.postMessage({__frame_ready:!0},j);let v=-1,P=0;const C=()=>{P=0;const r=Math.max(document.documentElement.scrollHeight,document.body?document.body.scrollHeight:0);r!==v&&(v=r,parent.postMessage({__frame_size:!0,h:r},y))},L=()=>{P||(P=setTimeout(C,200))},Z=new ResizeObserver(L);Z.observe(document.documentElement),document.body&&Z.observe(document.body),document.addEventListener("load",L,!0),document.fonts?.ready.then(L,()=>{}),addEventListener("beforeprint",()=>{v=-1,C()}),L(),addEventListener("message",r=>{if(!(r.source!==parent||r.origin!==y)&&W(r.data)){try{e?.promoted()}catch{}v=-1,L()}})})}})();</script><!-- /frame-runtime --><meta name="viewport" content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>CH2/CH3 인위적확산 부호 이슈 — 팀 결정 요청</title>
+<style>
+:root{
+  --ink:#1c2321; --paper:#f6f4ee; --sf:#ffffff;
+  --accent:#3d6b82; --accent-dim:#e4edf1; --accent-ink:#2a4d5e;
+  --ok:#3f8a5a; --ok-dim:#e6f2e9;
+  --warn:#c07f21; --warn-dim:#faf0dd;
+  --bad:#bf4136; --bad-dim:#fbe9e7;
+  --line:#e0dbcd; --mu:#6b6558; --mu2:#95907f;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", "Consolas", monospace;
+  --sans: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --ink:#eae7dd; --paper:#181b19; --sf:#20241f;
+    --accent:#7bb0c7; --accent-dim:#1f2e33; --accent-ink:#a9d3e3;
+    --ok:#6fce93; --ok-dim:#182620;
+    --warn:#e3ad5c; --warn-dim:#2a2013;
+    --bad:#e2857c; --bad-dim:#2c1c1a;
+    --line:#33372f; --mu:#a6a290; --mu2:#7d786a;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#eae7dd; --paper:#181b19; --sf:#20241f;
+  --accent:#7bb0c7; --accent-dim:#1f2e33; --accent-ink:#a9d3e3;
+  --ok:#6fce93; --ok-dim:#182620;
+  --warn:#e3ad5c; --warn-dim:#2a2013;
+  --bad:#e2857c; --bad-dim:#2c1c1a;
+  --line:#33372f; --mu:#a6a290; --mu2:#7d786a;
+}
+:root[data-theme="light"]{
+  --ink:#1c2321; --paper:#f6f4ee; --sf:#ffffff;
+  --accent:#3d6b82; --accent-dim:#e4edf1; --accent-ink:#2a4d5e;
+  --ok:#3f8a5a; --ok-dim:#e6f2e9;
+  --warn:#c07f21; --warn-dim:#faf0dd;
+  --bad:#bf4136; --bad-dim:#fbe9e7;
+  --line:#e0dbcd; --mu:#6b6558; --mu2:#95907f;
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{
+  font-family:var(--sans); background:var(--paper); color:var(--ink);
+  margin:0; line-height:1.65; font-size:15.5px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:800px; margin:0 auto; padding:0 24px 80px}
+::selection{background:var(--accent); color:var(--sf)}
+
+/* ── sticky status bar ── */
+.statusbar{
+  position:sticky; top:0; z-index:50; background:var(--paper);
+  border-bottom:1px solid var(--line); padding:12px 24px;
+  display:flex; align-items:center; gap:12px; backdrop-filter:blur(6px);
+}
+.statusbar .tag{
+  font-family:var(--mono); font-size:11px; letter-spacing:.04em;
+  padding:3px 9px; border-radius:20px; font-weight:600;
+  background:var(--warn-dim); color:var(--warn); border:1px solid color-mix(in srgb, var(--warn) 35%, transparent);
+}
+.statusbar .proj{font-size:12.5px; color:var(--mu); font-family:var(--mono)}
+.statusbar a{margin-left:auto; font-size:12.5px; color:var(--accent-ink); text-decoration:none; font-weight:600}
+.statusbar a:hover{text-decoration:underline}
+
+/* ── header ── */
+header{padding:56px 0 36px; border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:var(--mono); font-size:11.5px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--accent-ink); font-weight:700; margin:0 0 14px;
+}
+h1{
+  font-size:33px; line-height:1.22; margin:0 0 16px; font-weight:800; letter-spacing:-.01em;
+  text-wrap:balance;
+}
+h1 em{font-style:normal; color:var(--accent-ink)}
+.dek{font-size:16px; color:var(--mu); max-width:62ch; margin:0 0 22px; text-wrap:pretty}
+.metarow{display:flex; gap:22px; flex-wrap:wrap; font-size:12.5px; color:var(--mu2); font-family:var(--mono)}
+.metarow b{color:var(--mu); font-weight:600}
+
+/* ── sections ── */
+section{padding:40px 0; border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:none}
+.snum{
+  font-family:var(--mono); font-size:12px; color:var(--mu2); letter-spacing:.06em;
+}
+h2{font-size:22px; margin:6px 0 6px; font-weight:800; letter-spacing:-.005em; text-wrap:balance}
+.h2-sub{color:var(--mu); font-size:14px; margin:0 0 22px; max-width:64ch}
+h3{font-size:16px; margin:28px 0 10px; font-weight:700}
+p{margin:0 0 14px; max-width:68ch}
+p.tight{margin-bottom:8px}
+
+/* ── pills / badges ── */
+.pill{
+  display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700;
+  padding:2.5px 9px; border-radius:20px; font-family:var(--mono); letter-spacing:.01em;
+  white-space:nowrap;
+}
+.pill.ok{background:var(--ok-dim); color:var(--ok)}
+.pill.bad{background:var(--bad-dim); color:var(--bad)}
+.pill.warn{background:var(--warn-dim); color:var(--warn)}
+
+/* ── callout ── */
+.callout{
+  border-radius:10px; padding:18px 20px; margin:18px 0; border:1px solid transparent;
+  display:flex; gap:14px; align-items:flex-start;
+}
+.callout.decision{background:var(--warn-dim); border-color:color-mix(in srgb, var(--warn) 30%, transparent)}
+.callout.ok{background:var(--ok-dim); border-color:color-mix(in srgb, var(--ok) 30%, transparent)}
+.callout .ic{font-size:18px; line-height:1.3; flex:none}
+.callout .body b{display:block; font-size:14px; margin-bottom:4px}
+.callout .body{font-size:13.5px; color:var(--ink)}
+
+/* ── timeline ── */
+.tl{list-style:none; margin:0; padding:0; border-left:2px solid var(--line); margin-left:6px}
+.tl li{position:relative; padding:0 0 20px 22px}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{
+  content:''; position:absolute; left:-6.5px; top:4px; width:11px; height:11px;
+  border-radius:50%; background:var(--sf); border:2.5px solid var(--accent);
+}
+.tl .t{font-family:var(--mono); font-size:11px; color:var(--mu2); display:block; margin-bottom:2px}
+.tl .d{font-size:14px}
+
+/* ── tables ── */
+.tblwrap{overflow-x:auto; border:1px solid var(--line); border-radius:10px; margin:16px 0}
+table{width:100%; border-collapse:collapse; font-size:13.5px; min-width:480px}
+th{
+  background:var(--accent-dim); color:var(--accent-ink); text-align:left; font-weight:700;
+  padding:9px 13px; font-size:12px; letter-spacing:.01em; white-space:nowrap;
+  position:sticky; top:0;
+}
+td{padding:8px 13px; border-top:1px solid var(--line); vertical-align:top}
+td.num, th.num{font-family:var(--mono); text-align:right; font-variant-numeric:tabular-nums}
+tr.hl td{background:var(--accent-dim)}
+.arrow{color:var(--mu2); margin:0 4px}
+.delta-up{color:var(--ok); font-weight:700}
+.delta-down{color:var(--bad); font-weight:700}
+
+/* ── compare grid (before/after) ── */
+.compare{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
+.compare .card{
+  border:1px solid var(--line); border-radius:10px; padding:16px 18px; background:var(--sf);
+}
+.compare .card.before{border-left:3px solid var(--bad)}
+.compare .card.after{border-left:3px solid var(--ok)}
+.compare .lbl{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--mu2); margin-bottom:8px; display:block}
+.compare dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:6px 12px; font-size:13.5px}
+.compare dt{color:var(--mu)}
+.compare dd{margin:0; font-family:var(--mono); font-weight:600; text-align:right; font-variant-numeric:tabular-nums}
+@media (max-width:600px){.compare{grid-template-columns:1fr}}
+
+/* ── code / path chips ── */
+.code{
+  font-family:var(--mono); font-size:12.5px; background:var(--accent-dim); color:var(--accent-ink);
+  padding:1.5px 6px; border-radius:5px; word-break:break-all;
+}
+.pathbox{
+  font-family:var(--mono); font-size:12px; background:var(--sf); border:1px solid var(--line);
+  border-radius:8px; padding:10px 14px; color:var(--mu); overflow-x:auto; white-space:pre;
+}
+
+/* ── quote ── */
+blockquote{
+  margin:16px 0; padding:12px 18px; border-left:3px solid var(--accent); background:var(--accent-dim);
+  border-radius:0 8px 8px 0; font-size:13.5px; color:var(--ink);
+}
+blockquote footer{margin-top:6px; font-size:11.5px; color:var(--mu2); font-family:var(--mono)}
+
+/* ── stat row ── */
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin:18px 0}
+.stat{border:1px solid var(--line); border-radius:10px; padding:14px 16px; background:var(--sf)}
+.stat .v{font-family:var(--mono); font-size:24px; font-weight:700; letter-spacing:-.02em}
+.stat .v.bad{color:var(--bad)} .stat .v.ok{color:var(--ok)}
+.stat .l{font-size:11.5px; color:var(--mu); margin-top:3px}
+
+/* ── footer nav ── */
+.jumpnav{display:flex; gap:8px; flex-wrap:wrap; margin:14px 0}
+.jumpnav a{
+  font-size:12px; font-family:var(--mono); color:var(--mu); text-decoration:none;
+  border:1px solid var(--line); border-radius:20px; padding:4px 11px;
+}
+.jumpnav a:hover{border-color:var(--accent); color:var(--accent-ink)}
+
+.checklist{list-style:none; margin:0; padding:0}
+.checklist li{display:flex; gap:10px; padding:8px 0; border-top:1px solid var(--line); font-size:13.5px}
+.checklist li:first-child{border-top:none}
+.checklist .box{
+  flex:none; width:18px; height:18px; border-radius:5px; margin-top:1px;
+  display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;
+}
+.checklist .box.need{border:2px solid var(--warn); color:var(--warn)}
+.checklist .box.done{background:var(--ok); color:var(--sf)}
+
+footer.pagefoot{padding:32px 0 0; font-size:12px; color:var(--mu2); font-family:var(--mono)}
+</style>
+
+<div class="statusbar">
+  <span class="tag">⚠ 팀 결정 필요</span>
+  <span class="proj">I'mPine · CH2/CH3 대시보드</span>
+  <a href="https://2322570b-ec63-45e2-bd5d-884adf753618.frame.claudeusercontent.com/_f/1785437355-b1f7/#decision">결정 사항 바로가기 ↓</a>
+</div>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">내부 기술 메모 · 2026-07-31</p>
+  <h1>CH2 인위적확산 도메인 <em>부호 버그</em>,<br>CH3까지 번진 파급 효과 정리</h1>
+  <p class="dek">CH2 대시보드 수치가 원본 스크립트·제출 보고서와 다르다는 걸 발견해 고쳤는데, 그 수정이 CH3 우선순위 산식에 그대로 연결돼 있어서 CH3 결과가 큰 폭으로 바뀝니다. 팀 결정이 필요한 지점까지 한 문서에 정리했습니다.</p>
+  <div class="metarow">
+    <span><b>대상 파일</b> ch2/data.js, ch2/ch2_data.js</span>
+    <span><b>영향 범위</b> ch3/ch3_data.js (미반영)</span>
+    <span><b>검증 방식</b> 원본 model1_final.py 재실행 대조</span>
+  </div>
+</header>
+
+<div class="jumpnav">
+  <a href="https://2322570b-ec63-45e2-bd5d-884adf753618.frame.claudeusercontent.com/_f/1785437355-b1f7/#found">① 문제 발견</a>
+  <a href="https://2322570b-ec63-45e2-bd5d-884adf753618.frame.claudeusercontent.com/_f/1785437355-b1f7/#verify">② 검증</a>
+  <a href="https://2322570b-ec63-45e2-bd5d-884adf753618.frame.claudeusercontent.com/_f/1785437355-b1f7/#fix">③ CH2 수정</a>
+  <a href="https://2322570b-ec63-45e2-bd5d-884adf753618.frame.claudeusercontent.com/_f/1785437355-b1f7/#ch3">④ CH3 파급</a>
+  <a href="https://2322570b-ec63-45e2-bd5d-884adf753618.frame.claudeusercontent.com/_f/1785437355-b1f7/#decision">⑤ 결정 필요</a>
+</div>
+
+<section id="found">
+  <span class="snum">01 / 문제 발견</span>
+  <h2>대시보드가 왜 제출 보고서랑 다른 숫자를 보여주지?</h2>
+  <p class="h2-sub">CH2_분석보고서_6차.docx를 최종 점검하던 중, 대시보드(ch2/data.js)의 Model 1 지표가 보고서와 어긋난다는 걸 발견했습니다.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="v bad">0.600 / 0.616</div><div class="l">대시보드 AUC(훈련/홀드아웃)</div></div>
+    <div class="stat"><div class="v ok">0.581 / 0.564</div><div class="l">docx·원본 스크립트 AUC</div></div>
+    <div class="stat"><div class="v bad">4.8%</div><div class="l">대시보드 배분갭 R²</div></div>
+    <div class="stat"><div class="v ok">2.39%</div><div class="l">docx·원본 스크립트 R²</div></div>
+  </div>
+
+  <p>가장 극적인 사례는 <b>완도군</b>이었습니다. docx 보고서는 완도군을 구조적취약성지수 <span class="code">1.233</span>으로 전국 1위로 명시하는데, 당시 대시보드는 <span class="code">0.228</span>(순위 밖)로 표시하고 있었습니다.</p>
+</section>
+
+<section id="verify">
+  <span class="snum">02 / 원인 검증</span>
+  <h2>원본 스크립트를 다시 실행해서 확인했습니다</h2>
+  <p class="h2-sub"><span class="code">Modeling/CH2/6차/script/model1_final.py</span> — 사용자가 직접 찾아준 진짜 원본. 실행 결과가 docx와 소수점까지 일치했습니다.</p>
+
+  <h3>4개 도메인 중 인위적확산 하나만 부호가 반대</h3>
+  <p>완도군·통영시로 시작해 순위 1위부터 221위(최하위)까지 총 7개 시군구를 무작위로 대조했습니다. 예외 없이 같은 패턴이 나왔습니다.</p>
+
+  <div class="tblwrap">
+  <table>
+    <tbody><tr><th>순위</th><th>시군구</th><th class="num">노출도</th><th class="num">기후위험도</th><th class="num">지자체역량</th><th class="num">인위적확산</th></tr>
+    <tr><td>1</td><td>완도군</td><td class="num">일치</td><td class="num">일치</td><td class="num">일치</td><td class="num" style="color:var(--bad)">부호反</td></tr>
+    <tr><td>2</td><td>통영시</td><td class="num">일치</td><td class="num">일치</td><td class="num">일치</td><td class="num" style="color:var(--bad)">부호反</td></tr>
+    <tr><td>50</td><td>부산 서구</td><td class="num">일치</td><td class="num">일치</td><td class="num">일치</td><td class="num" style="color:var(--bad)">부호反</td></tr>
+    <tr><td>111</td><td>오산시</td><td class="num">일치</td><td class="num">일치</td><td class="num">일치</td><td class="num" style="color:var(--bad)">부호反(±0 근처도 예외 없음)</td></tr>
+    <tr><td>150</td><td>완주군</td><td class="num">일치</td><td class="num">일치</td><td class="num">일치</td><td class="num" style="color:var(--bad)">부호反</td></tr>
+    <tr><td>200</td><td>괴산군</td><td class="num">일치</td><td class="num">일치</td><td class="num">일치</td><td class="num" style="color:var(--bad)">부호反</td></tr>
+    <tr><td>221(최하위)</td><td>진천군</td><td class="num">일치</td><td class="num">일치</td><td class="num">일치</td><td class="num" style="color:var(--bad)">부호反</td></tr>
+  </tbody></table>
+  </div>
+
+  <p>크기는 항상 정확히 같고 부호만 반대 — 우연이 아니라 코드에서 <span class="code">× -1</span> 대신 <span class="code">× +1</span>을 곱한 것 그 자체입니다.</p>
+
+  <blockquote>
+    원목업체_resid 방향은 이론(원목업체 많음 = 확산위험 높음)이 아니라, <b>Y와의 실측 상관(r=-0.196, 음의 방향)에 맞춰 정렬</b>한 것 — 다른 3개 도메인과 동일한 규칙. 6차 최종본은 이 규칙 그대로(direction=-1)이고, 대시보드만 이론적 방향(+1, "A안")으로 뒤집혀 있었습니다.
+    <footer>model1_final.py, 지자체대응역량·인위적확산 도메인 구성 로직</footer>
+  </blockquote>
+
+  <h3>왜 하필 이 데이터가 섞여 들어왔나 — 타임라인</h3>
+  <ul class="tl">
+    <li><span class="t">6차 이전</span><span class="d">CH3 폴더(<span class="code">Modeling/CH3/2차_최종채택(A안)</span>)에서 "원목업체 부호를 이론대로 반전하면 어떨까"라는 A/B 실험 진행 — 이때는 아직 CH2 6차 모델이 존재하지 않았음</span></li>
+    <li><span class="t">git 커밋 순서로 확인</span><span class="d"><span class="code">CH3 A안 script</span> 커밋이 <span class="code">6차 모델링 script</span> 커밋보다 먼저 — 구조적으로 6차 결정을 반영할 수 없는 시점</span></li>
+    <li><span class="t">병합 과정</span><span class="d">그 실험 폴더에 같이 있던 CH2 대시보드 사본이 최상위 <span class="code">ch2/</span> 폴더로 그대로 승격되며 A안 데이터가 "현재 대시보드"가 됨</span></li>
+    <li><span class="t">2026-07-31</span><span class="d">원본 <span class="code">model1_final.py</span> 재발견 + 실행 → 이 문서의 검증 완료</span></li>
+  </ul>
+</section>
+
+<section id="fix">
+  <span class="snum">03 / CH2 수정 완료</span>
+  <h2>ch2/data.js, ch2/ch2_data.js는 이미 고쳤습니다</h2>
+  <p class="h2-sub">디자인 파일(ch2_ch2.html 등)은 전혀 건드리지 않고, 222개 시군구의 데이터 필드만 원본 실행 결과로 교체했습니다.</p>
+
+  <div class="compare">
+    <div class="card before">
+      <span class="lbl">Before (A안 · 버그)</span>
+      <dl>
+        <dt>완도군 index_main</dt><dd>0.228</dd>
+        <dt>완도군 순위</dt><dd>순위 밖</dd>
+        <dt>완도군 유형</dt><dd>노출도-우세형</dd>
+        <dt>AUC 훈련/홀드아웃</dt><dd>0.600 / 0.616</dd>
+        <dt>배분갭 R²</dt><dd>4.8%</dd>
+      </dl>
+    </div>
+    <div class="card after">
+      <span class="lbl">After (원본 일치)</span>
+      <dl>
+        <dt>완도군 index_main</dt><dd>1.233</dd>
+        <dt>완도군 순위</dt><dd>1위</dd>
+        <dt>완도군 유형</dt><dd>복합형</dd>
+        <dt>AUC 훈련/홀드아웃</dt><dd>0.581 / 0.564</dd>
+        <dt>배분갭 R²</dt><dd>2.39%</dd>
+      </dl>
+    </div>
+  </div>
+
+  <p class="tight"><span class="pill ok">확인됨</span> typology·thresholdSensitivity 요약 블록은 원래부터 정확했음(개별 필드만 틀렸던 자기모순) — 그대로 유지</p>
+  <p class="tight"><span class="pill ok">확인됨</span> git status 기준 ch2_data.js·data.js 2개 파일만 수정, html 무변경</p>
+  <p class="tight"><span class="pill warn">범위 밖</span> Model2·국가대응수준·rolling-origin 섹션은 이번 수정 대상 아님(별도 스크립트, 필요시 추후 검토)</p>
+</section>
+
+<section id="ch3">
+  <span class="snum">04 / CH3 파급 효과</span>
+  <h2>CH3 우선순위 산식이 CH2 위험지수 하나로만 결정됩니다</h2>
+  <p class="h2-sub"><span class="code">rebuild_ch3_priority.py</span> 확인 결과 — <span class="code">priority_score = percentile_rank(위험지수)</span>. 배분갭은 산식에서 이미 제거됐고, 재발위험확률은 별도 조건일 뿐 순위엔 관여하지 않습니다.</p>
+
+  <p>즉 CH2 위험지수를 고치면 CH3 우선순위도 같은 공식으로 다시 계산돼야 앞뒤가 맞습니다. 실제로 재계산해보니:</p>
+
+  <div class="stats">
+    <div class="stat"><div class="v">96위 <span class="arrow">→</span> 6위</div><div class="l">완도군 priority_rank</div></div>
+    <div class="stat"><div class="v">1 / 222</div><div class="l">순위가 그대로인 시군구</div></div>
+    <div class="stat"><div class="v bad">135 / 222</div><div class="l">등급(S~D) 자체가 바뀌는 곳</div></div>
+    <div class="stat"><div class="v">10 / 15</div><div class="l">TOP15 명단 교체 인원</div></div>
+  </div>
+
+  <p>등급 <em>분포</em>(S12·A11·B22·C133·D44)는 백분위 기준이라 그대로지만, <b>그 등급에 누가 들어가는지는 61%가 바뀝니다.</b></p>
+
+  <h3>TOP15에서 빠지는 곳 (S/A/B → D 등급 추락)</h3>
+  <div class="tblwrap">
+  <table>
+    <tbody><tr><th>시군구</th><th class="num">기존 순위</th><th class="num">재계산 순위</th><th>등급 변화</th></tr>
+    <tr><td>전북 전주시</td><td class="num">4위</td><td class="num delta-down">222위</td><td>S → D</td></tr>
+    <tr><td>전남 장흥군</td><td class="num">6위</td><td class="num delta-down">196위</td><td>S → D</td></tr>
+    <tr><td>강원 춘천시</td><td class="num">9위</td><td class="num delta-down">190위</td><td>S → D</td></tr>
+    <tr><td>강원 홍천군</td><td class="num">8위</td><td class="num delta-down">170위</td><td>S → C</td></tr>
+    <tr><td>충북 충주시</td><td class="num">25위</td><td class="num delta-down">214위</td><td>B → D</td></tr>
+  </tbody></table>
+  </div>
+
+  <h3>TOP15에 새로 들어오는 곳 (D → S/A 등급 급상승)</h3>
+  <div class="tblwrap">
+  <table>
+    <tbody><tr><th>시군구</th><th class="num">기존 순위</th><th class="num">재계산 순위</th><th>등급 변화</th></tr>
+    <tr><td>전남 완도군</td><td class="num">96위</td><td class="num delta-up">6위</td><td>C → S</td></tr>
+    <tr><td>경남 산청군</td><td class="num">165위</td><td class="num delta-up">12위</td><td>C → S</td></tr>
+    <tr><td>인천 옹진군</td><td class="num">177위</td><td class="num delta-up">21위</td><td>C → A</td></tr>
+    <tr><td>전남 신안군</td><td class="num">201위</td><td class="num delta-up">19위</td><td>D → A</td></tr>
+    <tr><td>전남 영광군</td><td class="num">198위</td><td class="num delta-up">45위</td><td>D → B</td></tr>
+  </tbody></table>
+  </div>
+
+  <p>지리적으로도 뚜렷합니다 — 빠지는 쪽은 강원·충청 내륙권, 들어오는 쪽은 <b>경남·전남 남해안권</b>에 몰립니다. 위험지수가 3개 도메인(노출도·기후위험도·인위적확산) 평균이라, 그중 하나의 부호를 뒤집으면 인위적확산 비중이 컸던 도시들이 구조적으로 극단 이동하는 겁니다.</p>
+
+  <div class="callout ok">
+    <div class="ic">✓</div>
+    <div class="body"><b>CH3 산식 자체는 손댈 필요 없음</b>이미 검증된 원본 공식(위험지수 백분위)을 그대로 다시 돌리기만 하면 됩니다. CH2 때와 동일한 방식 — html·다른 로직 변경 없이 데이터만 교체.</div>
+  </div>
+</section>
+
+<section id="decision">
+  <span class="snum">05 / 결정 필요</span>
+  <h2>팀 논의가 필요한 지점</h2>
+
+  <div class="callout decision">
+    <div class="ic">⚠</div>
+    <div class="body"><b>CH3의 ch3_data.js(prioritySggList)도 CH2와 같은 방식으로 재계산·교체할지 결정 필요</b>순위·등급이 61% 바뀌고 TOP15 중 10곳이 교체되는 큰 변화라, "버그 수정"이 아니라 "정책 추천 대상 자체가 바뀐다"는 무게가 있습니다. 이미 발표자료·서사에 특정 시군구(전주시·홍천군 등)를 언급했다면 그 부분도 함께 수정해야 합니다.</div>
+  </div>
+
+  <h3>참고 — 판단에 필요한 체크리스트</h3>
+  <ul class="checklist">
+    <li><div class="box done">✓</div><div>CH2는 원본 스크립트로 검증·수정 완료 (docx·model1_final.py와 일치)</div></li>
+    <li><div class="box done">✓</div><div>CH3 산식이 CH2 위험지수에만 의존한다는 것 코드로 확인 완료</div></li>
+    <li><div class="box need">!</div><div>CH3 재계산분을 실제 ch3_data.js에 반영할지 팀 결정</div></li>
+    <li><div class="box need">!</div><div>이미 작성된 CH3 관련 보고서·발표자료에 특정 시군구 언급이 있는지 확인</div></li>
+    <li><div class="box need">!</div><div>ch1/ 폴더도 별도로 배포 파일 동기화 필요(팀원 지적 사항, 이 문서 범위 밖)</div></li>
+  </ul>
+</section>
+
+<footer class="pagefoot">
+  I'mPine 공모전 · CH2/CH3 내부 검토 메모 · 이 문서는 팀 논의용으로 작성됨, 외부 제출용 아님
+</footer>
+
+</div>
+
+</body></html>
