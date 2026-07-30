@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>I'mPine 수식 감사 — 전체 산식의 이론적 근거·정확도·개선 방향</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0c1a14; --ink2:#1d3229;
+  --bg:#f0f2ed; --card:#fafbf8; --white:#fff;
+  --rule:rgba(12,26,20,.10); --rule2:rgba(12,26,20,.20);
+  --tx:#0c1a14; --tx2:#4a5b54; --tx3:#7d8b85;
+  --pine:#1a6644; --moss:#6a9e5b;
+  --red:#b5382a; --amber:#a87a14; --blue:#2d6a94; --teal:#15806a;
+  --code-bg:#f4f6f2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font:15px/1.72 'IBM Plex Sans','Noto Sans KR',sans-serif;background:var(--bg);color:var(--tx)}
+.mono{font-family:'IBM Plex Mono',monospace}
+
+/* layout */
+.page{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+header{margin-bottom:40px;border-bottom:2px solid var(--pine);padding-bottom:20px}
+header h1{font:700 26px/1.3 'Noto Sans KR',sans-serif;letter-spacing:-.5px;color:var(--ink)}
+header p{font-size:14px;color:var(--tx2);margin-top:6px;max-width:65ch}
+
+/* nav */
+.toc{background:var(--card);border:1px solid var(--rule2);padding:16px 20px;margin-bottom:36px}
+.toc h2{font-size:13px;font-weight:600;color:var(--pine);letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px}
+.toc ol{columns:2;column-gap:24px;padding-left:22px;font-size:13.5px;line-height:1.8}
+.toc a{color:var(--tx);text-decoration:none;border-bottom:1px solid var(--rule)}
+.toc a:hover{color:var(--pine);border-color:var(--pine)}
+@media(max-width:640px){.toc ol{columns:1}}
+
+/* formula card */
+.f{background:var(--card);border:1px solid var(--rule2);margin-bottom:28px;scroll-margin-top:20px}
+.f .hd{padding:14px 18px 12px;border-bottom:1px solid var(--rule);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.f .hd .id{font-family:'IBM Plex Mono';font-size:11px;font-weight:600;color:var(--pine);background:rgba(26,102,68,.08);border:1px solid rgba(26,102,68,.22);padding:2px 8px;letter-spacing:.05em;white-space:nowrap}
+.f .hd h3{font-size:16px;font-weight:700;letter-spacing:-.2px}
+.f .hd .loc{margin-left:auto;font-family:'IBM Plex Mono';font-size:11px;color:var(--tx3)}
+
+.f .body{padding:16px 18px}
+.eq{background:var(--code-bg);border-left:3px solid var(--pine);padding:12px 16px;margin:10px 0;font-family:'IBM Plex Mono';font-size:13.5px;line-height:1.7;overflow-x:auto;white-space:pre-wrap}
+.eq .cmt{color:var(--tx3);font-size:12px}
+
+/* tags */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.tag{font-family:'IBM Plex Mono';font-size:10px;font-weight:600;letter-spacing:.04em;padding:3px 8px;border:1px solid;white-space:nowrap}
+.tag.theory{color:var(--pine);border-color:rgba(26,102,68,.35);background:rgba(26,102,68,.06)}
+.tag.adhoc{color:var(--amber);border-color:rgba(168,122,20,.4);background:rgba(168,122,20,.06)}
+.tag.error{color:var(--red);border-color:rgba(181,56,42,.35);background:rgba(181,56,42,.06)}
+.tag.plan{color:var(--blue);border-color:rgba(45,106,148,.35);background:rgba(45,106,148,.06)}
+
+/* sections within card */
+.f section{margin-top:14px;padding-top:12px;border-top:1px dashed var(--rule)}
+.f section h4{font-size:12.5px;font-weight:600;color:var(--tx2);letter-spacing:.03em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.f section h4::before{content:'';width:8px;height:8px;flex:none;border-radius:1px}
+.f section.basis h4::before{background:var(--pine)}
+.f section.issue h4::before{background:var(--red)}
+.f section.improve h4::before{background:var(--blue)}
+.f section.metric h4::before{background:var(--teal)}
+
+.f p,.f li{font-size:14px;line-height:1.7;margin-bottom:5px}
+.f ul,.f ol{padding-left:20px}
+.f code{font-family:'IBM Plex Mono';font-size:12.5px;background:var(--code-bg);padding:1px 5px}
+
+/* verdict bar */
+.verdict{display:flex;gap:1px;margin:12px 0 4px}
+.verdict .bar{height:6px;border-radius:1px}
+.verdict .bar.g{background:var(--pine)}
+.verdict .bar.y{background:var(--amber)}
+.verdict .bar.r{background:var(--red)}
+.verdict-label{display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono'}
+
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+th{text-align:left;font-size:11px;font-weight:600;color:var(--tx3);letter-spacing:.04em;text-transform:uppercase;padding:6px 8px;border-bottom:2px solid var(--rule2)}
+td{padding:6px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+td code{font-size:11.5px}
+tr:hover td{background:rgba(26,102,68,.03)}
+
+.summary{background:linear-gradient(135deg,var(--ink),var(--ink2));color:#fff;padding:20px 22px;margin-top:40px}
+.summary h2{font-size:17px;margin-bottom:12px;color:var(--moss)}
+.summary p{font-size:14px;line-height:1.7;opacity:.9}
+.summary table{color:#fff}
+.summary th{color:rgba(255,255,255,.6);border-color:rgba(255,255,255,.2)}
+.summary td{border-color:rgba(255,255,255,.12)}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <h1>I'mPine 수식 감사</h1>
+  <p>프로젝트에서 사용된 <strong>모든 핵심 산식</strong>을 코드에서 역추출하여, 각각의 이론적 근거·현재 정확도·개선 방향을 정리합니다. <span class="mono" style="color:var(--tx3)">2026-07-30 기준 · 대상: ch1~ch4 + Modeling/</span></p>
+</header>
+
+<nav class="toc">
+  <h2>목차</h2>
+  <ol>
+    <li><a href="#F01">Within-year Z-score 표준화</a></li>
+    <li><a href="#F02">도메인 점수 부호 결정</a></li>
+    <li><a href="#F03">구조적 취약성지수 (동일가중)</a></li>
+    <li><a href="#F04">면적통제 잔차화</a></li>
+    <li><a href="#F05">CRE(Mundlak) 2부문모형</a></li>
+    <li><a href="#F06">예산 배분갭</a></li>
+    <li><a href="#F07">축B 3분위 강제분할</a></li>
+    <li><a href="#F08">축A 유형화 임계값</a></li>
+    <li><a href="#F09">우선지원 점수 (현행)</a></li>
+    <li><a href="#F10">우선지원 점수 (계획서 처방)</a></li>
+    <li><a href="#F11">우선지원 점수 (검증보고서 제안)</a></li>
+    <li><a href="#F12">Model 2 재발위험 로지스틱</a></li>
+    <li><a href="#F13">격자 반복관측비율</a></li>
+    <li><a href="#F14">교차기준 복합 고위험 판정</a></li>
+    <li><a href="#F15">면적-피해 잔차분석</a></li>
+    <li><a href="#F16">CH4 비용 산출</a></li>
+  </ol>
+</nav>
+
+<!-- ═══════════════ F01 ═══════════════ -->
+<div class="f" id="F01">
+  <div class="hd">
+    <span class="id">F01</span>
+    <h3>Within-year Z-score 표준화</h3>
+    <span class="loc">model1_v4_final.py:79</span>
+  </div>
+  <div class="body">
+    <div class="eq">z<sub>it</sub> = (x<sub>it</sub> − μ<sub>t</sub>) / σ<sub>t</sub>
+<span class="cmt"># i = 시군구, t = 연도. 연도별로 평균·표준편차를 구해 표준화</span>
+<span class="cmt"># ddof=0 (모집단 SD 사용)</span></div>
+    <div class="tags">
+      <span class="tag theory">이론 근거 있음</span>
+    </div>
+    <section class="basis">
+      <h4>이론적 근거</h4>
+      <p>패널 데이터에서 <strong>시간 추세(trend)와 시점 효과(period effect)를 제거</strong>하기 위한 표준 방법. 기후변수처럼 연도별 전국 수준이 다른 변수에서 "그 해 평균 대비 얼마나 높은가"를 측정합니다.</p>
+      <p>참고문헌: Wooldridge (2010) <em>Econometric Analysis of Cross Section and Panel Data</em>, §10.5 — within-group transformation. 환경·역학 분야에서 연도 내 상대순위 사용은 보편적(예: CDC의 BMI z-score).</p>
+    </section>
+    <section class="issue">
+      <h4>현재 문제</h4>
+      <ul>
+        <li><code>ddof=0</code> (모집단 SD) 사용 — 표본인데 모집단 취급. n=222에서 차이 미미하지만 학술적으로는 <code>ddof=1</code>이 표준</li>
+        <li>연도별 n이 동일하지 않음(표본 카스케이드로 일부 연도에 시군구가 빠짐) — z-score의 비교 가능성에 미미한 영향</li>
+      </ul>
+    </section>
+    <section class="improve">
+      <h4>개선 방향</h4>
+      <p><code>ddof=1</code>로 변경(1줄). 또는 <strong>백분위 변환</strong>(percentile rank)으로 교체하면 정규성 가정 없이도 비교 가능하고, 이상치에 강건함. 계획서 §4.1도 백분위를 처방하고 있음.</p>
+    </section>
+    <section class="metric">
+      <h4>현재 정확도</h4>
+      <p>표준화 자체는 정보 손실 없는 단조변환이므로 "정확도" 개념이 적용되지 않습니다. 다만 <strong>순위 보존 여부</strong>는 100% — 원값의 순위가 z-score에서도 동일.</p>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F02 ═══════════════ -->
+<div class="f" id="F02">
+  <div class="hd">
+    <span class="id">F02</span>
+    <h3>도메인 점수 부호 결정</h3>
+    <span class="loc">model1_v4_final.py:82–95</span>
+  </div>
+  <div class="body">
+    <div class="eq">direction = np.sign(corr(x, Y))
+<span class="cmt"># Y = log_피해밀도. Y와의 상관 부호에 따라 +1 또는 −1</span>
+<span class="cmt"># 예: 연강수량 r=+0.036 → direction = +1</span>
+<span class="cmt"># 예: 대응예산 r=+0.255 → direction = −1 (역부호 고정)</span></div>
+    <div class="tags">
+      <span class="tag error">순환 검증 위험</span>
+      <span class="tag adhoc">일부 사전고정 / 일부 데이터결정</span>
+    </div>
+    <section class="basis">
+      <h4>이론적 근거</h4>
+      <p><strong>혼합.</strong> 대응역량(−1)·노출도(+1)는 사전 이론에 따라 고정. 기후위험도(연강수량·GDD)는 <code>np.sign(sign_check[...])</code>로 <strong>Y와의 상관에서 데이터 기반으로 결정</strong>됩니다.</p>
+      <p>문제: 결과변수(Y)를 보고 부호를 정한 뒤, 같은 Y로 지수-피해 관계를 검증하면 <strong>순환 검증(circular validation)</strong>이 됩니다. 특히 연강수량은 r=+0.036으로 순수 노이즈 수준인데 이것으로 부호가 결정되었습니다.</p>
+      <p>이론적으로 <strong>강수량은 소나무 수분 스트레스를 완화</strong>하므로 피해와 음의 관계(−1)가 예상됩니다. 하지만 재선충 매개충(솔수염하늘소) 활동은 <strong>습윤 조건에서 증가</strong>한다는 연구도 있어(Togashi & Shigesada, 2006) 방향이 자명하지 않습니다.</p>
+    </section>
+    <section class="issue">
+      <h4>현재 문제</h4>
+      <ul>
+        <li>연강수량의 부호가 노이즈(r=+0.036)에서 결정됨 → 표본이 바뀌면 부호가 뒤집힘</li>
+        <li>AUC 0.581도 이 순환 덕분에 상방 편향된 값</li>
+        <li>GDD는 r=+0.152로 이론과 부합(고온 → 매개충 세대수 증가)하지만, 역시 데이터에서 결정</li>
+      </ul>
+    </section>
+    <section class="improve">
+      <h4>개선 방향</h4>
+      <p><strong>모든 부호를 사전 이론으로 고정</strong>하고, 부호 정당성을 문헌으로 뒷받침:</p>
+      <table>
+        <tr><th>변수</th><th>이론 부호</th><th>근거</th></tr>
+        <tr><td><code>소나무류_면적비율</code></td><td>+1</td><td>숙주 밀도 ↑ = 감염 확률 ↑ (기본 역학)</td></tr>
+        <tr><td><code>연강수량</code></td><td>−1 (또는 제외)</td><td>수분 스트레스 완화; 직접 효과 불명확하면 제외가 더 안전</td></tr>
+        <tr><td><code>GDD</code></td><td>+1</td><td>솔수염하늘소 발육 적산온도. Togashi (2004)</td></tr>
+        <tr><td><code>대응예산</code></td><td>−1 (고정)</td><td>이미 고정. 역인과 문제는 별도</td></tr>
+        <tr><td><code>원목업체수</code></td><td>+1 (변경 필요)</td><td>현행 −1은 "업체 적음 = 위험 높음"이 되어 라벨과 모순</td></tr>
+      </table>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F03 ═══════════════ -->
+<div class="f" id="F03">
+  <div class="hd">
+    <span class="id">F03</span>
+    <h3>구조적 취약성지수 (동일가중 합산)</h3>
+    <span class="loc">model1_v4_final.py:101</span>
+  </div>
+  <div class="body">
+    <div class="eq">Index<sub>it</sub> = (1/4) × Σ<sub>d∈{노출,기후,역량,확산}</sub> DomainScore<sub>d,it</sub>
+<span class="cmt"># 4개 도메인에 각각 0.25 동일가중</span>
+<span class="cmt"># DomainScore = 도메인 내 변수들의 z-score × direction 평균</span></div>
+    <div class="tags">
+      <span class="tag theory">이론 근거 있음 (투명성 기준)</span>
+      <span class="tag adhoc">통계적 최적화 아님</span>
+    </div>
+    <section class="basis">
+      <h4>이론적 근거</h4>
+      <p><strong>의도적 설계.</strong> 동일가중은 OECD (2008) <em>Handbook on Constructing Composite Indicators</em>에서 "전문가 가중치가 불확실할 때의 기본값"으로 권장됩니다. 해석 투명성이 핵심 장점 — "왜 이 가중치인가"라는 질문이 발생하지 않습니다.</p>
+      <p>다만 도메인 간 상관이 있으면 실효 가중치가 동일하지 않습니다:</p>
+      <table>
+        <tr><th></th><th>노출</th><th>기후</th><th>역량</th><th>확산</th></tr>
+        <tr><td>노출</td><td>1.000</td><td>0.005</td><td>−0.135</td><td><strong>0.416</strong></td></tr>
+        <tr><td>기후</td><td></td><td>1.000</td><td>0.010</td><td><strong>0.343</strong></td></tr>
+        <tr><td>역량</td><td></td><td></td><td>1.000</td><td>0.074</td></tr>
+        <tr><td>확산</td><td></td><td></td><td></td><td>1.000</td></tr>
+      </table>
+      <p>노출-확산 0.416, 기후-확산 0.343 → 인위적확산 도메인이 다른 두 도메인과 겹쳐 실효가중치가 0.25 초과.</p>
+    </section>
+    <section class="metric">
+      <h4>현재 정확도</h4>
+      <table>
+        <tr><th>지표</th><th>훈련</th><th>홀드아웃</th><th>해석</th></tr>
+        <tr><td>corr(Index, log피해밀도)</td><td colspan="2">+0.202</td><td>약한 양의 상관</td></tr>
+        <tr><td>Spearman(Index, Y)</td><td colspan="2">+0.231</td><td>순위 상관 약간 높음</td></tr>
+        <tr><td>십분위 발생률 범위</td><td colspan="2">0.472 → 0.807</td><td>단조 증가 ✓</td></tr>
+        <tr><td>십분위 평균피해 범위</td><td colspan="2">0.019 → 0.105</td><td>5.5배 차이 ✓</td></tr>
+      </table>
+    </section>
+    <section class="improve">
+      <h4>개선 방향</h4>
+      <ol>
+        <li><strong>PCA 가중</strong> — 제1주성분 로딩으로 가중. 상관이 높은 도메인의 중복 정보를 자동 조정. 참고: OECD (2008) §3.2</li>
+        <li><strong>민감도 분석</strong> — 동일가중·PCA가중·역분산가중·BOD(Benefit of the Doubt) 4가지를 부록에 제시하고 순위상관 비교</li>
+        <li><strong>도메인 상관 보정</strong> — Mahalanobis 거리 기반 지수. 상관 구조를 반영해 실효가중 = 명목가중</li>
+      </ol>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F04 ═══════════════ -->
+<div class="f" id="F04">
+  <div class="hd">
+    <span class="id">F04</span>
+    <h3>면적통제 잔차화 (인위적확산 도메인)</h3>
+    <span class="loc">model1_v4_final.py:73–76</span>
+  </div>
+  <div class="body">
+    <div class="eq">resid<sub>i</sub> = x<sub>i</sub> − (α̂ + β̂ × log_소나무림면적<sub>i</sub>)
+<span class="cmt"># x = 도로소나무비율 또는 원목업체수</span>
+<span class="cmt"># OLS 잔차 = "면적 효과를 제거한 순수 인위적확산 신호"</span></div>
+    <div class="tags">
+      <span class="tag theory">이론 근거 있음</span>
+    </div>
+    <section class="basis">
+      <h4>이론적 근거</h4>
+      <p><strong>Frisch-Waugh-Lovell 정리.</strong> 다중회귀에서 한 변수의 효과를 보기 위해 다른 변수의 효과를 먼저 제거하는 것은 partialling out과 동치입니다. 면적이 크면 도로도 많고 업체도 많으므로, 면적의 교란(confounding)을 제거하는 표준 접근입니다.</p>
+    </section>
+    <section class="metric">
+      <h4>현재 정확도</h4>
+      <p>도로소나무비율: 면적통제 후 편상관이 TierB에서 0.19 → TierA에서 <strong>0.0008로 소멸</strong> → 최종 제외. 원목업체수: 면적통제 후 <strong>−0.196 유지</strong> → 지수에 투입.</p>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F05 ═══════════════ -->
+<div class="f" id="F05">
+  <div class="hd">
+    <span class="id">F05</span>
+    <h3>CRE(Mundlak) 2부문모형</h3>
+    <span class="loc">model1_v4_final.py:111–145</span>
+  </div>
+  <div class="body">
+    <div class="eq"><strong>1부문(발생여부):</strong>
+logit(P(Y<sub>it</sub>>0)) = α + β<sub>w</sub>·Index<sub>it</sub> + β<sub>b</sub>·Index̄<sub>i</sub> + ε<sub>it</sub>
+
+<strong>2부문(발생시 크기):</strong>
+E[Y<sub>it</sub> | Y<sub>it</sub>>0] = α + β<sub>w</sub>·Index<sub>it</sub> + β<sub>b</sub>·Index̄<sub>i</sub> + u<sub>it</sub>
+
+<span class="cmt"># Index̄ᵢ = 시군구 i의 시간 평균 (Mundlak device)</span>
+<span class="cmt"># β_w = within 효과 (같은 지자체 내 시간변동)</span>
+<span class="cmt"># β_b = between 효과 (지자체 간 만성적 차이)</span>
+<span class="cmt"># 클러스터 SE (시군구 수준)</span></div>
+    <div class="tags">
+      <span class="tag theory">이론 근거 있음</span>
+      <span class="tag error">구현 오류 있음</span>
+    </div>
+    <section class="basis">
+      <h4>이론적 근거</h4>
+      <p><strong>Correlated Random Effects (Mundlak, 1978).</strong> FE(고정효과)가 시불변 변수를 제거하는 대신 RE에 그룹평균을 추가해 between/within 효과를 분리. Chamberlain (1982)의 일반화. 재선충 맥락에서 "만성적 취약성(between)"과 "연도별 변동(within)"을 구분하는 데 적합합니다.</p>
+      <p><strong>2부문모형(Two-part model):</strong> 의료비·보험 분석에서 표준 — "발생여부"와 "발생시 크기"를 분리. Manning et al. (1987), Duan et al. (1983). 피해밀도가 0인 관측이 60%이므로 단일 OLS보다 적합합니다.</p>
+    </section>
+    <section class="issue">
+      <h4>현재 문제 — 치명적 구현 오류</h4>
+      <p><code>run_two_part(holdout, "구조적취약성지수", "홀드아웃")</code>은 <strong>홀드아웃에서 새로 적합(fit)</strong>합니다. 즉 "표본외 검증 AUC 0.564"는 실제로는 표본 내 값입니다.</p>
+      <p>Model2 스크립트의 <code>add_frozen_gm()</code>처럼 <strong>훈련 계수를 고정</strong>한 채 홀드아웃에서 예측만 해야 합니다.</p>
+    </section>
+    <section class="metric">
+      <h4>현재 정확도</h4>
+      <table>
+        <tr><th></th><th>between β</th><th>p</th><th>within β</th><th>p</th><th>AUC</th></tr>
+        <tr><td>훈련 (2017–20)</td><td>+1.138</td><td>0.002</td><td>−0.450</td><td>0.101</td><td>0.581</td></tr>
+        <tr><td>홀드아웃 (2021–22)</td><td>+1.200</td><td>0.020</td><td>−0.646</td><td>0.142</td><td>0.564</td></tr>
+      </table>
+      <p>Between 유의(만성 취약성 포착) / Within 비유의(단기예측 불가) / AUC ≈ 0.57(무작위 0.5 대비 +0.07)</p>
+    </section>
+    <section class="improve">
+      <h4>정확도를 높이는 방법</h4>
+      <ol>
+        <li><strong>Frozen-gm 적용</strong>(Model2처럼): AUC가 더 떨어질 수 있지만 정직한 표본외 수치</li>
+        <li><strong>Y_bin 임계값 상향</strong>: "1본 이상" → "상위 25%" → 기저율이 낮아져 AUC 개선 기대</li>
+        <li><strong>공간 래그 추가</strong>: 인접시군구 전기 피해밀도. Model2에서 비유의했지만 Model1과 사양이 달라 재시도 가치 있음</li>
+        <li><strong>혼합효과 로지스틱(GLMM)</strong>: CRE보다 엄밀한 랜덤효과 처리. <code>statsmodels.MixedLM</code> 또는 R의 <code>lme4::glmer</code></li>
+      </ol>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F06 ═══════════════ -->
+<div class="f" id="F06">
+  <div class="hd">
+    <span class="id">F06</span>
+    <h3>예산 배분갭</h3>
+    <span class="loc">model1_v4_final.py:149–166</span>
+  </div>
+  <div class="body">
+    <div class="eq">위험지수<sub>i</sub> = (노출도 + 기후위험도 + 인위적확산) / 3
+<span class="cmt"># 대응역량은 순환논리 방지를 위해 제외</span>
+
+배분갭<sub>i</sub> = 평균예산<sub>i</sub> − (α̂ + β̂ × 위험지수<sub>i</sub>)
+<span class="cmt"># OLS(평균예산 ~ 위험지수)의 잔차</span>
+<span class="cmt"># 양수 = 위험 대비 예산 과다, 음수 = 과소</span></div>
+    <div class="tags">
+      <span class="tag theory">표준 잔차 분석</span>
+      <span class="tag error">해석 주의 필요</span>
+    </div>
+    <section class="basis">
+      <h4>이론적 근거</h4>
+      <p>OLS 잔차를 "불일치(mismatch)"로 해석하는 것은 재정 분석에서 표준적입니다. Boadway & Shah (2009) <em>Fiscal Federalism</em>에서 교부금의 수평적 형평성을 진단할 때 사용합니다.</p>
+    </section>
+    <section class="issue">
+      <h4>현재 문제</h4>
+      <ul>
+        <li><strong>R² = 2.39%.</strong> 위험지수가 예산 분산의 2.4%만 설명 → 예측값이 거의 상수 → 잔차 ≈ 원변수(예산). <code>corr(배분갭, 평균예산_log) = 0.988</code></li>
+        <li><strong>예산 0 = 구조적 0.</strong> 재선충 예산이 0인 64곳은 "병이 없어서 배정 안 한 것"인데, 이것이 "과소배분"으로 판정됨</li>
+        <li><strong>역인과.</strong> 예산은 피해의 결과(r=+0.255). 피해가 있어야 예산이 옴</li>
+      </ul>
+    </section>
+    <section class="improve">
+      <h4>개선 방향</h4>
+      <ol>
+        <li><strong>2부문 처리:</strong> (a) 예산 배정 여부 로지스틱 (b) 배정된 경우만 수준 OLS. 배분갭은 (b)에서만 정의. 미배정은 별도 범주</li>
+        <li><strong>통제변수 추가:</strong> <code>budget ~ 위험지수 + log_소나무림면적 + 전기_피해량 + C(시도)</code> → R² 상승 → 잔차가 진짜 "불일치"에 가까워짐</li>
+        <li><strong>IV(도구변수):</strong> 시차예산 또는 배분공식 규칙요소를 도구변수로 → 역인과 통제</li>
+      </ol>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F07 ═══════════════ -->
+<div class="f" id="F07">
+  <div class="hd">
+    <span class="id">F07</span>
+    <h3>축B: 배분적정성 3분위 강제분할</h3>
+    <span class="loc">model1_v4_final.py:188</span>
+  </div>
+  <div class="body">
+    <div class="eq">축B = pd.qcut(배분갭, q=3, labels=["부족","적정","과다"])
+<span class="cmt"># 222 ÷ 3 = 74 → 정의상 항상 부족 74 / 적정 74 / 과다 74</span></div>
+    <div class="tags">
+      <span class="tag error">정의상 결론이 고정됨</span>
+    </div>
+    <section class="basis">
+      <h4>이론적 근거</h4>
+      <p><strong>없음.</strong> 분위수 분할은 데이터를 기술적으로 나누는 방법이지, "부족"이라는 판정을 내리는 방법이 아닙니다. "74개 시군구가 예산 부족"은 표본 크기의 함수입니다.</p>
+    </section>
+    <section class="improve">
+      <h4>개선 방향</h4>
+      <ol>
+        <li><strong>예측구간 기준:</strong> OLS 예측값의 95% 예측구간(PI) 밖 = "유의하게 과소/과다". 몇 곳인지가 진짜 발견</li>
+        <li><strong>절대 기준:</strong> 배분갭이 −1 SD 이하 = 과소배분. 몇 곳인지는 데이터에 따라 달라짐</li>
+        <li><strong>분위 유지 시:</strong> 반드시 <code>하위 3분위(정의상 74곳)</code>으로 명기</li>
+      </ol>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F08 ═══════════════ -->
+<div class="f" id="F08">
+  <div class="hd">
+    <span class="id">F08</span>
+    <h3>축A: 위험요인 유형화 임계값</h3>
+    <span class="loc">model1_v4_final.py:181–186</span>
+  </div>
+  <div class="body">
+    <div class="eq">diff = 노출도_점수<sub>i</sub> − 인위적확산_점수<sub>i</sub>
+if diff > 0.5:  "노출도-우세형"
+elif diff < −0.5: "인위적확산-우세형"
+else: "복합형"</div>
+    <div class="tags">
+      <span class="tag adhoc">경험적 임계값</span>
+      <span class="tag theory">민감도 분석 있음</span>
+    </div>
+    <section class="basis">
+      <h4>이론적 근거</h4>
+      <p>z-score 차이에서 <strong>0.5 SD 차이</strong>를 "우세"로 보는 것은 Cohen's d ≈ 0.5 (중간 효과크기)와 유사한 감각입니다. 하지만 직접 인용은 아닙니다.</p>
+      <p>민감도 분석이 존재합니다: ±0.3 / ±0.5(채택) / ±0.7에서 유형 분포가 [85/99/38] → [72/87/63] → [61/71/90]으로 변함. 이 민감도를 공개한 것은 좋은 관행입니다.</p>
+    </section>
+    <section class="improve">
+      <h4>개선 방향</h4>
+      <p><strong>클러스터 분석(k-means, k=3)</strong>으로 데이터 기반 유형화 → 임계값 의존 제거. 또는 <strong>3등분 분위</strong>를 쓰되 민감도와 함께 보고.</p>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F09 ═══════════════ -->
+<div class="f" id="F09">
+  <div class="hd">
+    <span class="id">F09</span>
+    <h3>우선지원 점수 — 현행 구현</h3>
+    <span class="loc">ch3/data.js:28</span>
+  </div>
+  <div class="body">
+    <div class="eq">priority_score = index_main − 배분갭
+<span class="cmt"># index_main: 0~1 스케일 z-score 평균 (SD=0.492)</span>
+<span class="cmt"># 배분갭: 로그예산 잔차 (SD=4.722, 범위 약 −7.3 ~ +7.5)</span></div>
+    <div class="tags">
+      <span class="tag error">계획서 미준수</span>
+      <span class="tag error">단위 불일치 — 배분갭이 98.9% 결정</span>
+    </div>
+    <section class="issue">
+      <h4>핵심 문제 — 3건의 독립 검증에서 동일 결론</h4>
+      <p><strong>서로 다른 척도의 직접 뺄셈.</strong> 배분갭의 SD가 index_main의 <strong>9.6배</strong>이므로 순위의 98.9%를 배분갭이 결정합니다. 그리고 corr(배분갭, 평균예산_log)=0.988 — 배분갭 회귀의 R²가 2.39%뿐이라 잔차≈원변수(예산 수준 그 자체).</p>
+      <p>결과: "부족" 74곳 중 86%가 예산=0, 89%가 피해=0. TOP30에 서울 자치구 8곳(관악·종로·은평·광진·성북·강북·용산·중랑). 1위 완도군(피해 0). 재발확률 1.000인 울산 4개구는 188~199위.</p>
+    </section>
+    <section class="metric">
+      <h4>정량 평가 (다중 지표)</h4>
+      <table>
+        <tr><th>평가지표</th><th>ρ</th><th>해석</th></tr>
+        <tr><td>재발확률</td><td><strong>−0.475</strong></td><td>재발 확실한 곳이 최하위 — 완전히 역전</td></tr>
+        <tr><td>누적피해(log)</td><td>−0.469</td><td>피해 많은 곳이 하위</td></tr>
+        <tr><td>피해밀도</td><td>−0.711</td><td>밀도 높은 곳이 최하위</td></tr>
+        <tr><td>반복관측률</td><td>−0.603</td><td>반복 피해지역이 하위</td></tr>
+      </table>
+      <p>모든 평가지표에서 음의 상관 → <strong>어떤 기준으로도 사용 불가.</strong></p>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F10 ═══════════════ -->
+<div class="f" id="F10">
+  <div class="hd">
+    <span class="id">F10</span>
+    <h3>우선지원 점수 — 계획서 처방</h3>
+    <span class="loc">분석계획서 §4.1</span>
+  </div>
+  <div class="body">
+    <div class="eq">Priority = 0.60 × RiskPct + 0.40 × UnderfundPct
+
+<span class="cmt"># RiskPct = 역량 제외 위험지수의 연도내 백분위 (0~1)</span>
+<span class="cmt"># UnderfundPct = (−배분갭)의 연도내 백분위 (0~1)</span>
+<span class="cmt"># 등급: S(상위5%) / A(10%) / B(20%) / C(80%) / D(하위20%)</span></div>
+    <div class="tags">
+      <span class="tag plan">계획서 처방</span>
+      <span class="tag theory">백분위 = 분포 비의존 표준화</span>
+    </div>
+    <section class="basis">
+      <h4>이론적 근거</h4>
+      <ul>
+        <li><strong>백분위 변환:</strong> 서로 다른 단위의 지표를 0~1 동일 척도로 변환. F09의 단위 불일치를 구조적으로 해결</li>
+        <li><strong>0.60/0.40 가중치:</strong> "위험이 우선, 예산 부족은 보조" 원칙. 계획서는 0.50/0.50, 0.70/0.30 민감도도 요구</li>
+        <li><strong>역량 제외:</strong> "적은 예산→취약점수↑→추가 예산 배분→더 적은 예산"의 순환논리 차단</li>
+        <li><strong>S/A/B/C/D:</strong> 정책적으로 우선순위 그룹을 명확히 구분. 예산 규모에 따라 S만 / S+A / S+A+B 선택</li>
+      </ul>
+    </section>
+    <section class="metric">
+      <h4>적용 결과 — 3건 독립 검증 수치</h4>
+      <table>
+        <tr><th>검증자</th><th>ρ(재발확률)</th><th>완도군</th></tr>
+        <tr><td>검증보고서</td><td>+0.063</td><td>1위</td></tr>
+        <tr><td>피드백 리뷰어</td><td>+0.123</td><td>1위</td></tr>
+        <tr><td>최종 합의 계산</td><td>+0.063~0.123</td><td>1위</td></tr>
+      </table>
+      <p>부호는 뒤집히지만(−0.48→+0.06~0.12) 개선폭이 미미하고 완도군은 여전히 1위.</p>
+      <p><strong>원인 분해 (피드백 리뷰어 검증):</strong></p>
+      <ul>
+        <li>RiskPct 단독: ρ=+0.40~0.47 (괜찮은 신호)</li>
+        <li>UnderfundPct 단독: ρ=<strong>−0.518</strong> (실제 위험과 반대 방향!)</li>
+        <li>→ 0.40의 가중합에 UnderfundPct를 40% 넣으면 +0.40이 +0.06으로 <strong>하락</strong></li>
+        <li>→ <strong>UnderfundPct가 RiskPct의 긍정적 신호를 상쇄</strong>. 배분갭이 독.</li>
+      </ul>
+      <p>백분위 변환은 척도 문제(F09)를 해결하지만, 배분갭 자체의 근본 문제(예산=0인 곳이 최과소배분, corr 0.988)는 해결하지 못합니다.</p>
+    </section>
+    <section class="improve">
+      <h4>최종 권고 — 계획서의 공식이 아니라 원칙을 따르라</h4>
+      <p>계획서 §3.1의 핵심 원칙: <em>"배분용 위험지수에 예산을 혼입하지 않는다."</em> 이 원칙에 따르면 <strong>배분갭(UnderfundPct)을 산식에서 완전히 제거</strong>하고 RiskPct 단독을 쓰는 것(F10-E)이 계획서의 정신에 가장 부합합니다. → F10-E 참조.</p>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F11 ═══════════════ -->
+<div class="f" id="F11">
+  <div class="hd">
+    <span class="id">F11</span>
+    <h3>우선지원 점수 — 검증보고서 제안 (철회됨) → 최종 합의: RiskPct 단독</h3>
+    <span class="loc">검증보고서 §2-A → 3건 독립검증 후 정정</span>
+  </div>
+  <div class="body">
+    <div class="eq"><s>priority = 0.5 × z(구조위험지수) + 0.5 × z(재발위험확률) + 0.15 × z(−배분갭)</s>
+<span class="cmt" style="color:var(--red)"># ↑ 이 산식은 자기충족적(tautological) 구조로 확인되어 철회되었습니다</span>
+
+<strong>최종 합의 산식:</strong>
+Priority = RiskPct = percentile_rank(위험지수<sub>i</sub>)
+<span class="cmt"># 위험지수 = (노출도 + 기후위험도 + 인위적확산) / 3  (대응역량 제외)</span>
+<span class="cmt"># 등급: S(상위5%) / A(10%) / B(20%) / C(80%) / D(하위20%)</span></div>
+    <div class="tags">
+      <span class="tag error">원안 철회</span>
+      <span class="tag theory">최종안: 변수역할분리 원칙 준수</span>
+    </div>
+
+    <section class="issue">
+      <h4>원안(검증보고서 제안)이 철회된 이유 — 자기충족성 분해</h4>
+      <p>3건의 독립 검증에서 동일한 결론이 나왔습니다:</p>
+      <table>
+        <tr><th>산식</th><th>ρ(재발확률)</th><th>해석</th></tr>
+        <tr><td>C 전체 (0.5z_risk + 0.5z_recur + 0.15z_gap)</td><td>+0.73~0.79</td><td>높아 보이지만…</td></tr>
+        <tr><td>C에서 재발확률만 제거</td><td>+0.15~0.23</td><td>재발확률 없으면 급락</td></tr>
+        <tr><td>재발확률 자리에 <strong>랜덤 노이즈</strong></td><td>+0.12~0.23</td><td>랜덤과 거의 동일!</td></tr>
+      </table>
+      <p><strong>ρ≈0.79 중 약 0.56(71%)이 "재발확률로 재발확률을 예측한" 순환에서 발생.</strong> 재발확률을 빼면 랜덤 노이즈와 같은 수준으로 떨어집니다. "상류 문제를 우회"한 게 아니라, 답을 시험지에 적어 넣은 것입니다.</p>
+      <p>추가 문제: 가중치 합 1.15≠1.0, 임계값(0.05/0.3) 근거 없음, Model2 자체가 기준모형(연속발생연수 단독 AUC 0.918)보다 못한데(0.911) 그 출력을 50% 가중으로 사용.</p>
+    </section>
+
+    <section class="basis">
+      <h4>최종 합의 — 6개 공식의 확정 성적표</h4>
+      <table>
+        <tr><th>공식</th><th>ρ(재발)</th><th>완도</th><th>배분갭 의존</th><th>자기충족</th><th>판정</th></tr>
+        <tr><td>A 현행 (idx−갭)</td><td>−0.475</td><td>1위</td><td>98.9%</td><td>0%</td><td style="color:var(--red)">사용불가</td></tr>
+        <tr><td>B 계획서 (0.6R+0.4U)</td><td>+0.06~0.12</td><td>1위</td><td>40%</td><td>0%</td><td style="color:var(--amber)">개선 미미</td></tr>
+        <tr><td style="text-decoration:line-through">C 검증보고서 (z혼합)</td><td>+0.73~0.79</td><td>21~25위</td><td>13%</td><td style="color:var(--red)"><strong>71%</strong></td><td style="color:var(--red)">철회</td></tr>
+        <tr><td>D 절충 (0.5R+0.3U+0.2Rec)</td><td>+0.37~0.42</td><td>1위</td><td>30%</td><td>20%</td><td style="color:var(--amber)">차선</td></tr>
+        <tr style="background:rgba(26,102,68,.08)"><td><strong>E RiskPct 단독</strong></td><td><strong>+0.40~0.47</strong></td><td><strong>5~6위</strong></td><td><strong>0%</strong></td><td><strong>0%</strong></td><td style="color:var(--pine)"><strong>채택</strong></td></tr>
+        <tr><td>F 0.6Risk+0.4Recur</td><td>+0.74~0.78</td><td>40~43위</td><td>0%</td><td>40%</td><td style="color:var(--amber)">자기충족 있음</td></tr>
+      </table>
+      <p><strong>E가 채택된 이유:</strong> 배분갭 안 씀(독 제거), 재발확률 안 씀(자기충족 제거), ad-hoc 파라미터(가중치·임계값) 없음, 그런데도 ρ=+0.40~0.47로 현행(−0.48)·계획서(+0.06~0.12)보다 확실히 나음. 계획서 §3.1 원칙 "배분용 위험지수에 예산을 혼입하지 않는다"와 가장 부합.</p>
+    </section>
+
+    <section class="improve">
+      <h4>E의 한계와 선행 조건</h4>
+      <p><strong>E도 만능이 아닙니다.</strong> 다중 평가지표로 보면:</p>
+      <table>
+        <tr><th>평가지표</th><th>E의 ρ</th><th>해석</th></tr>
+        <tr><td>재발확률</td><td>+0.40~0.47</td><td>양호</td></tr>
+        <tr><td>누적피해(log)</td><td>+0.157</td><td>약함 — 누적1위 울주군이 48위</td></tr>
+        <tr><td>피해밀도</td><td>+0.187</td><td>약함</td></tr>
+        <tr><td>반복관측률</td><td>+0.050</td><td>거의 없음 — 반복피해 못 잡음</td></tr>
+      </table>
+      <p>구미시(누적2위, 224,599본)가 RiskPct 103위, 경기 광주시(누적5위)가 197위. 이것은 E의 잘못이 아니라 <strong>상류 입력(인위적확산 도메인 부호/라벨)의 잘못</strong>입니다.</p>
+      <p><strong>따라서 E를 쓰기 전에 반드시:</strong></p>
+      <ol>
+        <li><strong>F02 해결:</strong> 인위적확산 도메인의 부호를 +1(이론대로)로 바꾸거나, "산업기반 취약성"으로 개명 → 완도군이 자연스럽게 하락, 구미시·울주군 상승</li>
+        <li><strong>F06 해결:</strong> 배분갭을 2부문 처리(예산배정여부/배정수준) → 진단표에서만 사용</li>
+      </ol>
+      <p>이 두 가지 상류 수정 후 E를 적용하면, "구조적으로 취약하면서 실제로 피해도 많은 곳"이 상위에 오게 됩니다.</p>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F12 ═══════════════ -->
+<div class="f" id="F12">
+  <div class="hd">
+    <span class="id">F12</span>
+    <h3>Model 2: 재발위험 로지스틱 (Frozen-GM)</h3>
+    <span class="loc">model2_final_재구현.py:79–143</span>
+  </div>
+  <div class="body">
+    <div class="eq">logit(P(Y<sub>it</sub>>0)) = α + β₁·Index<sub>it</sub> + β₂·연속발생연수<sub>i,t-1</sub>
+    + β₃·집단발생여부<sub>i,t-1</sub> + β₄·log_인접시군_피해밀도<sub>i,t-1</sub>
+    + γ₁·Index̄<sub>i</sub> + γ₂·연속̄<sub>i</sub> + γ₃·집단̄<sub>i</sub> + γ₄·인접̄<sub>i</sub>
+
+<span class="cmt"># _gm은 훈련기간에서만 계산 후 고정(frozen-gm) → 누수 차단</span>
+<span class="cmt"># t-1 래그: 정보 시점 엄수 (조기경보 모형 요건)</span></div>
+    <div class="tags">
+      <span class="tag theory">CRE + Frozen-GM (정석)</span>
+      <span class="tag error">공간전파 항 준분리</span>
+    </div>
+    <section class="metric">
+      <h4>현재 정확도</h4>
+      <table>
+        <tr><th>사양</th><th>훈련 AUC</th><th>홀드아웃 AUC</th></tr>
+        <tr><td>전체 모형 (8변수)</td><td>0.976</td><td><strong>0.911</strong></td></tr>
+        <tr><td>연속발생연수 단독 (기준모형)</td><td>—</td><td><strong>0.918</strong></td></tr>
+      </table>
+      <p><strong>기준모형이 우세.</strong> 8개 변수를 써도 발생 이력 하나보다 못합니다. 7차 보고서가 이미 인정한 사실.</p>
+    </section>
+    <section class="issue">
+      <h4>문제</h4>
+      <ul>
+        <li><code>log_인접시군_피해밀도_L1</code>의 SE가 7.68, <code>_gm</code>은 8.68 — 계수보다 SE가 14배. 준분리(quasi-separation) 또는 극심한 다중공선성</li>
+        <li>재발위험확률이 상위에서 포화(0.9996~0.99996) → 순위 정보 소실</li>
+      </ul>
+    </section>
+    <section class="improve">
+      <h4>개선 방향</h4>
+      <ol>
+        <li><strong>공간전파 항 제거</strong>(p=0.36~0.94로 일관 비유의)</li>
+        <li><strong>확률→분위 변환</strong>(7차 보고서 §5 권고): 상/중/하 3구간</li>
+        <li>"조기경보" 대신 <strong>"상습지역 분류기"</strong>로 재명명 — 더 정직하고 오히려 설득력 있음</li>
+      </ol>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F13 ═══════════════ -->
+<div class="f" id="F13">
+  <div class="hd">
+    <span class="id">F13</span>
+    <h3>격자 반복관측비율</h3>
+    <span class="loc">ch1/data.js (headline, gridComposition100m)</span>
+  </div>
+  <div class="body">
+    <div class="eq">반복관측비율 = (2회 이상 관측된 격자 수) / (1회 이상 관측된 전체 격자 수)
+= 161,194 / 365,194 = <strong>44.2%</strong>
+<span class="cmt"># 100m × 100m 격자 기준. 6개 관리주기(2016.5~2022.4)</span></div>
+    <div class="tags">
+      <span class="tag theory">정의 명확</span>
+      <span class="tag adhoc">격자 크기 의존 (MAUP)</span>
+    </div>
+    <section class="basis">
+      <h4>이론적 근거</h4>
+      <p><strong>MAUP (Modifiable Areal Unit Problem).</strong> Openshaw (1984). 공간 단위를 바꾸면 결과가 달라지는 근본적 문제.</p>
+      <table>
+        <tr><th>격자 크기</th><th>반복관측비율</th></tr>
+        <tr><td>10m (원자료 해상도)</td><td>8.0%</td></tr>
+        <tr><td><strong>100m (채택)</strong></td><td><strong>44.2%</strong></td></tr>
+        <tr><td>500m</td><td>66.0%</td></tr>
+        <tr><td>1km</td><td>72.5%</td></tr>
+      </table>
+      <p>100m 선택 근거: 산림청 방제 집행 관리단위(100m×100m, 630만 셀). 역학적 확산 지표가 아니라 <strong>정책 관리단위 기준 반복관리 대상 비율</strong>.</p>
+    </section>
+    <section class="improve">
+      <h4>개선 방향</h4>
+      <p>민감도 4개 값을 상시 함께 보고. 라벨을 "방제 관리단위(100m) 기준 반복관리 대상 구역 비율"로 변경.</p>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F14 ═══════════════ -->
+<div class="f" id="F14">
+  <div class="hd">
+    <span class="id">F14</span>
+    <h3>교차기준 복합 고위험 판정</h3>
+    <span class="loc">ch1/data.js (crossMetric)</span>
+  </div>
+  <div class="body">
+    <div class="eq">각 시군구별 4개 지표의 3분위 배지:
+  ① 누적피해규모  ② 면적당부담  ③ 반복관측률  ④ 장기지속격자수
+
+if 높음_개수 ≥ 3: → 복합 고위험 (25곳)
+<span class="cmt"># 산림청 지명 8곳 중 7곳 포착 → 재현율 87.5%</span></div>
+    <div class="tags">
+      <span class="tag adhoc">경험적 기준</span>
+      <span class="tag theory">외부 타당성 검증 가능</span>
+    </div>
+    <section class="metric">
+      <h4>외부 타당성</h4>
+      <table>
+        <tr><th>산림청 지명 지역</th><th>높음 개수</th><th>포착 여부</th></tr>
+        <tr><td>포항(남·북구), 경주, 울주, 밀양</td><td>4/4</td><td>✓</td></tr>
+        <tr><td>안동, 창녕</td><td>3/4</td><td>✓</td></tr>
+        <tr><td>양평</td><td>2/4</td><td>✗ (기준 미달)</td></tr>
+      </table>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F15 ═══════════════ -->
+<div class="f" id="F15">
+  <div class="hd">
+    <span class="id">F15</span>
+    <h3>면적-피해 잔차분석 (CH1 §03)</h3>
+    <span class="loc">ch1/data.js (residual)</span>
+  </div>
+  <div class="body">
+    <div class="eq">누적피해 = α + β × 소나무류면적 + ε
+R² = 0.049,  n = 148
+실측/예측 비: 제주시 501배, 청송군 0.0008배</div>
+    <div class="tags">
+      <span class="tag error">삭제 권고</span>
+    </div>
+    <section class="issue">
+      <h4>문제</h4>
+      <p>R²=5% 모델의 예측값을 분모로 쓴 배수는 <strong>통계적으로 무의미</strong>합니다. 예측값이 거의 상수이므로 "501배"는 단순히 "피해가 많다"와 같은 말. 하지만 심사위원은 501이라는 숫자에 의문을 제기할 것.</p>
+    </section>
+    <section class="improve">
+      <h4>개선 방향</h4>
+      <p>"면적만으로는 피해를 설명할 수 없다(R²=0.05) → CH2 다요인 접근 필요"로 전환. 배수 표시 삭제.</p>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ F16 ═══════════════ -->
+<div class="f" id="F16">
+  <div class="hd">
+    <span class="id">F16</span>
+    <h3>CH4 비용 산출</h3>
+    <span class="loc">ch4/data.js · ch4/ch4.html</span>
+  </div>
+  <div class="body">
+    <div class="eq">총비용 = Σ (물량<sub>m</sub> × 단가<sub>m</sub>) × (1 + max(0, 거리−10km) × 0.5%)
+필요인력 = 물량 / 1인당일처리량 / 목표일수</div>
+    <div class="tags">
+      <span class="tag error">전부 추정치 — 근거 없음</span>
+    </div>
+    <section class="issue">
+      <h4>문제</h4>
+      <ul>
+        <li><strong>모든 단가가 임의값.</strong> ch4/data.js 헤더: "상식적으로 그럴듯한 값을 넣었습니다"</li>
+        <li>항공방제 250,000원/ha, 나무주사 45,000원/본 — 실제 품셈과 괴리 가능성 높음</li>
+        <li>나무주사(예방)와 피해목 처리를 혼재</li>
+        <li>거리 가산(10km 초과 시 km당 0.5%) — 근거 없음</li>
+      </ul>
+    </section>
+    <section class="improve">
+      <h4>개선 방향</h4>
+      <p>방법 선택 <strong>로직</strong>은 「소나무재선충병 방제지침」 인용 가능. 단가는 비우고 <strong>사용자 입력형</strong>으로 전환. 「산림사업 표준품셈」에서 1~2건이라도 실제 값을 확보하면 예시로 표기.</p>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ 종합 ═══════════════ -->
+<div class="summary">
+  <h2>종합 감사 결과 — 3건 독립검증 후 최종 합의</h2>
+  <table>
+    <tr><th>분류</th><th>건수</th><th>해당 항목</th></tr>
+    <tr><td>이론 근거 있음 (학술적 표준)</td><td>6</td><td>F01, F03, F04, F05, F10, F13</td></tr>
+    <tr><td>경험적/ad-hoc (민감도 있음)</td><td>3</td><td>F02(일부), F08, F14</td></tr>
+    <tr><td>근거 불충분 → 수정 완료</td><td>4</td><td>F07, F09→E채택, <s>F11</s>철회, F16</td></tr>
+    <tr><td>구현 오류 (즉시 수정)</td><td>3</td><td>F02(순환검증), F05(홀드아웃 재적합), F15(삭제)</td></tr>
+  </table>
+
+  <p style="margin-top:16px"><strong>최종 합의 — 우선순위 산식:</strong></p>
+  <p>Priority = <strong>RiskPct</strong>(위험지수 백분위, 대응역량 제외) 단독. 배분갭은 산식에서 제거→별도 진단표. 재발확률은 urgentList 교차조건으로만. 이것이 계획서 §3.1 "변수역할분리 원칙"과 가장 부합하며, 6개 대안 중 자기충족 0%·배분갭 의존 0%인 유일한 산식.</p>
+
+  <p style="margin-top:12px"><strong>단, E의 효과는 상류 수정에 의존합니다:</strong></p>
+  <p>① <strong>F02</strong> 인위적확산 도메인 부호/라벨 수정 → 완도군 하락, 구미시·울주군 상승<br>
+     ② <strong>F06</strong> 배분갭 2부문 처리 → "병 없어서 예산 0"과 "과소배분" 분리<br>
+     이 둘을 안 고치면 어떤 산식을 써도 입력이 오염되어 결과가 틀립니다.</p>
+
+  <p style="margin-top:12px;padding:10px;border:1px solid rgba(255,255,255,.2)"><strong>교훈:</strong> 산식(하류)을 바꾸는 것보다 입력(상류)을 고치는 것이 항상 더 큰 개선을 만듭니다. 6개 공식을 전부 비교한 결과, 공식 간 차이보다 <strong>배분갭 정의(F06)와 도메인 부호(F02)의 영향이 압도적</strong>이었습니다.</p>
+</div>
+
+</div>
+</body>
+</html>

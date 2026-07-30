@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소나무재선충병 방제 취약지역 분석 — I'mPine</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12211c; --ink2:#1d3229;
+  --paper:#e8ece6; --card:#f8faf7; --white:#fff;
+  --rule:rgba(18,33,28,.10); --rule2:rgba(18,33,28,.22);
+  --tx:#12211c; --tx2:#4a5b54; --tx3:#7d8b85;
+  --pine:#1d6b47; --moss:#8aa96b;
+  --steel:#3d6b8f; --teal:#17886b; --amber:#b8811a; --rust:#a8452c;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --sans:'Noto Sans KR',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--paper);color:var(--tx);display:flex;flex-direction:column;overflow:hidden;font-size:13.5px;line-height:1.6}
+
+/* ── 헤더 ── */
+.topbar{flex:none;display:flex;align-items:stretch;background:var(--ink);border-bottom:2px solid var(--pine)}
+.brand{display:flex;align-items:center;gap:11px;padding:11px 20px;border-right:1px solid rgba(255,255,255,.10)}
+.brand .mark{width:30px;height:30px;flex:none;border:1.5px solid var(--moss);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1.5px;padding:2.5px}
+.brand .mark i{background:var(--moss);opacity:.28}
+.brand .mark i:nth-child(1),.brand .mark i:nth-child(4){opacity:1}
+.brand .txt strong{display:block;color:#fff;font-size:14.5px;font-weight:700;letter-spacing:-.2px;line-height:1.25}
+.brand .txt span{display:block;font-family:var(--mono);font-size:9.5px;color:var(--moss);letter-spacing:.06em}
+
+nav{display:flex;margin-left:auto}
+.tab{display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 17px;background:none;border:0;border-left:1px solid rgba(255,255,255,.09);
+  cursor:pointer;font-family:var(--sans);text-align:left;color:rgba(255,255,255,.52);transition:background .14s,color .14s}
+.tab:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.tab .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;opacity:.8}
+.tab .n{font-size:12.5px;font-weight:500;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--paper);color:var(--ink)}
+.tab[aria-selected="true"] .k{color:var(--pine);font-weight:700;opacity:1}
+.tab:focus-visible{outline:2px solid var(--moss);outline-offset:-2px}
+
+/* ── 본문 ── */
+.stage{flex:1;position:relative;overflow:hidden}
+iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--paper);display:none}
+iframe.on{display:block}
+#overview{position:absolute;inset:0;overflow-y:auto;display:none}
+#overview.on{display:block}
+.wrap{max-width:1240px;margin:0 auto;padding:26px 24px 60px}
+
+/* eyebrow: 실제 정보를 담는 라벨 */
+.eyebrow{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--tx3);text-transform:uppercase;display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.eyebrow::after{content:'';flex:1;height:1px;background:var(--rule)}
+
+/* ── ① 논지 ── */
+.thesis{border-left:3px solid var(--pine);padding:2px 0 2px 20px;margin-bottom:30px}
+.thesis p{font-size:22px;font-weight:700;line-height:1.5;letter-spacing:-.5px;max-width:34ch}
+.thesis p em{font-style:normal;color:var(--rust);border-bottom:2px solid rgba(168,69,44,.28)}
+.thesis .sub{margin-top:11px;font-size:13px;color:var(--tx2);max-width:62ch;font-weight:400}
+
+/* ── ② 파이프라인 ── */
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule2);border:1px solid var(--rule2);margin-bottom:30px}
+.step{background:var(--card);padding:15px 16px 14px;display:flex;flex-direction:column;min-height:194px;text-decoration:none;color:inherit;transition:background .14s}
+.step:hover{background:var(--white)}
+.step:focus-visible{outline:2px solid var(--pine);outline-offset:-2px}
+.step .hd{display:flex;align-items:baseline;gap:8px;margin-bottom:3px}
+.step .ch{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--pine)}
+.step h3{font-size:14px;font-weight:700;letter-spacing:-.2px}
+.step .q{font-size:11.5px;color:var(--tx3);margin-bottom:13px;min-height:2.6em}
+.step .fig{font-family:var(--mono);font-size:27px;font-weight:700;letter-spacing:-1.5px;line-height:1;color:var(--ink)}
+.step .fig small{font-family:var(--sans);font-size:11.5px;font-weight:500;letter-spacing:0;color:var(--tx2);margin-left:3px}
+.step .cap{font-size:11px;color:var(--tx2);margin-top:6px;line-height:1.5}
+.step .foot{margin-top:auto;padding-top:11px;display:flex;align-items:center;gap:7px}
+
+/* 신뢰수준 배지 — 실제 정보 */
+.bdg{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.07em;padding:2.5px 7px;border:1px solid;border-radius:2px;white-space:nowrap}
+.bdg.v{color:var(--teal);border-color:rgba(23,136,107,.4);background:rgba(23,136,107,.08)}
+.bdg.m{color:var(--steel);border-color:rgba(61,107,143,.4);background:rgba(61,107,143,.08)}
+.bdg.e{color:var(--amber);border-color:rgba(184,129,26,.45);background:rgba(184,129,26,.09)}
+.bdg.c{color:var(--tx3);border-color:var(--rule2);background:rgba(18,33,28,.04)}
+.step .go{font-family:var(--mono);font-size:10px;color:var(--tx3);margin-left:auto}
+.step:hover .go{color:var(--pine)}
+
+/* ── 2단 배치 ── */
+.duo{display:grid;grid-template-columns:1.06fr 1fr;gap:24px;margin-bottom:30px;align-items:start}
+@media(max-width:1000px){.duo{grid-template-columns:1fr}.pipe{grid-template-columns:repeat(2,1fr)}}
+
+.panel{background:var(--card);border:1px solid var(--rule2)}
+.panel > .ph{padding:12px 16px;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.panel > .ph h4{font-size:13px;font-weight:700}
+.panel > .pb{padding:14px 16px 16px}
+
+/* 검증 스트립 */
+.vrow{display:flex;align-items:baseline;gap:9px;padding:8px 0;border-bottom:1px dotted var(--rule2);font-size:12px}
+.vrow:last-child{border-bottom:0}
+.vrow .lb{color:var(--tx2);flex:1}
+.vrow .vl{font-family:var(--mono);font-weight:700;font-size:14px}
+.vrow .vl.ok{color:var(--teal)}
+.vrow .vl.no{color:var(--rust)}
+.vrow .tag{font-family:var(--mono);font-size:9px;color:var(--tx3);border:1px solid var(--rule2);padding:1px 5px}
+.bignum{font-family:var(--mono);font-size:38px;font-weight:700;letter-spacing:-2px;line-height:1;color:var(--pine)}
+.bignum sup{font-size:15px;letter-spacing:0;vertical-align:top;top:.4em;position:relative}
+
+/* ── ④ 격자 모자이크 (시그니처) ── */
+.mosaic{display:flex;gap:9px;align-items:flex-start;margin:4px 0 2px}
+.mcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px}
+.mgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;width:100%;aspect-ratio:1}
+.mcell{background:var(--rule);border-radius:1px}
+.mcell.nw{background:var(--steel)}
+.mcell.co{background:var(--teal)}
+.mcell.re{background:var(--amber)}
+.mcol.struct .mgrid{outline:1.5px dashed rgba(168,69,44,.55);outline-offset:3px}
+.mcol.struct .mcell{opacity:.34}
+.mcol .yr{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.02em;text-align:center;line-height:1.3}
+.mcol .yr b{display:block;color:var(--tx);font-size:10.5px}
+.mcol.struct .yr b{color:var(--rust)}
+.mcol .flag{font-family:var(--mono);font-size:8.5px;color:var(--rust);letter-spacing:.02em;text-align:center;line-height:1.25;margin-top:-3px}
+@media(prefers-reduced-motion:no-preference){
+  .mgrid{opacity:0;transform:translateY(6px);animation:rise .5s cubic-bezier(.2,.7,.3,1) forwards}
+}
+@keyframes rise{to{opacity:1;transform:none}}
+.mkey{display:flex;flex-wrap:wrap;gap:12px;margin-top:13px;padding-top:11px;border-top:1px solid var(--rule);font-size:11px;color:var(--tx2)}
+.mkey span{display:flex;align-items:center;gap:5px}
+.mkey i{width:10px;height:10px;border-radius:1px;flex:none}
+.mkey i.dash{background:transparent;border:1px dashed rgba(18,33,28,.4)}
+
+/* ── 표 ── */
+table.t{width:100%;border-collapse:collapse;font-size:11.5px}
+.t th{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);
+  text-align:left;padding:7px 9px;border-bottom:1px solid var(--rule2);font-weight:500;white-space:nowrap}
+.t td{padding:7px 9px;border-bottom:1px solid var(--rule);vertical-align:top}
+.t tr:last-child td{border-bottom:0}
+.t td.n{font-family:var(--mono);font-weight:700;text-align:right;white-space:nowrap}
+.t tbody tr:hover td{background:rgba(29,107,71,.045)}
+.t td .why{color:var(--tx3);font-size:11px}
+
+/* ── 한계 ── */
+.limits{border:1px solid var(--rule2);border-left:3px solid var(--amber);background:rgba(184,129,26,.05);padding:14px 18px}
+.limits h4{font-size:12.5px;font-weight:700;margin-bottom:9px;display:flex;align-items:center;gap:8px}
+.limits ol{margin:0;padding-left:19px;font-size:12px;color:var(--tx2)}
+.limits li{margin-bottom:5px}
+.limits li:last-child{margin-bottom:0}
+.limits li b{color:var(--tx)}
+
+.note{font-size:11px;color:var(--tx3);margin-top:9px;line-height:1.55}
+.note code{font-family:var(--mono);font-size:10.5px;background:rgba(18,33,28,.055);padding:1px 4px}
+footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--rule2);display:flex;flex-wrap:wrap;gap:14px;
+  font-family:var(--mono);font-size:10px;color:var(--tx3);letter-spacing:.03em}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="mark"><i></i><i></i><i></i><i></i></div>
+    <div class="txt">
+      <strong>소나무재선충병 방제 취약지역 분석</strong>
+      <span>I'MPINE · 2026 임업통계 활용 경진대회</span>
+    </div>
+  </div>
+  <nav role="tablist" aria-label="챕터 선택">
+    <button class="tab" role="tab" aria-selected="true"  data-i="0"><span class="k">개요</span><span class="n">한눈에 보기</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-i="1"><span class="k">CH.1</span><span class="n">발생 현황</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-i="2"><span class="k">CH.2</span><span class="n">취약도 분석</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-i="3"><span class="k">CH.3</span><span class="n">우선지원 전략</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-i="4"><span class="k">CH.4</span><span class="n">맞춤형 방제 설계</span></button>
+  </nav>
+</div>
+
+<div class="stage">
+
+<!-- ══════════════ 개요 ══════════════ -->
+<section id="overview" class="on" role="tabpanel">
+<div class="wrap">
+
+  <!-- ① 논지 -->
+  <div class="thesis">
+    <div class="eyebrow">분석의 논지</div>
+    <p>피해는 새 지역으로 퍼지기보다 <em>같은 곳에서 반복</em>됩니다.<br>그런데 예산은 위험이 아니라 <em>작년 피해</em>를 따라갑니다.</p>
+    <div class="sub">
+      전국 100m 격자 원자료 6개 관리주기(2016.5~2022.4)와 229개 시군구 8개년 패널을 결합해,
+      반복 피해 구조를 진단하고 현행 예산 배분이 구조적 위험을 얼마나 반영하는지 측정했습니다.
+      결론은 <b>사후대응에서 예방형 배분으로의 전환</b>입니다.
+    </div>
+  </div>
+
+  <!-- ② 파이프라인 -->
+  <div class="eyebrow">분석 흐름 · 각 단계의 질문과 산출물</div>
+  <div class="pipe">
+    <a class="step" href="#" data-goto="1">
+      <div class="hd"><span class="ch">CH.1</span><h3>발생 현황</h3></div>
+      <div class="q">피해는 어디에, 얼마나, 반복해서 나타나는가?</div>
+      <div class="fig">44.2<small>%</small></div>
+      <div class="cap">방제 관리단위(100m) 기준<br>반복관리 대상 구역 비율</div>
+      <div class="foot"><span class="bdg v">검증</span><span class="go">열기 →</span></div>
+    </a>
+    <a class="step" href="#" data-goto="2">
+      <div class="hd"><span class="ch">CH.2</span><h3>취약도 분석</h3></div>
+      <div class="q">구조적으로 취약한 곳은 어디이고, 예산은 그것을 반영하는가?</div>
+      <div class="fig">2.4<small>%</small></div>
+      <div class="cap">현행 예산이 설명되는 비율<br>(배분갭 회귀 R²)</div>
+      <div class="foot"><span class="bdg m">모형추정</span><span class="go">열기 →</span></div>
+    </a>
+    <a class="step" href="#" data-goto="3">
+      <div class="hd"><span class="ch">CH.3</span><h3>우선지원 전략</h3></div>
+      <div class="q">한정된 예산을 어디에 먼저 배분해야 하는가?</div>
+      <div class="fig">2×2<small>배분 규칙</small></div>
+      <div class="cap">재발위험 × 현행 예산수준<br>4구간 배분 규칙</div>
+      <div class="foot"><span class="bdg e">산식 개편 중</span><span class="go">열기 →</span></div>
+    </a>
+    <a class="step" href="#" data-goto="4">
+      <div class="hd"><span class="ch">CH.4</span><h3>맞춤형 방제 설계</h3></div>
+      <div class="q">선정된 지역에서 어떤 방제방법을 쓸 것인가?</div>
+      <div class="fig">4<small>가지 방법</small></div>
+      <div class="cap">면적·경사·주거지 인접 조건별<br>방법 선택 로직</div>
+      <div class="foot"><span class="bdg c">컨셉 · 단가 미확보</span><span class="go">열기 →</span></div>
+    </a>
+  </div>
+
+  <div class="duo">
+    <!-- ③ 검증 -->
+    <div class="panel">
+      <div class="ph">
+        <h4>데이터 검증</h4>
+        <span class="bdg v">검증</span>
+        <span style="margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--tx3)">원자료 ↔ 산림청 공식통계</span>
+      </div>
+      <div class="pb">
+        <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:14px">
+          <div>
+            <div class="bignum">0.19<sup>%</sup></div>
+            <div class="note" style="margin-top:4px">6개 관리주기 합계 오차<br>(3,255,787 vs 3,261,838본)</div>
+          </div>
+          <div style="border-left:1px solid var(--rule2);padding-left:16px">
+            <div class="bignum" style="font-size:28px;color:var(--ink)">0.67<sup>%</sup></div>
+            <div class="note" style="margin-top:4px">단일 주기 최대 오차</div>
+          </div>
+        </div>
+
+        <div class="vrow"><span class="lb">분석에 사용한 관리주기</span><span class="vl ok">6</span><span class="tag">주기</span></div>
+        <div class="vrow"><span class="lb">제외한 주기 — 원자료 공개율 44.6%</span><span class="vl no">1</span><span class="tag">2022.5~2023.4</span></div>
+        <div class="vrow"><span class="lb">확정한 원자료 좌표계</span><span class="vl">EPSG:5186</span></div>
+        <div class="vrow"><span class="lb">고유 피해관측 격자 (100m)</span><span class="vl">365,194</span><span class="tag">셀</span></div>
+
+        <div class="eyebrow" style="margin:18px 0 8px">외부 타당성</div>
+        <div class="vrow">
+          <span class="lb">산림청이 별도 지명한 피해집중 지역 중<br>우리 4지표 교차기준이 독립적으로 포착한 비율</span>
+          <span class="vl ok">7/8</span><span class="tag">87.5%</span>
+        </div>
+        <div class="vrow"><span class="lb">정부 미지명 · 우리 기준 추가 후보</span><span class="vl">18</span><span class="tag">시군구</span></div>
+        <div class="note">
+          산림청 명단을 입력으로 쓰지 않고 과거 공간자료 4개 지표(누적규모·면적당부담·반복관측률·장기지속)만으로
+          도출한 25개 시군구가, 산림청 지명 8곳 중 7곳을 포함합니다. 미포착 1곳은 양평군(4개 중 2개 지표만 상위).
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ 시그니처: 격자 모자이크 -->
+    <div class="panel">
+      <div class="ph">
+        <h4>피해 격자의 반복 구조</h4>
+        <span class="bdg v">검증</span>
+        <span style="margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--tx3)">100m 격자 · 관리주기별 구성비</span>
+      </div>
+      <div class="pb">
+        <div class="mosaic" id="mosaic"></div>
+        <div class="mkey">
+          <span><i style="background:var(--steel)"></i>신규관측</span>
+          <span><i style="background:var(--teal)"></i>연속관측</span>
+          <span><i style="background:var(--amber)"></i>공백 후 재관측</span>
+          <span><i class="dash"></i>구조적 제약 주기 — 비교 대상 제외</span>
+        </div>
+        <div class="note" style="margin-top:11px">
+          한 칸이 해당 주기 관측격자의 4%입니다. 신규관측 비중은 6년간
+          <b style="color:var(--tx)">100% → 37.9%</b>로 줄어들고, 관측격자의
+          <b style="color:var(--tx)">62.1%</b>가 기존 피해지역입니다(2021.5~2022.4).
+          <br><br>
+          <b style="color:var(--tx)">앞 두 주기를 점선으로 묶어 흐리게 처리했습니다.</b> 첫 주기는 비교할 직전 연도가 없어 정의상 신규 100%이고,
+          재관측은 과거 이력과 직전 연도 미관측이 동시에 필요해 2주기까지 구조적으로 0입니다.
+          따라서 재관측 비중의 상승선은 역학 현상이 아니라 <b style="color:var(--tx)">관측창 확장의 산술적 결과</b>이며,
+          3주기 이후 구간만 비교 대상으로 삼았습니다.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="duo">
+    <!-- ⑤ 분석단위 정합표 -->
+    <div class="panel">
+      <div class="ph">
+        <h4>분석단위 정합표</h4>
+        <span style="margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--tx3)">챕터마다 지역 수가 다른 이유</span>
+      </div>
+      <div class="pb" style="padding-top:4px">
+        <table class="t">
+          <thead><tr><th>지역 수</th><th>정체</th><th>사용 위치</th></tr></thead>
+          <tbody>
+            <tr><td class="n">166</td><td>2026년 공식 발생 시군구<span class="why"><br>산림청 2026-06-25 발표</span></td><td class="why">CH1 KPI</td></tr>
+            <tr><td class="n">180</td><td>공간 원자료 분석대상<span class="why"><br>2016.5~2022.4 격자자료 보유</span></td><td class="why">CH1 지도·순위</td></tr>
+            <tr><td class="n">148</td><td>소나무류 면적자료까지 결합된 시군구</td><td class="why">CH1 면적-피해 분석</td></tr>
+            <tr><td class="n">229</td><td>원본 패널 시군구 (×8개년 = 1,832행)</td><td class="why">CH2 표본 카스케이드 시작</td></tr>
+            <tr><td class="n">222</td><td>핵심변수 완비 후 (1,753행)<span class="why"><br>소나무림면적 0·임상도 무효·결측 제외</span></td><td class="why">CH2·CH3 모형 표본</td></tr>
+          </tbody>
+        </table>
+        <div class="note">
+          <b>제주·세종 제외</b> — 제주시·서귀포시는 자치권 없는 행정시로 시군구 단위 예산·행정통계에서 제외됩니다.
+          두 지역 누적 피해는 560,314본으로 전국 누적의 <b style="color:var(--rust)">17.2%</b>에 해당하므로,
+          CH2·CH3의 중대한 적용범위 한계입니다. CH1에서는 별도로 분석했습니다.
+        </div>
+      </div>
+    </div>
+
+    <!-- 핵심 발견 -->
+    <div class="panel">
+      <div class="ph">
+        <h4>핵심 발견</h4>
+        <span class="bdg m">모형추정</span>
+        <span style="margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--tx3)">222 시군구 · 2017~2022</span>
+      </div>
+      <div class="pb" style="padding-top:4px">
+        <table class="t">
+          <thead><tr><th>지표</th><th style="text-align:right">값</th><th>읽는 법</th></tr></thead>
+          <tbody>
+            <tr><td>구조적 위험이 현행 예산을 설명하는 정도 <span class="why">(R²)</span></td>
+                <td class="n" style="color:var(--rust)">2.4%</td><td class="why">예산은 위험을 거의 반영하지 않음</td></tr>
+            <tr><td>취약성-예산 순위상관 <span class="why">(Spearman)</span></td>
+                <td class="n" style="color:var(--rust)">0.116</td><td class="why">사실상 무관</td></tr>
+            <tr><td>예산-피해량 상관 <span class="why">(r)</span></td>
+                <td class="n" style="color:var(--pine)">+0.255</td><td class="why">예산은 피해를 <b>따라감</b> — 사후대응 구조</td></tr>
+            <tr><td>지수 십분위별 발생률 <span class="why">(1분위→10분위)</span></td>
+                <td class="n">0.47→0.81</td><td class="why">단조 증가 — 만성 취약성은 포착</td></tr>
+            <tr><td>지수 십분위별 평균 피해밀도</td>
+                <td class="n">0.019→0.105</td><td class="why">5.5배 차이</td></tr>
+            <tr><td>단기 재발 예측 AUC <span class="why">(홀드아웃)</span></td>
+                <td class="n">0.911</td><td class="why">기준모형 0.918과 사실상 동일</td></tr>
+          </tbody>
+        </table>
+        <div class="note">
+          마지막 줄이 중요합니다. <code>연속발생연수</code> 단일 변수만으로 홀드아웃 AUC 0.918에 도달하고,
+          구조지표·공간전파 항을 더해도 개선되지 않았습니다(0.911).
+          즉 <b>단기 재발은 발생 이력만으로 충분히 판별</b>되며, 구조적 취약성지수의 역할은
+          단기 예측이 아니라 <b>중장기 우선순위 선별</b>에 있습니다.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ 한계 -->
+  <div class="limits">
+    <h4><span class="bdg e">선제 고백</span> 아직 해결하지 못한 것</h4>
+    <ol>
+      <li><b>지수의 시간 변동 설명력이 없습니다.</b> 지자체 간(between) 효과는 유의하나(계수 +1.14, p=0.002), 지자체 내(within) 효과는 비유의한 음수입니다. 따라서 "지수가 올라가면 피해가 늘어난다"는 인과 해석과 개입효과 추정은 하지 않았습니다.</li>
+      <li><b>기후 도메인의 실질 공간해상도가 낮습니다.</b> 기상관측소 89개를 229개 시군구에 배정했고, 한 관측소가 30개 시군구에 동시 배정되어 이 지역들은 8년간 기후값이 동일합니다. 최원거리는 옹진군 73.9km입니다.</li>
+      <li><b>예산 변수는 피해의 결과입니다.</b> 재선충 명시 예산은 피해가 발생한 뒤 배정되므로 역인과가 있습니다. 배분갭은 <b>현행 평균 배분관행 대비 편차</b>이며 <b>최적 대비 부족이 아닙니다.</b> 인과 해석에는 IV·event study가 필요하고 아직 확보하지 못했습니다.</li>
+      <li><b>CH4 단가는 미확보입니다.</b> 방제방법 선택 로직은 산림청 「소나무재선충병 방제지침」 기준을 따르지만, 단가·1인당 작업량은 표준품셈을 확보하지 못해 사용자 입력값으로 처리합니다.</li>
+    </ol>
+  </div>
+
+  <footer>
+    <span>DATA · 산림청 소나무재선충병 원자료 · e-나라지표 · 임업통계연보 · 산림산업조사(2024년 기준)</span>
+    <span>UNIT · 100m 격자 / 시군구 / 관리주기(5월~익년 4월)</span>
+    <span>CRS · EPSG:5186</span>
+  </footer>
+
+</div>
+</section>
+
+<iframe id="f1" title="CH1 발생 현황"        data-src="ch1/ch1.html"></iframe>
+<iframe id="f2" title="CH2 취약도 분석"      data-src="ch2/ch2.html"></iframe>
+<iframe id="f3" title="CH3 우선지원 전략"    data-src="ch3/ch3.html"></iframe>
+<iframe id="f4" title="CH4 맞춤형 방제 설계" data-src="ch4/ch4.html"></iframe>
+
+</div>
+
+<script>
+/* ── 격자 모자이크: 실제 데이터에서 25칸으로 배분 (최대잉여법) ── */
+const CYCLES = [
+  { yr:'2016.5', lab:'1주기', tot:130287, nw:100.0, co:0.0,  re:0.0,  imp:'직전연도 없음 → 신규 100% 강제' },
+  { yr:'2017.5', lab:'2주기', tot:127248, nw:60.1,  co:39.9, re:0.0,  imp:'재관측 정의상 불가'            },
+  { yr:'2018.5', lab:'3주기', tot:108741, nw:41.2,  co:46.5, re:12.4, imp:null                          },
+  { yr:'2019.5', lab:'4주기', tot:102039, nw:38.9,  co:40.4, re:20.7, imp:null                          },
+  { yr:'2020.5', lab:'5주기', tot:91885,  nw:39.6,  co:37.0, re:23.4, imp:null                          },
+  { yr:'2021.5', lab:'6주기', tot:99150,  nw:37.9,  co:32.9, re:29.2, imp:null                          }
+];
+const N = 25;
+
+function allocate(c){
+  const keys = ['nw','co','re'];
+  const raw  = keys.map(k => c[k] / 100 * N);
+  const base = raw.map(Math.floor);
+  let rem = N - base.reduce((a,b) => a + b, 0);
+  const order = raw.map((v,i) => [v - base[i], i]).sort((a,b) => b[0] - a[0]);
+  for (let j = 0; rem > 0; j++, rem--) base[order[j % 3][1]]++;
+  return { nw:base[0], co:base[1], re:base[2] };
+}
+
+const host = document.getElementById('mosaic');
+CYCLES.forEach((c, ci) => {
+  const a = allocate(c);
+  const cells = [];
+  ['nw','co','re'].forEach(k => { for (let i = 0; i < a[k]; i++) cells.push(k); });
+
+  const col = document.createElement('div');
+  col.className = 'mcol' + (c.imp ? ' struct' : '');
+  const grid = document.createElement('div');
+  grid.className = 'mgrid';
+  grid.style.animationDelay = (ci * 70) + 'ms';
+  grid.setAttribute('role','img');
+  grid.setAttribute('aria-label',
+    `${c.lab} 관측격자 ${c.tot.toLocaleString('ko-KR')}개 — 신규 ${c.nw}%, 연속 ${c.co}%, 재관측 ${c.re}%`
+    + (c.imp ? ` (구조적 제약: ${c.imp}, 비교 제외)` : ''));
+  cells.slice(0, N).forEach(k => {
+    const d = document.createElement('div');
+    d.className = 'mcell ' + k;
+    grid.appendChild(d);
+  });
+  const lb = document.createElement('div');
+  lb.className = 'yr';
+  lb.innerHTML = `<b>${c.lab}</b>${c.yr}<br>${(c.tot/1000).toFixed(0)}k셀`;
+  col.append(grid, lb);
+
+  if (c.imp){
+    const fl = document.createElement('div');
+    fl.className = 'flag';
+    fl.textContent = c.imp;
+    col.appendChild(fl);
+  }
+  host.appendChild(col);
+});
+
+/* ── 탭 ── */
+const tabs   = [...document.querySelectorAll('.tab')];
+const panels = [document.getElementById('overview'),
+                ...[1,2,3,4].map(i => document.getElementById('f' + i))];
+
+function show(i){
+  tabs.forEach((t, j) => t.setAttribute('aria-selected', String(i === j)));
+  panels.forEach((p, j) => p.classList.toggle('on', i === j));
+  const p = panels[i];
+  if (i > 0 && !p.src && p.dataset.src) p.src = p.dataset.src;
+  if (i === 0) panels[0].scrollTop = panels[0].scrollTop; // keep position
+}
+tabs.forEach(t => t.addEventListener('click', () => show(+t.dataset.i)));
+document.querySelectorAll('[data-goto]').forEach(a =>
+  a.addEventListener('click', e => { e.preventDefault(); show(+a.dataset.goto); }));
+
+/* 좌우 화살표로 탭 이동 */
+document.querySelector('nav').addEventListener('keydown', e => {
+  const cur = tabs.findIndex(t => t.getAttribute('aria-selected') === 'true');
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){
+    e.preventDefault();
+    const nx = (cur + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
+    show(nx); tabs[nx].focus();
+  }
+});
+</script>
+</body>
+</html>
