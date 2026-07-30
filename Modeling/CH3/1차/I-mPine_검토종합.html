@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>I'mPine 검토 종합 — CH2/CH3/패치 전체 정리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f2ec;--sf:#fff;--bd:#e2ddd0;--bd2:#cfc7b0;
+  --tx:#22201a;--mu:#655f50;--mu2:#8c8570;
+  --gd:#5c4108;--gl:#b8860b;--ga:#fbead0;
+  --ok:#1c7a4a;--ok-bg:#e4f4ea;
+  --warn:#a15a1f;--warn-bg:#fcecd8;
+  --bad:#a1291f;--bad-bg:#fbe3e0;
+  --info:#2a5a8f;--info-bg:#e3edf7;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --sans:'Noto Sans KR',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);font-size:14.5px;line-height:1.65}
+.layout{display:flex;max-width:1440px;margin:0 auto}
+.toc{width:250px;flex:none;position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 16px;border-right:1px solid var(--bd)}
+.toc h5{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--mu2);text-transform:uppercase;margin:18px 0 8px}
+.toc h5:first-child{margin-top:0}
+.toc a{display:block;font-size:12.5px;color:var(--mu);text-decoration:none;padding:4px 8px;border-radius:6px;line-height:1.4}
+.toc a:hover{background:var(--ga);color:var(--gd)}
+.toc a.lvl2{padding-left:18px;font-size:11.5px;color:var(--mu2)}
+main{flex:1;min-width:0;padding:36px 44px 100px;max-width:1120px}
+
+header.top{padding-bottom:22px;border-bottom:3px solid var(--gd);margin-bottom:8px}
+header.top .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--gl);text-transform:uppercase;margin-bottom:10px}
+header.top h1{font-size:26px;font-weight:800;letter-spacing:-.3px;margin-bottom:10px}
+header.top p{font-size:13.5px;color:var(--mu);max-width:74ch}
+.meta-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.meta-row span{font-family:var(--mono);font-size:11px;background:var(--sf);border:1px solid var(--bd);border-radius:5px;padding:4px 9px;color:var(--mu)}
+
+section{padding:34px 0;border-bottom:1px solid var(--bd);scroll-margin-top:20px}
+section:last-of-type{border-bottom:0}
+h2{font-size:19px;font-weight:800;color:var(--gd);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+h2 .num{font-family:var(--mono);font-size:13px;background:var(--gd);color:#fff;padding:2px 8px;border-radius:5px}
+h3{font-size:15px;font-weight:700;margin:22px 0 10px;color:var(--tx)}
+h4{font-size:13px;font-weight:700;margin:16px 0 8px;color:var(--mu)}
+p{margin-bottom:10px}
+.lede{font-size:12.5px;color:var(--mu);font-style:italic;margin-bottom:16px}
+
+.status{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;white-space:nowrap}
+.status.ok{background:var(--ok-bg);color:var(--ok)}
+.status.warn{background:var(--warn-bg);color:var(--warn)}
+.status.bad{background:var(--bad-bg);color:var(--bad)}
+.status.info{background:var(--info-bg);color:var(--info)}
+
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin:12px 0 18px;background:var(--sf);border:1px solid var(--bd)}
+th{background:var(--ga);text-align:left;padding:8px 10px;font-weight:700;color:var(--gd);border-bottom:2px solid var(--bd2);white-space:nowrap;font-size:11.5px}
+td{padding:7px 10px;border-bottom:1px solid var(--bd);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:#fbf9f3}
+td.num{font-family:var(--mono);text-align:right;white-space:nowrap}
+.tw{overflow-x:auto}
+
+code,.mono{font-family:var(--mono)}
+code{background:rgba(0,0,0,.055);padding:1px 5px;border-radius:3px;font-size:12px}
+pre{background:#1c1a15;color:#e8e3d3;border-radius:8px;padding:14px 16px;overflow-x:auto;font-size:12px;line-height:1.6;margin:10px 0}
+
+.card{background:var(--sf);border:1px solid var(--bd);border-left:4px solid var(--gl);border-radius:8px;padding:14px 18px;margin:12px 0}
+.card.ok{border-left-color:var(--ok)}
+.card.warn{border-left-color:var(--warn)}
+.card.bad{border-left-color:var(--bad)}
+.card.info{border-left-color:var(--info)}
+.card .ch{font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.card ul{padding-left:18px;margin-top:4px}
+.card li{margin-bottom:4px}
+
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{font-family:var(--mono);font-size:11.5px;background:var(--sf);border:1px solid var(--bd);border-radius:20px;padding:4px 12px;color:var(--mu)}
+.chip b{color:var(--tx)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+@media(max-width:1000px){.grid2,.grid3{grid-template-columns:1fr}.layout{flex-direction:column}.toc{position:relative;width:100%;height:auto}}
+
+.expect{background:var(--info-bg);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--info);margin-top:8px}
+.expect b{color:var(--tx)}
+
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--bd);font-family:var(--mono);font-size:10.5px;color:var(--mu2)}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc">
+  <h5>목차</h5>
+  <a href="#s0">0. 총괄 상태</a>
+  <a href="#s1">1. CH2 자체 점검</a>
+  <a href="#s2">2. CH3 vs 분석계획서</a>
+  <a href="#s3">3. 외부 검증보고서 검토</a>
+  <a href="#s3" class="lvl2">3-1 크로스체크</a>
+  <a href="#s3b" class="lvl2">3-2 치명적 결함 5건</a>
+  <a href="#s3c" class="lvl2">3-3 직접 재검증</a>
+  <a href="#s3d" class="lvl2">3-4 CH1 피드백</a>
+  <a href="#s3e" class="lvl2">3-5 CH2/CH3 피드백</a>
+  <a href="#s3f" class="lvl2">3-6 대시보드 재설계</a>
+  <a href="#s3g" class="lvl2">3-7 멘토링·스토리라인</a>
+  <a href="#s3h" class="lvl2">3-8 심사위원 Q&amp;A 12개</a>
+  <a href="#s3i" class="lvl2">3-9 일정 배분 제안</a>
+  <a href="#s3j" class="lvl2" style="color:var(--pine);font-weight:700">3-10 우선순위 공식 최종결정 ★</a>
+  <a href="#s4">4. 패치 7건 검토</a>
+  <a href="#s5">5. 종합 우선순위표</a>
+  <a href="#s6">6. 다음 단계</a>
+</nav>
+
+<main>
+
+<header class="top">
+  <div class="eyebrow">I'mPine · 세션 종합 리포트 (v2 · 누락 보완판)</div>
+  <h1>CH2/CH3 대시보드 · 분석계획서 대조 · 외부 검증보고서 · 패치 7건 — 전체 정리</h1>
+  <p>이 문서는 이번 대화에서 다룬 모든 점검·대조·검증 내용을 하나도 빠짐없이 모은 것입니다. 각 항목에는 <b>문제</b>·<b>우선순위</b>·<b>피드백/근거</b>·<b>코드 수정 방향</b>·<b>수정 후 예상 결과</b>를 함께 표기했고, 제가 직접 파일을 열거나 코드를 실행해서 재확인한 항목은 <span class="status ok">✅ 확인</span>, 외부 보고서의 주장이나 아직 독립 검증을 안 한 항목은 <span class="status warn">⚠️ 미검증</span>으로 구분했습니다.</p>
+  <div class="meta-row">
+    <span>대상: ch1~ch4 대시보드, Modeling/ 스크립트·로그, 분석계획서, 검증보고서, 패치 7건</span>
+    <span>검증 방식: 직접 렌더링·실행·파일 대조 + 배경 에이전트 팩트체크</span>
+  </div>
+</header>
+
+<!-- ══════════════ 0. 총괄 ══════════════ -->
+<section id="s0">
+  <h2><span class="num">0</span>총괄 상태</h2>
+  <table>
+    <tr><th>영역</th><th>상태</th><th>한 줄 요약</th></tr>
+    <tr><td><b>CH1 발생현황</b></td><td><span class="status ok">🟢 제출 가능</span></td><td>공식통계 대조 검증이 최대 자산. 프레이밍 몇 개만 손보면 됨</td></tr>
+    <tr><td><b>CH2 취약성지수</b></td><td><span class="status warn">🟡 한계 명시 필요</span></td><td>방법론 문서화는 훌륭하나 예측력(AUC 0.56)·순환검증 문제를 화면에 정직하게 노출해야 함</td></tr>
+    <tr><td><b>CH3 우선지원</b></td><td><span class="status bad">🔴→🟢 최종공식 확정</span></td><td>기존 순위는 실제 재발위험과 역상관(−0.48). 6개 후보 공식 전수비교 끝에 <b>RiskPct(위험지수 백분위) 단독</b> 채택(+0.40~0.47, §3-10) — 단 F02·F06 선행조건 있음</td></tr>
+    <tr><td><b>CH4 방제설계</b></td><td><span class="status bad">🔴 전면 재프레이밍</span></td><td>단가·작업량 전부 임의값, 도메인 오류(나무주사=예방조치 vs 피해목 처리 혼재)</td></tr>
+    <tr><td><b>통합대시보드</b></td><td><span class="status warn">🟡 개요 부재</span></td><td>4.3KB iframe 래퍼. 개선안 html 있으나 정합표 미완성(8개 중 3개 누락)</td></tr>
+    <tr><td><b>CH3 vs 분석계획서</b></td><td><span class="status bad">🔴 다른 방법론 구현됨</span></td><td>계획서 자체가 "지금 코드"를 비판하며 다른 방법을 처방한 재작성 지시서였음</td></tr>
+  </table>
+  <div class="card bad">
+    <div class="ch">🚨 제출 전 반드시 고쳐야 할 3가지 (검증보고서 원문 강조)</div>
+    <ol style="padding-left:18px">
+      <li><b>CH3 우선지원 순위 산식</b> — 지금은 사실상 "재선충 예산 기록이 없는 지역 순위"</li>
+      <li><b>지도 렌더링</b> — 강원 18곳 + 서울 17곳 등 63/222개(28%)가 지도에 안 그려짐</li>
+      <li><b>CH2 홀드아웃 AUC 표시값</b> — 대시보드 0.947, 저장소 로그 0.911. 7차 보고서가 이미 이 불일치를 인정했는데 대시보드만 옛 값</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══════════════ 1. CH2 자체점검 ══════════════ -->
+<section id="s1">
+  <h2><span class="num">1</span>CH2 대시보드 자체 점검</h2>
+  <p class="lede">ch2/ch2.html + ch2/data.js를 브라우저로 직접 렌더링하고 데이터 참조 관계를 대조한 1차 점검 결과.</p>
+
+  <div class="card ok">
+    <div class="ch">✅ 정상 확인된 것</div>
+    콘솔 에러 없음 · 지도(Leaflet)·차트(Chart.js) 전부 정상 렌더링 · ch2.html이 참조하는 모든 <code>D.*</code> 키가 data.js에 실존(누락 없음) · <code>축B_배분적정성</code> 부족/적정/과다 각 74개(합 222) = <code>budgetGapSummary</code> 값과 정확히 일치
+  </div>
+
+  <table>
+    <tr><th>#</th><th>문제</th><th>우선순위</th><th>수정 방향</th><th>예상 결과</th></tr>
+    <tr><td>1-1</td><td>§03 해석박스 "R²=2.4%" 하드코딩 vs 바로 위 템플릿값 "2.39%" 반올림 불일치</td><td>P2</td><td>2.39%로 통일(정밀도 유지)</td><td>수치 불일치로 인한 심사 감점 요소 제거</td></tr>
+    <tr><td>1-2</td><td>"취약 상위·과소배분 시군구" 칩 라벨이 교집합처럼 읽히나 실제 값(74)은 취약성 순위와 무관한 배분갭 3분위 전체 개수</td><td>P2</td><td>라벨을 "배분갭 하위 3분위(74곳)"로 명확화</td><td>라벨-계산범위 일치, 심사위원 질문("74가 뭔가요") 선제 방어</td></tr>
+  </table>
+  <p class="lede">※ 이 두 건은 이후 §3-2의 "qcut 3등분" 문제와 본질적으로 같은 뿌리임이 나중에 드러났습니다.</p>
+</section>
+
+<!-- ══════════════ 2. CH3 vs 계획서 ══════════════ -->
+<section id="s2">
+  <h2><span class="num">2</span>CH3 vs 분석계획서 대조</h2>
+  <p class="lede">대상: <code>ImPine_CH3_우선지원_지원효과_시뮬레이션_분석계획서.docx</code></p>
+
+  <div class="card bad">
+    <div class="ch">🔴 핵심 발견</div>
+    이 docx는 일반 계획서가 아니라 <b>"현재 업로드된 ch3.html·data.js 구조"를 검토해 문제점을 진단하고 수정된 방법론을 처방하는 gap-analysis 문서</b>입니다(표지에 명시). 지금 대시보드가 계획서와 다르다는 것 자체가 계획서가 지적한 문제 그대로라는 뜻입니다.
+  </div>
+
+  <h3>섹션별 대조</h3>
+  <div class="tw"><table>
+    <tr><th>섹션</th><th>계획서 요구사항</th><th>실제 구현</th><th>판정</th></tr>
+    <tr><td>01 우선지원순위</td><td><code>0.6×RiskPct + 0.4×UnderfundPct</code>(백분위 결합, 대응역량은 순환논리 방지 위해 제외), S/A/B/C/D 5단계 등급(상위5%=즉시재검토, 5~10%=차년도후보, 10~20%=예찰강화, 20~80%=현행유지, 하위20%=최소보장)</td><td><code>priority_score = index_main − 배분갭</code>(척도 다른 두 값 직접 차감), 등급 체계 없음</td><td><span class="status bad">🔴 불일치</span></td></tr>
+    <tr><td>02 정책매칭</td><td>4도메인(노출도/기후위험도/인위적확산/대응역량취약) 각각 주 정책. "산업기반부족"은 주 정책을 안 덮어쓰는 <b>병기 태그</b>(직접집행필요/업체·인력매칭필요/산업연계지원)</td><td>"산업기반부족형"이 dominant_domain·정책을 통째로 대체(TOP15 중 9곳 영향). 임계값(3.2점/0.5%) 출처 불명</td><td><span class="status bad">🔴 불일치</span></td></tr>
+    <tr><td>03 실행가능성</td><td>대응역량×산업기반 2요인 로직만 규정, 매트릭스·사분면 개념 없음</td><td>"취약성×정부지원필요도" 4사분면 매트릭스를 독자적으로 신설</td><td><span class="status bad">🔴 계획에 없는 것을 신설</span></td></tr>
+    <tr><td>04 지원효과 시뮬레이션</td><td>3개 시나리오(보수 50%/±10%, 기준 30%/±20%, 적극 20%/±30%), QP 최적화, rolling-origin 검증(2016→17~2021→22), 7개 지표, <code>simulation.scenarios/yearlySummary/regionResults</code> 스키마, 지정 탭 제목·캡션 문구</td><td>전부 미구현. 대신 계획서에 없는 <b>Model2(7차) 재발위험확률 결합</b>으로 대체</td><td><span class="status bad">🔴 완전히 다른 내용</span></td></tr>
+  </table></div>
+
+  <h3>Model2 결합 표 자체의 추가 문제</h3>
+  <ul style="padding-left:20px;margin-bottom:12px">
+    <li>CSV(<code>Model2_재발위험확률_2022기준_final.csv</code>)에는 ≥0.83인 시군구가 <b>82개</b>(221개 중) 있는데, <code>urgentList</code>는 <b>6개</b>뿐 — 예전 6차 보고서가 지목한 7개 이름(영주시만 빠짐)과 정확히 일치. 전수 재계산이라기보다 옛 명단 재확인에 가까움</li>
+    <li>7차 보고서 §5는 "발표자료에 원시 확률값을 인용 말고 순위/분위로 표현하라"고 명시하는데, ch3.html은 원시 확률(0.999, 0.998, 0.838, 0.830)을 그대로 노출</li>
+  </ul>
+
+  <h3>사소한 사실관계 오류</h3>
+  <table>
+    <tr><th>오류</th><th>내용</th></tr>
+    <tr><td>시군구 수 표기</td><td>ch3.html: "CH2의 <b>229개</b> 시군구" → 실제 CH2 최종표본은 <b>222개</b>(229는 제외 전 원본 패널 수)</td></tr>
+    <tr><td>CSV 행수</td><td>Modeling/7차 CSV는 실제 <b>221행</b>인데 7차 docx·작업기록 문서는 "222개"라 기재</td></tr>
+    <tr><td>특별방제구역 12곳</td><td>계획서·7차 자료 어디서도 출처를 찾지 못함(근거 미표기)</td></tr>
+  </table>
+
+  <div class="expect"><b>수정 시 예상 결과</b>: 04번 섹션을 계획서 스키마대로 재구현하면, 심사위원이 "이 시뮬레이션이 계획서와 다른데요?"라고 묻는 상황 자체가 사라지고, 예산 재배분의 정량적 효과(포착률·타겟팅 리프트)를 실제로 보여줄 수 있게 됨.</div>
+</section>
+
+<!-- ══════════════ 3. 외부 검증보고서 ══════════════ -->
+<section id="s3">
+  <h2><span class="num">3</span>외부 검증보고서(<code>I-mPine_검증보고서.md</code>) 검토</h2>
+  <p class="lede">리포지토리 전체(CH1~CH4 + Modeling 스크립트·로그)를 코드 줄번호 단위로 대조한 문서. 5개 핵심 주장을 배경 에이전트로 재검증했으며 전부 CONFIRMED.</p>
+
+  <h3>3-1. 크로스체크 — 통과 vs 불일치</h3>
+
+  <h4>CH1 공식통계 대조 (6주기 전체) — 통과</h4>
+  <div class="tw"><table>
+    <tr><th>관리주기</th><th class="num">원자료 집계</th><th class="num">공식 발표</th><th class="num">오차</th><th>판정</th></tr>
+    <tr><td>2016.5~2017.4</td><td class="num">992,098</td><td class="num">992,363</td><td class="num">−0.027%</td><td>✅</td></tr>
+    <tr><td>2017.5~2018.4</td><td class="num">684,088</td><td class="num">686,422</td><td class="num">−0.340%</td><td>✅</td></tr>
+    <tr><td>2018.5~2019.4</td><td class="num">490,936</td><td class="num">490,693</td><td class="num">+0.050%</td><td>✅</td></tr>
+    <tr><td>2019.5~2020.4</td><td class="num">406,369</td><td class="num">406,362</td><td class="num">+0.002%</td><td>✅</td></tr>
+    <tr><td>2020.5~2021.4</td><td class="num">307,919</td><td class="num">307,919</td><td class="num">0.000%</td><td>✅</td></tr>
+    <tr><td>2021.5~2022.4</td><td class="num">380,600</td><td class="num">378,079</td><td class="num">+0.667%</td><td>✅</td></tr>
+    <tr><td>2022.5~2023.4</td><td class="num">474,996</td><td class="num">1,065,967</td><td class="num">−55.4%</td><td><span class="status bad">❌ 제외</span></td></tr>
+    <tr><td><b>6주기 합계</b></td><td class="num"><b>3,255,787</b></td><td class="num"><b>3,261,838</b></td><td class="num"><b>−0.19%</b></td><td>✅</td></tr>
+  </table></div>
+  <p class="lede">2017~2024 공식 시계열(99.2만→68.6만→49.1만→40.6만→30.8만→37.8만→106.6만→89.9만)도 e-나라지표 공표치와 부합. 산림청 지정 8곳 중 7곳(87.5%)을 4개 지표 교차기준이 독립 재현.</p>
+
+  <div class="card warn">
+    <div class="ch">⚠️ README 표기 오해 소지</div>
+    README의 <code>✅ 원자료-공식통계 오차 0.67%</code> 표기는 오해를 부릅니다. 0.67%는 <b>6주기 중 최악값</b>이고, 별도로 <b>1주기(2022.5~2023.4)는 원자료 공개율이 공식치의 44.6%뿐이라 통째로 제외</b>했습니다. 제외 사실을 숨기면 나중에 더 크게 문제됩니다.
+    <div class="expect"><b>수정 방향</b>: <code>6주기 최대오차 0.67% · 합계오차 0.19% · 1주기는 원자료 공개율 44.6%로 분석 제외</code>로 문구 교체. <b>예상 결과</b>: "왜 이 주기만 뺐나요" 질문에 선제 답변 가능</div>
+  </div>
+
+  <h4>도메인 라벨 vs 실제 계산값 (전체)</h4>
+  <div class="tw"><table>
+    <tr><th>도메인 라벨</th><th>실제 투입변수</th><th>부호</th><th>Y상관</th><th>라벨이 맞는가</th></tr>
+    <tr><td>노출도</td><td>소나무류_면적비율(%)</td><td class="num">+1</td><td class="num">+0.251</td><td><span class="status ok">✅ 맞음</span></td></tr>
+    <tr><td>기후위험도</td><td>연강수량_mm</td><td class="num">+1</td><td class="num">+0.036</td><td><span class="status warn">⚠️ 상관 사실상 0. 부호가 np.sign(0.036)으로 결정</span></td></tr>
+    <tr><td>기후위험도</td><td>GDD_솔수염하늘소_base11.9</td><td class="num">+1</td><td class="num">+0.152</td><td><span class="status ok">✅ 이론과 부합</span></td></tr>
+    <tr><td>지자체대응역량(역)</td><td>대응자원투입예산_ha당_log</td><td class="num">−1</td><td class="num">+0.255</td><td><span class="status bad">🔴 예산은 피해의 결과. 역인과 오염</span></td></tr>
+    <tr><td>지자체대응역량(역)</td><td>예찰사업_존재_flag</td><td class="num">−1</td><td class="num">−0.054</td><td><span class="status warn">⚠️ 신호 없음</span></td></tr>
+    <tr><td><b>인위적확산</b></td><td><b>log1p_원목생산업체수(면적통제 잔차)</b></td><td class="num"><b>−1</b></td><td class="num">−0.072(통제후 −0.196)</td><td><span class="status bad">🔴 <b>라벨과 정반대</b></span></td></tr>
+  </table></div>
+
+  <div class="card bad">
+    <div class="ch">🔴 문제 1 — "인위적확산" 도메인은 실제로 "원목업체가 적은 곳" 점수</div>
+    6차 최종판에서 이 도메인은 원목생산업체수 단독이고 부호가 −1 — 업체가 적으면 점수가 높음. 그런데 CH3 처방은 "도로변/원목유통 관리". 완도군·옹진군·신안군(원목생산업체 거의 없는 도서지역)에 원목유통 관리를 처방하는 구조. 이 도메인이 잡아낸 건 확산위험이 아니라 <b>임업 산업기반의 부재</b>. CH3가 같은 지역을 "산업기반부족형"이라 부르는 게 오히려 맞는 해석 — 다만 CH2(3유형)와 CH3(4유형) 체계가 서로 다른 채로 방치됨.
+    <div class="expect"><b>수정 방향 (택1)</b>: (A) 부호를 이론대로 +1로 변경(업체多=이동경로多=확산위험高, 단 지수 성능은 하락) 또는 <b>(B, 권장) 도메인 이름을 "임업 산업기반 취약성"으로 개명</b>, 처방도 "방제 수행역량·업계 기반 확충"으로 변경. <b>예상 결과</b>: CH3의 "산업기반부족형"과 자연스럽게 통합되고, README의 "5개 도메인"을 "4개 도메인"으로 정정 필요(87개 시군구가 이 유형이라 파급 큼)</div>
+  </div>
+
+  <div class="card warn">
+    <div class="ch">⚠️ 문제 3 — 도메인 동일가중(0.25)인데 도메인끼리 상관이 있음</div>
+    <code>Modeling/4차/Model1_v4_로그.txt</code>: 노출도-인위확산 상관 <b>0.416</b>, 기후-인위확산 상관 <b>0.343</b> → 인위확산 도메인이 다른 도메인과 겹쳐 실효 가중치가 0.25가 아님.
+    <div class="expect"><b>수정 방향</b>: 동일가중 유지 시 상관을 보고하고 이유(해석가능성·정책투명성)를 명시하거나, PCA/상관보정 가중을 부록에 추가</div>
+  </div>
+
+  <div class="card warn">
+    <div class="ch">⚠️ 문제 4 — 기후위험도의 실질 공간해상도는 229개가 아니라 89개 미만</div>
+    방법론 문서에 이미 기록됨: 기상관측소 <b>89개</b>를 229개 시군구에 배정, <b>관측소 108번 하나가 30개 시군구에 동시 배정</b>되어 이 지역들은 8년간 기후값이 완전 동일. <b>옹진군은 최근접 관측소가 73.9km.</b> 즉 기후 도메인은 시군구 단위 변별력이 거의 없음.
+    <div class="expect"><b>수정 방향</b>: 화면 어딘가에 이 한계를 한 줄로 명시. <b>예상 결과</b>: "기후 도메인이 왜 이렇게 약한가" 질문에 대한 선제 답변 확보</div>
+  </div>
+
+  <div class="card warn">
+    <div class="ch">⚠️ 순환검증 문제 (문제 2)</div>
+    도메인 부호를 <code>np.sign(Y와의 상관)</code>으로 정한 뒤, 같은 표본에서 그 지수가 Y를 설명하는지 검증(<code>model1_v4_final.py</code>).
+    <pre>sign_check = {}
+for dom, vs in CORE.items():
+    for v in vs:
+        r = model_df[[v, Y]].corr().iloc[0, 1]
+        sign_check[v] = r
+...
+("연강수량_mm", np.sign(sign_check["연강수량_mm"]) or 1),</pre>
+    특히 연강수량은 상관 +0.036 — 순수 노이즈로 부호가 결정됨. 이론적으로는 오히려 가뭄이 소나무 수세를 약화시켜 피해를 키우므로 <b>강수량은 −1이어야 함</b>.
+    <div class="expect"><b>수정 방향</b>: 부호를 사전 이론 근거로 고정(GDD +1, 강수량 −1, 소나무비율 +1)하고, 지수-Y 관계는 그 후에 보고. 숫자는 나빠지지만 주장이 성립함. <b>예상 결과</b>: "AUC 0.58"이 상방편향 아닌 정직한 값이 됨 — <span class="status ok">✅ CONFIRMED</span>(실제 경로: <code>Modeling/CH2/4차/model1_v4_final.py</code>)</div>
+  </div>
+
+  <h4>숫자 재현성 3자 대조 (대시보드 vs 로그 vs 보고서, 전체)</h4>
+  <div class="tw"><table>
+    <tr><th>지표</th><th>대시보드 표시</th><th>저장소 로그 실측</th><th>6·7차 보고서</th><th>판정</th></tr>
+    <tr><td>Model2 훈련 AUC</td><td class="num">0.976</td><td class="num">0.9764</td><td class="num">0.976</td><td>✅</td></tr>
+    <tr><td>Model2 <b>홀드아웃 AUC</b></td><td class="num"><b>0.947</b></td><td class="num"><b>0.9110</b></td><td>7차: "0.911~0.926 vs 보고서 0.933~0.947"</td><td><span class="status bad">🔴 불일치</span></td></tr>
+    <tr><td>기준모형(연속발생연수 단독)</td><td class="num">0.918</td><td class="num">0.9178</td><td class="num">0.918</td><td>✅</td></tr>
+    <tr><td><b>모델 vs 기준모형 우열</b></td><td>모델 승(0.947&gt;0.918)</td><td><b>기준모형 승(0.918&gt;0.911)</b></td><td>7차: "오히려 단독모형이 근소하게 더 높게 나왔다"</td><td><span class="status bad">🔴 결론이 뒤집힘</span></td></tr>
+    <tr><td>배분갭 R²</td><td class="num">2.39%</td><td>(6차 재현 미확인)</td><td>6차 §4.1 2.39%</td><td><span class="status warn">⚠️</span></td></tr>
+    <tr><td>Model1 AUC 훈련/홀드아웃</td><td class="num">0.581 / 0.564</td><td>v4 로그: 0.600 / 0.594</td><td>6차 0.581/0.564</td><td><span class="status warn">⚠️ 6차 산출 스크립트 없음</span></td></tr>
+    <tr><td>Model1 rolling AUC</td><td class="num">0.584 / 0.526</td><td><b>해당 계산 스크립트 없음</b></td><td>6차</td><td><span class="status warn">⚠️ 재현 불가</span></td></tr>
+  </table></div>
+  <div class="card warn">
+    <div class="ch">지적 3가지</div>
+    <ol>
+      <li><code>ch2/data.js</code>의 <code>model2_note.holdout: 0.947</code>은 저장소에서 재현되지 않는 숫자. 7차 보고서가 이미 이 불일치를 정직하게 기록해뒀는데 대시보드만 옛 값 → <b>0.911로 교체하고 "기준모형(0.918)이 근소하게 우세 — 성능은 대부분 상습발생 이력에서 나옴"으로 수정</b>. 이게 오히려 더 강한 인상을 줌</li>
+      <li><code>Modeling/6차/model1_final_재구현_TierA_TierB_검증.py</code>는 편상관만 계산(81줄). AUC·between계수·배분갭 R²를 산출하는 코드가 없는데 <code>ch2/data.js</code> 헤더는 "정확히 일치함을 확인"이라 주장 → 근거 없는 문장이므로 완전재현스크립트 추가 또는 문구를 "편상관만 재현 확인, 나머지는 6차 보고서 전재"로 하향</li>
+      <li>Model1 rolling-origin AUC(0.584→0.526)를 만드는 코드가 저장소에 없음. 게다가 <code>model1_v4_final.py</code>의 홀드아웃 평가는 <code>run_two_part(holdout,...)</code>가 holdout에 <b>새로 적합</b>하므로 표본외 예측이 아니라 <b>표본내 적합값</b> → Model2의 frozen-gm 방식(train 계수로 test 예측)을 이식 필요</li>
+    </ol>
+  </div>
+
+  <h3 id="s3b">3-2. 치명적 결함 5건</h3>
+
+  <div class="card bad">
+    <div class="ch">A. 🔴 CH3 우선순위가 실제 재발위험과 −0.48 역상관</div>
+    <ul>
+      <li><code>priority_score = index_main − 배분갭</code>에서 배분갭 SD(4.722)가 index_main SD(0.492)의 9.6배 → 순위의 <b>98.9%</b>가 배분갭 단독 결정</li>
+      <li><code>corr(배분갭, 평균예산_log) = 0.988</code>(배분갭 회귀 R²=2.39%뿐) → "부족 74곳" 중 86%가 예산 0, 89%가 피해 0</li>
+      <li>TOP30에 서울 자치구 8곳(관악·종로·은평·광진·성북·강북·용산·중랑), 1위 완도군(피해 0). 재발확률 1.000인 울산 4개구·경주·거제·기장·밀양 등은 오히려 120~199위</li>
+      <li>근본원인: 예산 변수 3중 계상 — ① 대응역량 도메인(−1) ② 배분갭 종속변수(실효 −1 가중) ③ 예산 자체가 피해의 결과(r=+0.255)</li>
+      <li>개별 추적 오류 2건: <b>인천 옹진군(우선지원 2위)</b>는 임상도 2019→2024판 갱신 아티팩트(소나무류 면적비율 +367.2%)로 신뢰 불가한 값이 그대로 반영됨. <b>강원 고성군(18위)</b>도 같은 아티팩트 목록(+59.1%)에 있으나 제외되지 않았고, 방법론 문서 자체가 "왜 제외 안 됐는지 근거가 로그에 없음"이라 기록</li>
+    </ul>
+    <h4>수정 코드 (4단계, 검증보고서 원안)</h4>
+    <pre># 1) 분석 모집단을 제한: 발생 이력이 있는 시군구만
+eligible = panel.groupby("key")["Y_bin"].max() == 1   # 2017-2022 중 1회 이상 발생
+# (또는 소나무림면적 ≥ 300ha 등 정책적 하한)
+
+# 2) 예산 0을 '값 0'이 아니라 '구조적 0'으로 분리 처리
+#    → 2부문: (a) 예산 배정 여부 로지스틱  (b) 배정된 경우의 수준 OLS
+#    배분갭은 (b)에서만 정의. 미배정 지역은 '미배정' 별도 범주.
+
+# 3) 배분갭 회귀에 통제변수 추가 (현재는 평균위험 단 하나)
+budget ~ 평균위험 + log_소나무림면적 + 전기_피해량 + C(시도)
+
+# 4) 우선순위 산식을 z-정규화 후 결합. 배분갭은 동률 조정 요소로만.
+priority = 0.5*z(구조위험지수) + 0.5*z(재발위험확률) + 0.15*z(-배분갭)</pre>
+    <div class="expect"><b>✅ 직접 실행 검증 완료했으나 이후 철회 — §3-10 최종결정 참조</b> — 처음엔 4단계 중 4번(<code>0.5z(idx)+0.5z(재발확률)+0.15z(-갭)</code>)만 반영해 Spearman −0.4766→+0.6967을 확인하고 "효과 검증됨"이라 판단했으나, 이후 <b>이 검증 자체가 자기충족적(재발확률을 산식에 50% 넣고 재발확률과 비교)임을 발견해 철회</b>했습니다. 최종적으로는 <b>RiskPct(위험지수 백분위) 단독</b> 공식을 채택 — 자기충족·배분갭 의존이 전혀 없으면서도 ρ=+0.40~0.47로 유의미하게 개선됨을 확인했습니다. 전체 6개 공식 비교와 최종결정 근거는 <a href="#s3j">§3-10</a> 참조.</div>
+  </div>
+
+  <div class="card bad">
+    <div class="ch">B. 🔴 "예산부족 74개"는 발견이 아니라 산술</div>
+    <pre>contrib["축B_배분적정성"] = pd.qcut(contrib["배분갭"], 3, labels=["부족","적정","과다"])
+# 222 ÷ 3 = 74 → 항상 성립. 전국 몇 곳이든 1/3은 "부족"
+# 이 숫자가 CH2 §3 결론, CH3 simulation.underfundedCount, 7차 보고서까지 그대로 전파됨</pre>
+    <div class="expect"><b>수정 방향</b>: 배분갭 회귀 예측구간(95% 하한) 밖에 있는 지역만 "유의하게 과소배분"으로 절대판정, 또는 표기를 "배분갭 하위 3분위(정의상 74곳)"로 명시. <b>예상 결과</b>: "74"라는 숫자가 실제 발견에서 나온 것으로 바뀌거나, 최소한 정의상 산술임을 투명하게 공개해 심사위원 반박 방지</div>
+  </div>
+
+  <div class="card bad">
+    <div class="ch">C. 🔴 63/222개(28%)가 지도에 안 그려짐 (행정코드 개편 미반영)</div>
+    <table>
+      <tr><th></th><th class="num">GeoJSON 피처</th><th class="num">CH2/CH3 데이터</th><th>결과</th></tr>
+      <tr><td>전체</td><td class="num">193</td><td class="num">222</td><td><b>159개만 매칭(71.6%)</b></td></tr>
+      <tr><td>강원</td><td class="num">42xxx 18개(구 강원도)</td><td class="num">51xxx 18개(강원특별자치도)</td><td><span class="status bad">🔴 18곳 전부 미표시</span></td></tr>
+      <tr><td>서울</td><td class="num">7개</td><td class="num">24개</td><td><span class="status bad">🔴 17곳 미표시</span></td></tr>
+      <tr><td>인천</td><td class="num">2개</td><td class="num">10개</td><td><span class="status bad">🔴 8곳 미표시</span></td></tr>
+      <tr><td>충북</td><td class="num">7개</td><td class="num">11개</td><td><span class="status bad">🔴 4곳 미표시</span></td></tr>
+    </table>
+    <b>원인 두 가지</b>: ① 강원특별자치도 출범(2023.6) 코드 개편 미반영(GeoJSON은 구 42xxx, 데이터는 신 51xxx, 전북은 양쪽 다 45xxx라 우연히 맞음) ② <code>CH1_GEOJSON</code>은 CH1 분석대상(180곳)용 부분집합인데 CH2/CH3(222곳)가 그대로 재사용 — <code>ch2/data.js</code> 헤더는 "240개 일반구 분리"라 적혀 있지만 실제는 193개.<br>
+    <span class="status ok">✅ CONFIRMED</span> — 좌표 18개(42110~42830) 전부 실제 확인. <b>CH2/CH3만의 문제가 아니라 CH1 자체 내부(<code>CH1_DATA</code>는 51xxx, <code>CH1_GEOJSON</code>은 42xxx)에서도 발생</b> — 보고서보다 범위가 넓음. CH1 자체도 <code>sggBurden</code> 180곳 중 20곳(강원 14곳 포함)이 미매칭.
+    <pre>function resolveCode(code) {
+  const s = String(code);
+  if (s.startsWith('51')) return '42' + s.slice(2);
+  return s;
+}
+// 조회 시: geoIndex[resolveCode(code)] || geoIndex[code]</pre>
+    <div class="expect"><b>예상 결과</b>: 강원 18곳 즉시 복구(30분 작업, 18/18 매칭 검증됨). 서울·인천·충북 45곳은 KOSTAT 2023 경계 파일 교체 필요(더 큰 작업). <b>이 resolveCode()를 ch1.html에도 반드시 추가해야</b> CH1 자체 지도도 완전히 복구됨(원 패치는 이걸 놓침). 즉시 확인 가능한 증상: CH3 우선지원 TOP20 중 동해시·삼척시·속초시·고성군이 통째로 회색.</div>
+  </div>
+
+  <div class="card warn">
+    <div class="ch">D. ⚠️ CH2/CH3가 제주도를 통째로 제외했는데 명시가 없음</div>
+    CH2 <code>sggIndex</code>의 시도 목록은 15개 — 제주특별자치도·세종특별자치시가 없음. CH1 누적 1위 제주시(370,602그루), 7위 서귀포시(189,712그루) — 합쳐서 560,314그루 = <b>전국 누적 피해의 17.2%</b>. 제외 자체는 정당화 가능(행정시라 시군구 단위 통계 제외가 흔함)하나, <code>excluded_note</code>에 대구중구·영등포구·인천동구만 있고 제주 언급이 없음.
+    <div class="expect"><b>수정 방향</b>: <code>excluded_note</code>에 사유 추가, CH1 제주 패널과 교차참조. <b>예상 결과</b>: 심사위원 1순위 예상질문("제주시가 왜 없나요") 선제 방어</div>
+  </div>
+
+  <div class="card bad">
+    <div class="ch">E. 🔴 CH4는 전부 임의 추정치</div>
+    <code>ch4/data.js</code> 헤더가 직접 "단가·1인당 작업량은 전부 추정치, 상식적으로 그럴듯한 값을 넣었다"고 명시. 정직한 건 좋지만 심사위원(산림청·임업 전문가)은 실제 품셈을 알고 있어 위험.
+    <table>
+      <tr><th>항목</th><th class="num">저장소 값</th><th>문제</th></tr>
+      <tr><td><code>ground</code> "지상 약제방제(나무주사)"</td><td class="num">45,000원/본</td><td>나무주사는 <b>건강한 나무에 놓는 예방조치</b>이지 피해목 방제가 아님. 훈증·파쇄(피해목 처리)와 같은 목록에 두면 정책범주 혼재. 실제 예방나무주사 단가는 본당 수천~1만원대</td></tr>
+      <tr><td><code>aerial</code> "항공방제"</td><td class="num">250,000원/ha</td><td>항공방제는 <b>매개충(솔수염하늘소) 성충</b> 대상이지 고사목 제거가 아님. 단가도 과대추정</td></tr>
+      <tr><td><code>distanceSurcharge</code></td><td>10km초과 시 km당 0.5%</td><td>근거 없음</td></tr>
+    </table>
+    <div class="expect"><b>권장 재프레이밍 — 숫자를 버리고 로직을 살릴 것</b>: 방제방법 선택 규칙(면적·경사·주거지인접·피해정도)은 「소나무재선충병 방제지침」에 공개돼 있고 <code>condition</code> 문구는 대체로 그 취지에 맞음 — 판단로직은 자산, 단가는 부채. 기본값 단가를 모두 비우고 사용자 입력란으로 전환("단가 입력형 시뮬레이터"), 「방제지침」 출처 배지 추가, 「산림사업 표준품셈」·지자체 발주공고에서 실제 낙찰단가 1~2건 확보해 예시값 표기(출처 명시), 나무주사는 "예방" 탭으로 분리. <b>예상 결과</b>: "숫자는 못 믿어도 판단로직은 인용 가능한 자산"이라는 평가로 전환</div>
+  </div>
+
+  <h3 id="s3c">3-3. 제가 직접 재확인한 것 (배경 에이전트 실행)</h3>
+  <table>
+    <tr><th>검증 대상</th><th>결과</th></tr>
+    <tr><td><code>model1_v4_final.py</code>의 OUTDIR/sign_check/qcut/holdout재적합</td><td><span class="status ok">✅ CONFIRMED</span> (실제 경로: <code>Modeling/CH2/4차/</code>)</td></tr>
+    <tr><td><code>ch1/vendor/</code>에 leaflet+chart.umd.js 존재</td><td><span class="status ok">✅ CONFIRMED</span>, 파일명까지 일치(<code>chart.umd.js</code>, <code>leaflet/leaflet.css</code>, <code>leaflet/leaflet.js</code> 등)</td></tr>
+    <tr><td>강원 42xxx vs 51xxx 코드 불일치</td><td><span class="status ok">✅ CONFIRMED</span>, CH1 내부에도 존재(범위 확대)</td></tr>
+    <tr><td>"전년비 +28만" vs "13개월 비교불가" 모순</td><td><span class="status ok">✅ CONFIRMED</span> (2025=1,486,324/13개월, 2026=1,770,000/12개월, 월평균환산 +29.0%[+398,009])</td></tr>
+    <tr><td><code>crossMetric</code> 25개 중 7개만 표시(<code>CROSS_CAP=7</code>)</td><td><span class="status ok">✅ CONFIRMED</span> — "총 25개" 텍스트는 표시되나 표 자체는 top7만 렌더링</td></tr>
+  </table>
+
+  <h3 id="s3d">3-4. 방법론 피드백 (CH1)</h3>
+  <table>
+    <tr><th>문제</th><th>근거</th><th>수정 방향</th><th>예상 결과</th></tr>
+    <tr><td>"반복관측비율 44.2%"는 격자크기 함수</td><td>10m(실제 해상도)=<b>8.0%</b>, 100m(채택)=44.2%, 500m=66.0%, 1km=72.5% (MAUP·가변공간단위문제)</td><td>"방제 관리단위(100m) 기준 반복관리 대상 구역 비율"로 재명명 + 민감도 4값 상시노출. "관측"과 "발생"을 구분한 것은 훌륭하나, 조사노력(예찰강도) 편향 통제가 없다는 한 줄이 추가로 필요</td><td>격자크기 바꿔도 결론 안 흔들림 — 방어력 확보. 100m가 산림청 실제 방제 관리단위(630만 셀)라는 방어논리는 이미 유효함</td></tr>
+    <tr><td>"재발률 0→29.2%"는 관측창 확장 아티팩트</td><td>1주기·2주기는 정의상 재발 불가(과거이력+직전미관측 동시필요), 3주기부터 경로 1개, 6주기에 다수 경로 가능 — 좌측절단(left-censoring)</td><td>1~2주기 회색처리+"구조적 0구간" 라벨(또는 제외), 재발률은 고정관측창(직전 3개 주기 이력 보유 격자만)으로 재계산, 결론문을 "재발이 증가하는 추세"에서 "신규비중 100%→37.9% 감소, 62.1%가 기존 피해지역"으로 수정</td><td>CH1 최종결론 근거차트가 방어 가능해짐. README의 "기존관측지역 재관측비중 62.1%"는 2021.5~2022.4 <b>단일주기</b> 값인데 전체기간 지표처럼 읽히므로 연도 표기 필요</td></tr>
+    <tr><td>잔차분석 패널(R²=0.049)로 "제주시 501배" 산출</td><td>설명력 5% 모델(n=148) 예측값을 분모로 쓴 배수(501.0배 제주시, 0.0008배 청송군)는 통계적으로 무의미</td><td>패널 삭제 → "소나무류 면적만으로는 피해를 설명할 수 없습니다(R²=0.05, n=148). 같은 면적에서도 피해가 수백 배 차이 납니다 → CH2의 다요인 접근 필요"로 재구성</td><td>약점이 CH2 도입 필연성의 근거로 전환 — "501배" 숫자는 안 써도 됨</td></tr>
+    <tr><td>제거율 62.7%, "총제거 309만"에 피해목+예방목적 감염우려목 혼재</td><td>발생 집계기간과 방제 집행기간(통상 10월~익년4월)이 불일치. 총제거 309만=피해고사목 111만+감염우려목(예방목적, 건강한 나무) 198만</td><td>시점 각주 추가("37%가 미제거로 남음"으로 오독 방지), 라벨 분리(특히 README 핵심결과 표)</td><td>오독 방지</td></tr>
+    <tr><td>교차기준 TOP7 컷 = 산림청 지정개수에 맞춤(순환논리로 보임)</td><td>실제론 25곳 전체가 산림청 지명 8곳 중 7곳(87.5%) 독립 재현 — 아래 상세표 참고</td><td>25곳 전체 공개+재현율 87.5%+추가후보 18곳 프레이밍 — 프로젝트 최강 슬라이드 후보</td><td>가장 강력한 단일 근거로 전환 — <span class="status ok">✅ CROSS_CAP=7, 25개 CONFIRMED</span></td></tr>
+  </table>
+
+  <h4>교차기준 재계산 상세 — 산림청 지명 8곳 대조</h4>
+  <table>
+    <tr><th>산림청 2026 지명공개 지역</th><th>4개 지표 중 '높음' 개수</th><th>25곳 안에 포함?</th></tr>
+    <tr><td>포항시 북구</td><td class="num">4/4</td><td>✅</td></tr>
+    <tr><td>포항시 남구</td><td class="num">4/4</td><td>✅</td></tr>
+    <tr><td>경주시</td><td class="num">4/4</td><td>✅</td></tr>
+    <tr><td>울주군</td><td class="num">4/4</td><td>✅</td></tr>
+    <tr><td>밀양시</td><td class="num">4/4</td><td>✅</td></tr>
+    <tr><td>안동시</td><td class="num">3/4</td><td>✅</td></tr>
+    <tr><td>창녕군</td><td class="num">3/4</td><td>✅</td></tr>
+    <tr><td>양평군</td><td class="num">2/4</td><td>❌</td></tr>
+    <tr><td><b>재현율</b></td><td colspan="2"><b>7/8 (87.5%)</b></td></tr>
+  </table>
+  <p class="lede">남은 18곳(정부 미지명·잠재 고위험 후보): 제주시, 서귀포시, 구미시, 울산 중구·동구·북구, 경기 광주시, 남양주시, 거제시, 김해시, 사천시, 창원 의창구, 순천시, 달성군, 기장군, 성주군, 고령군, 청도군</p>
+
+  <h3 id="s3e">3-5. 방법론 피드백 (CH2/CH3)</h3>
+  <table>
+    <tr><th>문제</th><th>근거</th><th>수정 방향</th><th>예상 결과</th></tr>
+    <tr><td>within 효과 음수, AUC 0.56 근거로 예측력 주장 불가</td><td>between +1.14~1.20(유의, p&lt;0.05), within −0.45~−0.65(비유의, p&gt;0.1). CH2 해석문 자체는 이미 정확("만성적으로 취약한가는 포착, 올해 왜 더 취약해졌나는 설명 못함")</td><td>AUC 대신 십분위 단조성(발생률 0.47→0.81, 피해 0.019→0.105, 5.5배) 전면 배치. "지수를 개선하면 피해가 준다"는 인과 시나리오는 쓸 수 없음(within 음수이므로) — <code>simulation.note</code>의 "인과적 피해감소 효과 추정 아님" 문구를 화면 크기로 키울 것</td><td>"단기예측 아닌 중장기 선별"이라는 정직하고 방어 가능한 주장으로 전환</td></tr>
+    <tr><td>Y_bin=피해&gt;0 기저율 41~81%로 너무 낮음</td><td>222곳 중 133곳(60%)이 피해밀도 0 — "1본이라도 죽었는가"를 예측 중, 정책적으로 의미있는 목표는 "심각한 피해"</td><td>Y_bin=피해밀도 상위 25% 또는 피해등급 임계로 재정의 후 AUC 재확인</td><td>AUC 숫자 자체가 개선될 가능성</td></tr>
+    <tr><td>Model2는 "조기경보"가 아니라 "상습지역 분류기"</td><td>모든 예측력이 _gm(지역평균)항에 있고 within항은 전부 음수(연속발생연수_L1 within=−0.5464, p=0.0073 — "연속발생연수가 늘수록 오히려 발생확률 낮아짐"은 신호가 아니라 사양불안정 징후). 공간전파항(인접시군 피해밀도_L1) SE 7.68·8.68 — 계수보다 14배 커서 심각한 다중공선성/준분리, 7차 보고서도 "모든 사양에서 p=0.36~0.94로 비유의"라 기록. 재발위험확률이 포화(울산 남구는 지수 −0.268인데 확률 0.99995, 상위10곳 전부 0.9996~0.99996 — 순위정보 사실상 없음)</td><td>공간전파 항 제거, "조기경보모형" 명칭 재검토(조기경보=미발생지 예측인데 이 모형은 상습지 재확인) → "재발예측은 연속발생연수 단일변수로 AUC 0.918 도달, 구조지표·공간전파 추가해도 개선 안 됨(0.911). 구조적 취약성지수의 역할은 단기예측 아닌 중장기 우선순위 선별"로 정직하게 서술</td><td>낮은 성능이 오히려 "이력만으로 충분, 8개변수 모형이 1개보다 못하다"는 발견으로 전환</td></tr>
+    <tr><td>CH2(3유형) vs CH3(4유형) 체계 불일치</td><td>완도군이 CH2="복합형", CH3="산업기반부족형". "산업기반부족형"(26곳)은 CH2 어디서도 도출되지 않는 새 범주</td><td>인위적확산→"산업기반 취약형"으로 CH2에서 통일(§3-1 문제1의 수정B와 동시 해결)</td><td>두 챕터가 동일 유형체계로 정합됨</td></tr>
+    <tr><td>CH3 실행가능성 매트릭스 y축이 17개 시도값뿐 → 계단형 산점도</td><td><code>feasibilityMatrix</code>의 <code>y_산업지원필요도</code>는 시도 평균값을 222개 시군구에 그대로 뿌린 값 — 같은 시도 내 시군구는 y가 전부 동일 <span class="status ok">✅ 브라우저에서 직접 확인</span>(스크린샷으로 계단형 패턴 확인)</td><td>시군구 단위 산점도를 17개 시도 단위 매트릭스로 강등하거나, y축을 시군구 단위 변수(임업 사업체수·산림조합 유무·<code>방제법인수_소나무림1만ha당_log</code> — 패널에 이미 있음)로 교체</td><td>"시군구 단위처럼 보이지만 사실 도 단위"라는 오해 제거</td></tr>
+    <tr><td>재현성: 로컬 절대경로 3건, CH2/CH3만 외부 CDN 의존</td><td><code>model1_v4_final.py</code> OUTDIR(Mac), <code>model1_final_재구현...</code> MOD(Windows), <code>model2_final_재구현.py</code> PANEL(Windows) — 저장소를 클론한 심사위원은 스크립트를 한 줄도 실행 불가. CH1은 이미 vendor/에 leaflet+chart.js 보유, CH2/CH3만 unpkg·cdnjs <span class="status ok">✅ vendor 폴더 파일명까지 CONFIRMED</span></td><td>pathlib 상대경로 + requirements.txt(pandas/numpy/statsmodels/scipy/scikit-learn) + run_all.py, CDN→../ch1/vendor/ 전환</td><td>클론 후 실행 가능, 오프라인 발표에도 CH2/CH3 정상 작동. 재현가능한 제출물은 심사에서 크게 차별화됨</td></tr>
+  </table>
+
+  <h3 id="s3f">3-6. 대시보드 재설계 제안</h3>
+  <div class="card info">
+    <div class="ch">진단: 조잡함은 디자인이 아니라 구조 문제</div>
+    ① 통합대시보드에 "우리 이야기"가 없음(4.3KB iframe 래퍼, 열면 곧바로 CH1 격자지도로 떨어짐) ② 같은 질문에 답하는 카드 3~4개 중복(CH1 §03은 시각화 7개가 전부 "반복발생"을 말함 — 조잡함은 정보량이 아니라 중복에서 옴) ③ 검증된 것과 임의추정치가 같은 시각적 무게로 놓임(심사위원이 뭘 믿어야 할지 판단 불가)
+  </div>
+  <div class="grid2">
+    <div class="card bad"><div class="ch">뺄 것</div>CH1 잔차패널(제주시 501배) · 발생시군구수 추이(점 3개) · <code>gridDynamics100m</code>(<code>gridComposition100m</code>과 중복, 분모만 다름) · CH2 산점도+CRE회귀표(십분위로 통합) · CH2 국가대응수준 부록(접이식 모달로 이동) · CH3 실행가능성산점도(시도표로 강등) · CH4 기본단가 숫자</div>
+    <div class="card ok"><div class="ch">넣을 것 (00 개요 탭)</div>① 한 문장 논지 ② 4단계 파이프라인+신뢰배지 ③ 검증 스트립(강점 전면배치) ④ 격자 반복 모자이크(구조적 0구간 자백 시그니처) ⑤ 분석단위 정합표(148/166/167/180/193/222/229/240) ⑥ 아직 못 한 것 3~4줄(선제 고백)</div>
+  </div>
+  <p><b>신뢰수준 배지 4단계</b> (이게 "③검증-임의추정 혼재" 문제를 한번에 해결): 🟢<b>검증</b>(공식통계·원자료 대조완료, CH1 발생현황) / 🔵<b>실측</b>(저장소 데이터로 재계산 가능, CH2 지수·십분위) / 🟡<b>모형추정</b>(통계모형 산출값·한계있음, CH2 배분갭·CH3 순위·Model2 확률) / ⚪<b>컨셉</b>(근거 미확보, CH4 단가·산림청연동 목업). 약한 부분을 스스로 ⚪로 표시하는 게 감추는 것보다 항상 유리함.</p>
+
+  <h4>남길 것 (팀의 자산 — 절대 버리지 말 것)</h4>
+  <table>
+    <tr><th>대상</th><th>이유</th></tr>
+    <tr><td>CH1 공식통계 대조 검증(6주기, 최대오차 0.67%)</td><td>이 프로젝트 최대 무기. 개요 첫 화면으로 승격</td></tr>
+    <tr><td>CH2 §05 검증·심사노트</td><td>자기 약점을 먼저 적은 대시보드는 거의 없음. 유지하고 개요에서 링크</td></tr>
+    <tr><td>CH2 사전확정 사양(pre-registered spec)</td><td>사양탐색 방지 장치, 학술적 신뢰 신호</td></tr>
+    <tr><td>CH1 "관측" vs "발생" 용어 구분</td><td>탐지편향을 이해하고 있다는 증거</td></tr>
+    <tr><td>CH1 분석기준 모달(격자민감도·좌표계·순위신뢰기준)</td><td>내용이 정확함. 모달에서 꺼내 상시노출</td></tr>
+    <tr><td>CH1 산림청발표 7곳 중립색 마커 처리</td><td>비공개 정보를 추정하지 않은 절제</td></tr>
+    <tr><td>방법론 결정사항 문서</td><td>심사 Q&amp;A 최강 무기, 부록으로 제출</td></tr>
+  </table>
+
+  <div class="card warn"><div class="ch">⚠️ 통합대시보드_개선안.html 현황</div>이 구조를 실제로 구현했으나(코드 확인 완료 — CYCLES 배열이 md의 신규/연속/재발% 수치와 정확히 일치, 최대잉여법 allocate() 함수도 정확히 구현됨), <b>정합표에 5개 숫자만 있고(166/180/148/229/222) 보고서 자신이 요구한 8개 중 3개(167/193/240)가 빠져</b> 아직 미완성.</div>
+
+  <h3 id="s3g">3-7. 멘토링</h3>
+
+  <div class="card ok">
+    <div class="ch">✅ 이 프로젝트의 진짜 강점 — 절대 버리지 말 것</div>
+    검증 과정에서 가장 인상적이었던 건 분석 결과가 아니라 <b>자기검증 문서</b>였음:
+    <ul>
+      <li><code>보고서_작성/1_방법론_결정사항_정리.txt</code> — 임상도 판전환 아티팩트를 GIS로 역추적해 "병합 파이프라인 버그가 아니라 원자료 갱신 자체의 변화"임을 확인, "양구·철원·고성은 왜 제외 안 됐는지 근거가 로그에 없음(불확실—재확인 권장)"까지 남김</li>
+      <li><code>Modeling/7차/CH2_분석보고서_7차.docx</code> — 재구현 결과가 6차 보고서와 다르다는 것을 스스로 발견하고 기록</li>
+      <li><code>ch4/data.js</code> 헤더 — 자기 숫자가 추정치라고 먼저 밝힘</li>
+      <li><code>Modeling/2차/기타(사용X)/</code> — 폐기한 스크립트 7건을 지우지 않고 보관</li>
+    </ul>
+    <b>대학생 공모전에서 이런 수준의 감사 추적(audit trail)은 흔하지 않음 — 이게 차별점.</b> 문제는 이 자산이 저장소 깊은 곳 txt 파일에만 있고, 대시보드는 정작 재현되지 않는 숫자(0.947)를 보여준다는 것. <b>지금 필요한 작업의 절반은 새로운 분석이 아니라, 이미 알고 있는 것을 화면으로 끌어올리는 일.</b>
+  </div>
+
+  <h4>스토리라인을 뒤집을 것 — 가장 중요한 조언</h4>
+  <p><b>현재</b>: "취약지역을 찾아냈다 → 예산을 주자" (예측력 약함(AUC 0.56)·순위 역상관·1위 완도군 — 가장 약한 지점을 결론으로 삼는 중)<br>
+  <b>제안</b>: <b>"현행 예산 배분은 위험이 아니라 작년 피해를 따라간다 → 사후대응에서 예방으로 전환해야 한다"</b> — 이미 계산된 숫자만으로 전부 성립함</p>
+  <table>
+    <tr><th>근거</th><th>숫자</th><th>출처</th></tr>
+    <tr><td>피해는 새 지역이 아니라 같은 곳에서 반복</td><td>방제관리단위(100m) 기준 반복관리대상 44.2%, 신규비중 100%→37.9%</td><td>CH1 gridComposition100m</td></tr>
+    <tr><td>소나무 면적으로는 피해가 설명 안 됨</td><td>R²=0.05(n=148)</td><td>CH1 residual</td></tr>
+    <tr><td>구조적 위험은 만성적으로 존재</td><td>십분위 1→10: 발생률 0.47→0.81, 피해 0.019→0.105(5.5배)</td><td>CH2 validity.decile</td></tr>
+    <tr><td><b>현행 예산은 그 위험을 거의 반영 못함</b></td><td><b>배분갭 R²=2.39%, 순위상관 0.116</b></td><td>CH2 budgetGapSummary</td></tr>
+    <tr><td>예산은 대신 피해량을 따라감</td><td>corr(예산,피해)=+0.255</td><td>Model1_v4_로그.txt</td></tr>
+    <tr><td>재발은 이력만으로 거의 완벽히 예측됨 → 예방시점을 알 수 있음</td><td>연속발생연수 단독 홀드아웃 AUC 0.918</td><td>Model2_final_로그.txt</td></tr>
+    <tr><td>우리 지표가 정부 지정지역을 독립 재현함</td><td>산림청 지명 8곳 중 7곳(87.5%)+미지정후보 18곳</td><td>CH1 crossMetric</td></tr>
+  </table>
+  <div class="expect"><b>"예산이 위험을 2.4%밖에 반영하지 못한다"와 "예산이 피해량과 +0.255로 상관된다"를 나란히 놓으면, 그것만으로 완결된 정책 발견</b>입니다. 반영률이 낮다는 건 모델의 실패가 아니라 현행 배분방식에 대한 진단. 같은 숫자를 어디에 놓는지가 전부.<br><br>
+  이 프레임에서는: AUC 0.56이 약점이 아니라 "단기예측 아닌 중장기 선별 도구"라는 결론의 일부가 됨. Model2가 기준모형에 못 미치는 것도 "단기재발은 이력만으로 충분, 복잡한 모형 불필요"라는 발견이 됨. CH3의 역할이 "순위 매기기"에서 "예방형 배분규칙 설계"로 바뀜 — 완도군 문제가 자동으로 사라짐.</div>
+
+  <h4>CH3 재설계 — 순위표 대신 2×2 배분규칙</h4>
+  <pre>                    현행 예산 수준
+                   낮음        높음
+              ┌──────────┬──────────┐
+     재발위험  │  ①      │  ②      │
+        높음   │ 최우선   │  유지    │
+              │ 증액     │  점검    │
+              ├──────────┼──────────┤
+     재발위험  │  ③      │  ④      │
+        낮음   │ 예찰만   │ 재배분   │
+              │ 유지     │  검토    │
+              └──────────┴──────────┘</pre>
+  <ul>
+    <li><b>①에 들어갈 곳</b>: 포항시(재발 0.999, 예산 하위), 성주군(0.999), 고령군(0.999), 횡성군 — <b>이미 여러분 데이터의 "부족" 리스트 하위에 있음(70·72·74·73위)</b></li>
+    <li><b>③에 들어갈 곳</b>: 완도·옹진·서울 자치구 → <b>"예산 부족"이 아니라 "정상"으로 올바르게 분류됨</b></li>
+    <li><b>④가 정책적으로 가장 흥미로운 칸</b> — 예산은 많은데 재발위험이 낮은 곳</li>
+  </ul>
+  <div class="expect">이 2×2는 배분갭을 순위 산식에서 빼고 <b>축으로만</b> 쓰기 때문에 3중 계상 문제가 구조적으로 해소됨. 필요한 데이터가 <code>ch3/data.js</code>에 이미 다 있어 만들기도 쉬움.</div>
+
+  <h4>마지막 한 가지</h4>
+  <p><code>ch2/ch2.html</code> §05에 스스로 적어둔 "약점" 섹션, 방법론 결정문서에 남긴 "왜 제외 안 됐는지 근거가 로그에 없음", 7차 보고서의 재현 불일치 기록 — 이 정도 감사 추적을 남긴 공모전 제출물은 드뭅니다. <b>수치를 좋게 만드는 것보다, 어떤 수치를 어디에 놓을지 다시 정하는 것이 지금 훨씬 큰 개선을 만듭니다.</b> AUC 0.56은 못 올리지만, "AUC 0.56이므로 이 지수는 단기예측이 아니라 중장기 선별 도구다"라고 먼저 말하면 그건 약점이 아니라 분석 역량의 증거가 됩니다.</p>
+
+  <h3 id="s3h">3-8. 심사위원 예상 질문 12개</h3>
+  <p class="lede">1~5번은 거의 확실히 나옴. <b>3·4·10번은 현재 답이 없음 → P0 우선순위의 근거.</b></p>
+  <div class="tw"><table>
+    <tr><th>#</th><th>질문</th><th>준비된 답의 요지</th></tr>
+    <tr><td>1</td><td>CH1에서 누적피해 1위인 제주시가 CH2·CH3에는 왜 없습니까?</td><td>제주시·서귀포시는 자치권 없는 행정시로 시군구 단위 예산·행정통계에서 제외됨. 전국 누적의 17.2%가 빠진 한계를 명시하고, CH1에서 별도 분석</td></tr>
+    <tr><td>2</td><td>반복관측비율 44.2%가 격자를 10m로 하면 8%인데, 왜 100m입니까?</td><td>산림청 방제 집행 관리단위가 100m×100m(630만 셀). 역학적 확산지표가 아니라 정책 관리단위 기준 반복관리 대상 비율. 민감도 4개 값 상시 공개</td></tr>
+    <tr><td>3</td><td>"예산 부족 74곳"의 74는 어떻게 나온 숫자입니까?</td><td><span class="status bad">(현 상태로는 답할 수 없음 — qcut 3분위. §3-2 B 수정 후 답변 가능)</span></td></tr>
+    <tr><td>4</td><td>우선지원 1위가 왜 피해가 없는 완도군입니까?</td><td><span class="status bad">(수정 전엔 답 없음. 2×2 전환 후 "완도는 ③정상 구간"으로 답변)</span></td></tr>
+    <tr><td>5</td><td>지수의 AUC가 0.56이면 예측력이 없는 것 아닙니까?</td><td>맞음. within 효과가 비유의하므로 단기예측 도구가 아님. 근거는 AUC가 아니라 십분위 단조성(발생률 0.47→0.81, 피해 5.5배). 용도는 중장기 우선순위 선별</td></tr>
+    <tr><td>6</td><td>기후위험도의 공간해상도는 어떻게 됩니까?</td><td>관측소 89개를 229개 시군구에 배정. 108번 관측소 하나가 30개 시군구 공유, 옹진 최근접 73.9km. 도메인 변별력 한계 명시</td></tr>
+    <tr><td>7</td><td>원목생산업체수가 많으면 확산위험이 높아야 하는데 부호가 왜 음수입니까?</td><td>(개명 후) 이 도메인은 확산이 아니라 임업 산업기반 취약성을 측정함. 이름을 바꿨음</td></tr>
+    <tr><td>8</td><td>예산을 취약성지수에 넣고, 그 지수로 예산배분을 판정하면 순환 아닙니까?</td><td>배분갭 회귀에는 예산을 뺀 위험지수(노출·기후·산업기반)만 사용함. 다만 구조적취약성지수에는 포함돼 있어 CH3 산식에서 중복계상이 있었고 수정함</td></tr>
+    <tr><td>9</td><td>2026년 피해가 전년비 얼마나 늘었습니까?</td><td>조사기간이 다름(2025년 13개월/2026년 12개월). 월평균 환산 +29%. 단순차이 +28만은 비교 불가</td></tr>
+    <tr><td>10</td><td>강원도가 지도에 왜 안 나옵니까?</td><td><span class="status bad">(수정 전이면 치명적. 반드시 고치고 갈 것)</span></td></tr>
+    <tr><td>11</td><td>Model2 AUC 0.91은 높은데, 단순 모형과 비교했습니까?</td><td>했음. 연속발생연수 단독이 0.918로 근소하게 더 높음. 단기 재발위험은 이력만으로 충분히 판별되며, 이것도 발견</td></tr>
+    <tr><td>12</td><td>CH4 단가는 어디서 왔습니까?</td><td>「소나무재선충병 방제지침」의 방법 선택 기준만 인용했고 단가는 미확보. 사용자 입력형 구조로 제시</td></tr>
+  </table></div>
+
+  <h3 id="s3i">3-9. 남은 시간 배분 제안</h3>
+  <p class="lede">가정: 제출까지 2주, 팀원 3명</p>
+  <table>
+    <tr><th>단계</th><th>기간</th><th>담당</th><th>내용</th></tr>
+    <tr><td>1</td><td>~3일</td><td>모델링</td><td><b>P0 #1·2·3</b> — 배분갭 2부문화, 모집단 제한, 우선순위 산식 교체, 2×2 매트릭스 산출</td></tr>
+    <tr><td>1</td><td>~1일</td><td>대시보드</td><td><b>P0 #4·5·6</b> — 지도 코드 매핑, AUC 교체, KPI 배지 수정</td></tr>
+    <tr><td>1</td><td>~1일</td><td>CH4</td><td><b>P0 #7</b> — 입력형 전환, 단가 비우기, 예방/처리 분리</td></tr>
+    <tr><td>2</td><td>~3일</td><td>전원</td><td><b>P1 #8~16</b> — CH1 잔차패널 삭제, 재발률 재계산, 도메인 개명, 25곳 확대, CDN 로컬화</td></tr>
+    <tr><td>3</td><td>~2일</td><td>대시보드 담당</td><td><b>P1 #19</b> — 00 개요 탭 구축, 신뢰배지 도입, 분석단위 정합표</td></tr>
+    <tr><td>4</td><td>~2일</td><td>전원</td><td>재현성 정비(#17·18) + 보고서에 스토리라인 반영(§3-7)</td></tr>
+    <tr><td>5</td><td>~2일</td><td>전원</td><td>Q&amp;A 12문항 리허설, 오프라인 시연 테스트(랜선 뽑고)</td></tr>
+  </table>
+  <p class="lede"><b>시간이 부족하면 P0 7건 + 00 개요 탭만 하세요.</b> 나머지는 "한계로 명시"하면 됩니다. 한계를 적은 분석은 감점이 작고, 틀린 결론을 확신하는 분석은 감점이 큽니다.</p>
+
+  <h3 id="s3j" style="color:var(--pine)">3-10. 우선순위 공식 최종결정 — 6개 공식 대조 (자기검증 포함)</h3>
+  <div class="card warn">
+    <div class="ch">⚠️ 제 이전 결론 정정</div>
+    이 세션 중 저는 검증보고서의 대안 공식(<code>0.5z(index_main)+0.5z(재발위험확률)+0.15z(-배분갭)</code>)을 직접 실행해 <b>Spearman +0.697</b>을 확인하고 "효과가 검증됐다"고 말씀드렸습니다. 이후 팀원 검토를 거쳐 재검토한 결과, <b>이 검증 자체가 방법론적으로 순환(자기충족)임을 발견했습니다</b> — 재발위험확률을 산식에 50% 넣고 그 산식이 재발위험확률과 상관이 높다고 말하는 건, "답을 시험지에 미리 적어놓고 정답률이 높다"고 말하는 것과 같습니다. 아래는 그 재검토·재검증 과정 전체와 최종 결론입니다.
+  </div>
+
+  <h4>자기충족성 분해 — 제가 직접 재현</h4>
+  <div class="tw"><table>
+    <tr><th>산식</th><th>ρ(재발확률)</th><th>해석</th></tr>
+    <tr><td>C 전체 (0.5z(index_main) + <b>0.5z(재발확률)</b> + 0.15z(-배분갭))</td><td class="num">+0.734</td><td>높아 보이지만…</td></tr>
+    <tr><td>C2. 재발확률 항만 제거 (0.5z(index_main) + 0.15z(-배분갭))</td><td class="num">+0.145</td><td>재발확률 없으면 급락</td></tr>
+    <tr><td>C3. 재발확률 자리에 <b>순수 랜덤 노이즈</b> 대입</td><td class="num">+0.122</td><td><b>C2와 거의 동일!</b></td></tr>
+  </table></div>
+  <p class="lede">C2(+0.145)와 C3(+0.122)가 사실상 같다는 것은, "재발확률 항"이 실제로 기여하는 정보량이 거의 0이라는 뜻입니다. C의 헤드라인 수치(+0.734)는 거의 전부 "재발확률을 재발확률로 검증한" 순환에서 나온 것입니다. <b>C(검증보고서 대안 공식)는 철회합니다.</b></p>
+
+  <h4>6개 공식 최종 성적표 (제가 직접 재현, n=221)</h4>
+  <div class="tw"><table>
+    <tr><th>공식</th><th>ρ(재발확률)</th><th>완도군 순위</th><th>배분갭 의존</th><th>자기충족</th><th>판정</th></tr>
+    <tr><td>A. 현행 (index_main − 배분갭)</td><td class="num">−0.475</td><td class="num">1위</td><td class="num">98.9%</td><td class="num">0%</td><td><span class="status bad">사용불가</span></td></tr>
+    <tr><td>B. 계획서 처방 (0.6×RiskPct+0.4×UnderfundPct)</td><td class="num">+0.12~0.16</td><td class="num">1위</td><td class="num">40%</td><td class="num">0%</td><td><span class="status warn">개선 미미</span></td></tr>
+    <tr><td style="text-decoration:line-through;color:var(--mu2)">C. 검증보고서 대안 (z 혼합)</td><td class="num" style="color:var(--mu2)">+0.73</td><td class="num" style="color:var(--mu2)">21위</td><td class="num" style="color:var(--mu2)">13%</td><td class="num"><b>71%</b></td><td><span class="status bad">철회</span></td></tr>
+    <tr><td>D. 계획서+재발 절충 (0.5R+0.3U+0.2Rec)</td><td class="num">+0.42</td><td class="num">1위</td><td class="num">30%</td><td class="num">20%</td><td><span class="status warn">차선</span></td></tr>
+    <tr style="background:var(--ok-bg)"><td><b>E. RiskPct 단독 (위험지수 백분위, 대응역량 제외)</b></td><td class="num"><b>+0.40~0.47</b></td><td class="num"><b>6위</b></td><td class="num"><b>0%</b></td><td class="num"><b>0%</b></td><td><span class="status ok">✅ 최종 채택</span></td></tr>
+    <tr><td>F. 0.6×RiskPct+0.4×RecurPct</td><td class="num">+0.74~0.78</td><td class="num">40~43위</td><td class="num">0%</td><td class="num">40%</td><td><span class="status warn">자기충족 일부</span></td></tr>
+  </table></div>
+
+  <div class="card ok">
+    <div class="ch">✅ 최종 결정 — Priority = RiskPct 단독</div>
+    <pre>Priority = percentile_rank(위험지수)
+# 위험지수 = (노출도 + 기후위험도 + 인위적확산) / 3  — 대응역량 제외
+# 등급: S(상위5%) / A(10%) / B(20%) / C(80%) / D(하위20%)
+# 배분갭 → 산식에서 완전히 제거, "예산-위험 불일치 현황" 별도 진단표로만 표시
+# 재발위험확률 → urgentList 교차조건으로만 사용 (계획서 원래 설계)</pre>
+    <b>채택 이유</b>: 배분갭을 안 써서 "예산 0인 곳이 최우선" 문제가 없고(A의 결함 해소), 재발확률을 산식에 안 써서 자기충족이 없으며(C의 결함 해소), 가중치·임계값 같은 ad-hoc 파라미터가 전혀 없습니다. 그런데도 ρ=+0.40~0.47로 현행(−0.48)·계획서 원안(+0.12~0.16)보다 뚜렷하게 낫습니다. 계획서 §3.1 "배분용 위험지수에 예산을 혼입하지 않는다"는 원칙과 가장 부합 — <b>계획서의 정확한 공식(B)보다 계획서의 원칙을 따르는 것(E)이 더 낫습니다.</b>
+  </div>
+
+  <h4>E의 한계 — 제가 직접 재검증 (다중 평가지표)</h4>
+  <p class="lede">E도 만능은 아닙니다. 재발확률 외 다른 실측 지표와 대조하면 약점이 드러납니다(제가 ch1/data.js의 <code>sggBurden</code>·ch2/data.js를 직접 조인해 재현):</p>
+  <div class="tw"><table>
+    <tr><th>평가지표</th><th>ρ(RiskPct)</th><th>해석</th></tr>
+    <tr><td>재발위험확률</td><td class="num">+0.40~0.47</td><td>양호</td></tr>
+    <tr><td>log_피해밀도</td><td class="num">+0.41</td><td>양호(원 감사문서 주장 +0.19보다 제 재검증이 더 높게 나옴)</td></tr>
+    <tr><td>누적피해고사목</td><td class="num">+0.28</td><td>약함(원 문서 주장 +0.16과 유사)</td></tr>
+    <tr><td>반복관측격자비율</td><td class="num">+0.33</td><td>약함~중간(원 문서는 "+0.05, 거의 없음"이라 했으나 제 재검증은 더 강한 관계로 나옴 — 방향은 같으나 정도 차이 있음, 결론엔 영향 없음)</td></tr>
+  </table></div>
+  <p><b>실제 사례 (제가 직접 확인)</b>: 누적피해고사목 <b>1위 울산 울주군(349,686그루)의 RiskPct 순위는 60위/222</b>, <b>2위 경북 구미시(224,599그루)는 113위</b>, <b>5위 경기 광주시(132,716그루)는 202위</b>(하위권). 반면 완도군(피해 이력 거의 없음)은 여전히 6위. 이건 RiskPct 산식의 잘못이 아니라 <b>상류 입력(인위적확산 도메인 부호/라벨, F02)의 문제</b>입니다.</p>
+
+  <div class="card warn">
+    <div class="ch">⚠️ E 채택의 전제조건 — 상류를 먼저 고칠 것</div>
+    E를 도입하기 전에 반드시 다음 두 가지를 먼저 고쳐야 합니다. 안 고치면 공식만 바꿔도 완도군류의 문제가 형태만 바뀌어 남습니다.
+    <ol>
+      <li><b>F02 해결</b>: 인위적확산 도메인의 부호를 +1(이론대로: 원목업체 多 = 이동경로 多 = 확산위험 高)로 바꾸거나, 도메인 자체를 "산업기반 취약성"으로 개명 → 완도군류 하락, 울주군·구미시류 상승 기대</li>
+      <li><b>F06 해결</b>: 배분갭을 2부문 모형(예산 배정여부 로지스틱 + 배정시 수준 OLS)으로 분리 → "병이 없어서 예산 0"과 "병은 있는데 과소배분"을 구분</li>
+    </ol>
+    <div class="expect"><b>예상 결과</b>: 이 두 가지를 고친 후 E(RiskPct 단독)를 적용하면 "구조적으로 취약하면서 실제로 피해도 많은 곳"이 자연스럽게 상위에 오게 됩니다. <b>공식(하류)을 고르는 문제가 아니라 입력(상류)을 고치는 문제</b>라는 것이 이번 6개 공식 전수비교의 핵심 교훈입니다.</div>
+  </div>
+</section>
+
+<!-- ══════════════ 4. 패치 검토 ══════════════ -->
+<section id="s4">
+  <h2><span class="num">4</span>패치 파일(<code>files (7)/</code>) 검토 결과</h2>
+  <p class="lede">7개 패치 + README + requirements.txt 전부 검토, 5개 핵심 사실을 배경 에이전트로 재검증, P0_1과 P1_17은 <b>실제로 실행</b>해서 확인.</p>
+
+  <h3>4-1. 제가 직접 실행한 검증</h3>
+  <div class="card ok">
+    <div class="ch">✅ P0_1 (우선순위 공식) — 실제 데이터로 재현</div>
+    <code>ch3/data.js</code>를 격리 테스트 폴더에 복사해 <code>P0_1_fix_priority_score.py</code> 그대로 실행:
+    <ul>
+      <li>Spearman(new_score, 재발위험확률): <b>−0.4766 → +0.6967</b></li>
+      <li>완도군: priority_rank <b>1위 → 24위</b>, quadrant "③예찰_유지"로 재분류</li>
+      <li>새 TOP3: 해운대구·통영시·여수시(실제 고위험 연안지역)</li>
+    </ul>
+    <div class="expect"><b>미완성 부분</b>: ① 모집단 제외 기준(재발확률≤0.05 AND 지수≤0.3)은 작성자 스스로 "느슨한 기준, 팀 논의 필요"라 명시한 임시값 ② JSON 파일만 생성 — ch3.html이 새 필드(priority_score_v2, quadrant)를 실제로 그리도록 렌더링 스크립트 연결 작업이 별도로 필요</div>
+  </div>
+
+  <div class="card bad">
+    <div class="ch">🔴 P1_17 (경로 수정) — 실행 자체가 이 환경에서 안 됨</div>
+    <b>인코딩 버그 ① — 콘솔 출력 크래시(경로와 무관, 더 심각함)</b>: 이 Windows 환경(cp949)에서 그냥 실행하면 <code>main()</code>의 첫 <code>print()</code>에서 em-dash 문자 때문에 <code>UnicodeEncodeError</code>로 즉시 죽습니다. 패치 로직은 시작도 못 함(실제 재현 확인 — 파일 크기 불변, .bak 미생성).
+    <pre>PYTHONIOENCODING=utf-8 python patches/P1_17_fix_paths.py</pre>
+    <div class="expect"><b>✅ 확인됨</b>: 위처럼 환경변수 지정하니 정상 작동, OUTDIR/MODELDIR/PANEL 3줄이 의도대로 정확히 치환됨(diff로 확인, 나머지 200줄 완전 동일). 두 번 실행해도 안전(이미 패치된 파일은 "변경 없음"으로 인식, .bak 타임스탬프·체크섬 불변 확인 — 처음엔 걱정했으나 기우로 판명).</div>
+
+    <b>인코딩 버그 ② — 로그 파일로 리다이렉션해도 동일하게 크래시함</b>: 팀원분이 추가로 지적한 부분도 직접 재현·검증했습니다.
+    <ul>
+      <li><span class="status ok">✅ CONFIRMED</span> — 6차 CSV(<code>CH2_전체병합패널_..._최종보정4.csv</code>)와 1차(구 7차) CSV(<code>Model2_재발위험확률_2022기준_final.csv</code>) 모두 실제로 <code>ef bb bf</code> BOM이 붙은 UTF-8(=utf-8-sig)입니다(hex dump로 직접 확인)</li>
+      <li><span class="status ok">✅ CONFIRMED</span> — <code>model1_v4_final.py</code> L33의 <code>df = pd.read_csv(PANEL)</code>에는 <code>encoding</code> 인자가 없습니다</li>
+      <li><span class="status warn">⚠️ 이 환경에서는 재현 안 됨</span> — "일부 pandas 버전에서 첫 컬럼명에 <code>﻿</code>가 붙을 수 있다"는 우려는, 실제 설치된 pandas 3.0.5로 같은 CSV를 읽어 테스트한 결과 BOM이 투명하게 처리되어(<code>columns[0] == '연도'</code>, <code>﻿</code> 없음) 이 환경에서는 발생하지 않았습니다. 다만 팀원 환경의 pandas 버전이 다르면 재발할 수 있는 리스크이므로, <b>안전을 위해 <code>encoding="utf-8-sig"</code>를 명시하는 것 자체는 여전히 옳은 방향</b>입니다(방어적 코딩)</li>
+      <li><span class="status ok">✅ CONFIRMED (직접 재현)</span> — 로그 파일 리다이렉션(<code>python script.py &gt; log.txt</code>, cmd.exe 방식)으로 실제 테스트한 결과, <b>PYTHONIOENCODING 미설정 시 콘솔 직접 실행과 완전히 동일한 <code>UnicodeEncodeError</code>가 파일 리다이렉션 시에도 그대로 발생</b>합니다(exit code 1). <code>PYTHONIOENCODING=utf-8</code>을 설정하면 리다이렉션 케이스도 정상화됨(exit code 0, 로그 파일에 한글 정상 기록)을 확인했습니다 — 별개 메커니즘이 아니라 같은 근본원인(콘솔 코드페이지 cp949)이 두 시나리오 모두를 덮습니다</li>
+    </ul>
+    <div class="expect"><b>수정 방향(최종)</b>:
+      <pre># 실행 가이드에 추가
+# Windows (1회성)
+set PYTHONIOENCODING=utf-8
+python Modeling/4차/model1_v4_final.py
+
+# 영구 설정(팀원 전체 PC에 권장)
+setx PYTHONIOENCODING utf-8
+
+# 코드 자체에도 추가(방어적 코딩, 팀원 pandas 버전 무관하게 안전)
+df = pd.read_csv(PANEL, encoding="utf-8-sig")</pre>
+      <b>예상 결과</b>: 콘솔 직접 실행·로그 파일 리다이렉션·다른 팀원의 pandas 버전 차이 세 가지 시나리오 전부에서 안전하게 실행됨. README의 "적용 전 체크"에 이 두 줄을 추가할 것.</div>
+
+    <p class="lede">경로 문제(팀원 저장소 구조 다를 수 있어 그대로 둠): <code>Modeling/4차/model1_v4_final.py</code> → 실제 로컬 경로는 <code>Modeling/CH2/4차/</code>(원본 OUTDIR="/Users/chanhaeng17/Desktop/최종 CH2 EDA/병합패널/output" 정확히 일치 확인). <code>Modeling/6차/model1_final_재구현_TierA_TierB_검증.py</code> → 실제 <code>Modeling/CH2/6차/</code>. <code>Modeling/7차/model2_final_재구현.py</code>는 폴더 자체가 <code>Modeling/1차/</code>로 이름이 바뀐 것으로 추정(내용 동일한 파일 확인).</p>
+    <div class="expect"><b>이 패치의 범위 밖(별도 수정 필요)</b>: sign_check 순환검증, qcut(3) 문제, holdout 재적합 문제는 경로와 무관하게 그대로 남음 — §5 우선순위표 참고</div>
+  </div>
+
+  <h3>4-2. 패치별 최종 판정</h3>
+  <div class="tw"><table>
+    <tr><th>패치</th><th>내용</th><th>판정</th><th>비고</th></tr>
+    <tr><td>P0_1</td><td>우선순위 공식 교체</td><td><span class="status ok">✅ 효과 검증됨</span></td><td>ch3.html 렌더링 연동 마무리 필요</td></tr>
+    <tr><td>P0_4</td><td>강원 51xxx→42xxx 코드 별칭</td><td><span class="status ok">✅ 로직 확인</span></td><td><b>ch1.html에도 적용 필요</b>(CH1 자체 버그이기도 함) — 원 패치가 놓친 부분</td></tr>
+    <tr><td>P0_5</td><td>Model2 AUC 0.947→0.911</td><td><span class="status ok">✅ 즉시 적용 가능</span></td><td>근거 확인됨(7차 로그)</td></tr>
+    <tr><td>P0_6</td><td>KPI "전년비+28만" 수정</td><td><span class="status ok">✅ 즉시 적용 가능</span></td><td>산술 확인됨(월평균환산 +29%)</td></tr>
+    <tr><td>P1_14</td><td>교차기준 7→25곳 확대</td><td><span class="status ok">✅ 즉시 적용 가능</span></td><td><code>CROSS_CAP=7</code> 실제 확인됨</td></tr>
+    <tr><td>P1_16</td><td>CDN→로컬 vendor 전환(sed)</td><td><span class="status ok">✅ 즉시 적용 가능</span></td><td>vendor 파일명까지 정확히 일치 확인</td></tr>
+    <tr><td>P1_17</td><td>절대경로→상대경로 변환</td><td><span class="status warn">🟡 인코딩 지정 후 실행</span></td><td><code>PYTHONIOENCODING=utf-8</code> 필수, 경로는 팀원 저장소 기준 유지</td></tr>
+  </table></div>
+</section>
+
+<!-- ══════════════ 5. 종합 우선순위표 ══════════════ -->
+<section id="s5">
+  <h2><span class="num">5</span>종합 우선순위표</h2>
+  <p class="lede">P0=제출 전 필수(약 12h) · P1=제출 전 권장(약 15h) · P2=시간 남으면. <span class="status ok">✅</span>=이 대화 중 직접/에이전트 재확인 · <span class="status warn">⚠️</span>=보고서 주장, 독립검증 안 함</p>
+
+  <div class="tw"><table>
+    <tr><th>#</th><th>P</th><th>영역</th><th>문제</th><th>조치</th><th>파일</th><th>공수</th><th>검증</th></tr>
+    <tr><td>1</td><td><span class="status bad">P0</span></td><td>CH3</td><td>우선순위 −0.48 역상관, TOP30에 서울 자치구 8곳</td><td><b>최종결정(§3-10)</b>: <code>priority = percentile_rank(위험지수)</code> 단독(RiskPct, 대응역량 제외) + S/A/B/C/D 등급. 배분갭은 산식에서 제거→별도 진단표, 재발확률은 urgentList 교차조건으로만. <b>단, F02·F06(상류) 선행 필요</b></td><td>ch3/data.js, model1_v4_final.py(F02·F06)</td><td class="num">5h</td><td><span class="status ok">✅ 6개 공식 전수비교로 최종확정(+0.40~0.47)</span></td></tr>
+    <tr><td>2</td><td><span class="status bad">P0</span></td><td>CH2</td><td>예산=0(64곳)을 실측 0으로 취급→배분갭 왜곡(corr 0.988)</td><td>2부문 처리(배정여부/배정수준) + 미배정 별도 범주</td><td>model1_v4_final.py(Modeling/CH2/4차/) L~160</td><td class="num">3h</td><td><span class="status ok">✅ 근거 확인</span></td></tr>
+    <tr><td>3</td><td><span class="status bad">P0</span></td><td>CH2</td><td><code>qcut(배분갭,3)</code>→"부족 74곳"은 정의상 1/3</td><td>예측구간 하한 기준 절대판정으로 교체, 또는 "하위 3분위(정의상 74곳)" 명기</td><td>동일 파일 L188</td><td class="num">1h</td><td><span class="status ok">✅ 줄번호 확인</span></td></tr>
+    <tr><td>4</td><td><span class="status bad">P0</span></td><td>지도</td><td>강원 18곳(42xxx↔51xxx) 등 63/222 미표시, <b>CH1 자체도 영향</b></td><td><code>SGG_ALIAS</code> 폴백 즉시 적용(ch1·ch2·ch3.html 전부) → KOSTAT 2023 경계로 교체</td><td>ch1/data.js, ch1/ch1.html, ch2/ch2.html, ch3/ch3.html</td><td class="num">0.5h→4h</td><td><span class="status ok">✅ 범위 확대 확인</span></td></tr>
+    <tr><td>5</td><td><span class="status bad">P0</span></td><td>CH2</td><td>홀드아웃 AUC 0.947←로그 0.911, 기준모형이 실제로 우세</td><td><code>0.911</code>로 교체 + "기준모형 0.918 우세" 명시</td><td>ch2/data.js validity.model2_note</td><td class="num">15m</td><td><span class="status ok">✅ CONFIRMED</span></td></tr>
+    <tr><td>6</td><td><span class="status bad">P0</span></td><td>CH1</td><td>KPI "전년비+28만"↔자체경고 "13개월 비교불가" 모순</td><td>배지 삭제 또는 "월평균환산 +29%"</td><td>ch1/ch1.html L~340</td><td class="num">15m</td><td><span class="status ok">✅ CONFIRMED</span></td></tr>
+    <tr><td>7</td><td><span class="status bad">P0</span></td><td>CH4</td><td>단가·작업량 전부 임의값. 나무주사(예방)를 방제와 혼재</td><td>단가 입력형 전환, 기본값 비움, 「방제지침」 출처 배지, 예방/피해목처리 분리</td><td>ch4/data.js, ch4/ch4.html</td><td class="num">3h</td><td><span class="status warn">⚠️ 미독립검증</span></td></tr>
+    <tr><td>8</td><td><span class="status bad">P0(신규)</span></td><td>패치</td><td>P1_17이 이 Windows 환경(cp949)에서 콘솔·로그리다이렉션 모두 즉시 크래시. CSV는 BOM(utf-8-sig)인데 read_csv에 encoding 미지정</td><td><code>PYTHONIOENCODING=utf-8</code>(1회성) 또는 <code>setx PYTHONIOENCODING utf-8</code>(영구) 가이드 추가 + <code>read_csv(PANEL, encoding="utf-8-sig")</code> 명시</td><td>P1_17_fix_paths.py, model1_v4_final.py L33</td><td class="num">10m</td><td><span class="status ok">✅ 콘솔·리다이렉션·BOM 전부 직접 재현+해결 확인</span></td></tr>
+    <tr><td>9</td><td><span class="status warn">P1</span></td><td>CH1</td><td>잔차패널 R²=0.049로 "501배" 산출</td><td>패널 삭제 → "면적만으론 설명 불가(R²=0.05) → CH2 필요" 한 문장으로 대체</td><td>ch1/ch1.html §03</td><td class="num">1h</td><td><span class="status warn">⚠️ 미독립검증</span></td></tr>
+    <tr><td>10</td><td><span class="status warn">P1</span></td><td>CH1</td><td>재발% 0→29.2%는 관측창 확장 아티팩트</td><td>1~2주기 회색+라벨, 고정 관측창으로 재계산, 결론문 수정</td><td>ch1/ch1.html, ch1/data.js</td><td class="num">2h</td><td><span class="status warn">⚠️ 논리타당, 미독립검증</span></td></tr>
+    <tr><td>11</td><td><span class="status warn">P1</span></td><td>CH2</td><td>도메인라벨 "인위적확산"이 실제(원목업체 적음, 부호 −1)와 반대</td><td>"산업기반 취약형"으로 개명, 처방 문구 교체, CH3 4유형과 통일</td><td>ch2/*, ch3/*, README</td><td class="num">2h</td><td><span class="status warn">⚠️ 개명은 팀 결정사항</span></td></tr>
+    <tr><td>12</td><td><span class="status warn">P1</span></td><td>CH1</td><td><code>오차 0.67%</code> 표기가 최악값이며 1주기 제외 사실 은폐</td><td><code>최대 0.67% · 합계 0.19% · 1주기 제외(공개율 44.6%)</code></td><td>README.md, ch1/ch1.html</td><td class="num">15m</td><td><span class="status warn">⚠️ 미독립검증</span></td></tr>
+    <tr><td>13</td><td><span class="status warn">P1</span></td><td>CH2</td><td>부호를 Y와의 상관으로 결정(np.sign) → 순환 검증</td><td>사전 이론 부호 고정(GDD +1, 강수량 −1) 후 재적합, 변경 전후 비교표 부록</td><td>model1_v4_final.py L82-84</td><td class="num">2h</td><td><span class="status ok">✅ 줄번호 확인</span></td></tr>
+    <tr><td>14</td><td><span class="status warn">P1</span></td><td>CH1</td><td><code>44.2%</code>가 격자크기 함수(10m=8%)</td><td>"방제 관리단위(100m) 기준" + 민감도 4값 상시 노출</td><td>README.md, ch1/ch1.html</td><td class="num">1h</td><td><span class="status warn">⚠️ 미독립검증</span></td></tr>
+    <tr><td>15</td><td><span class="status warn">P1</span></td><td>CH1</td><td>교차기준 7곳 컷 = 산림청 개수에 맞춤(순환논리)</td><td>25곳 전체 공개 + 재현율 7/8(87.5%) + 추가후보 18곳</td><td>ch1/ch1.html §03</td><td class="num">1.5h</td><td><span class="status ok">✅ CROSS_CAP=7, 25개 확인</span></td></tr>
+    <tr><td>16</td><td><span class="status warn">P1</span></td><td>CH2/3</td><td>제주(전국 피해 17.2%, CH1 1위) 제외 미명시</td><td><code>excluded_note</code>에 사유 추가, CH1 제주 패널과 교차참조</td><td>ch2/data.js, ch3/data.js</td><td class="num">30m</td><td><span class="status warn">⚠️ 미독립검증</span></td></tr>
+    <tr><td>17</td><td><span class="status warn">P1</span></td><td>배포</td><td>CH2/CH3만 unpkg·cdnjs 의존 → 오프라인 발표 시 전멸</td><td><code>../ch1/vendor/</code>로 경로 변경</td><td>ch2/ch2.html, ch3/ch3.html</td><td class="num">15m</td><td><span class="status ok">✅ vendor 파일 존재 확인</span></td></tr>
+    <tr><td>18</td><td><span class="status warn">P1</span></td><td>재현성</td><td>로컬 절대경로 3건 → 클론 후 실행 불가</td><td><code>pathlib</code> 상대경로 + requirements.txt + run_all.py</td><td>Modeling/*.py</td><td class="num">1.5h</td><td><span class="status ok">✅ 경로 확인, 단 인코딩버그 있음(#8)</span></td></tr>
+    <tr><td>19</td><td><span class="status warn">P1</span></td><td>CH2</td><td>재현 스크립트가 편상관만 계산, 헤더는 "AUC·R² 일치 확인" 주장</td><td>완전 재현 스크립트 추가 또는 헤더 문구 하향</td><td>Modeling/6차/, ch2/data.js 헤더</td><td class="num">2h</td><td><span class="status warn">⚠️ 미독립검증</span></td></tr>
+    <tr><td>20</td><td><span class="status warn">P1</span></td><td>통합</td><td>통합대시보드가 iframe 래퍼(4KB), 개요 없음</td><td>00 개요 탭 신설(§3-6 시안 참조)</td><td>통합대시보드.html</td><td class="num">3h</td><td><span class="status ok">✅ 개선안 존재, 정합표 미완성(8개 중 3개 누락)</span></td></tr>
+    <tr><td>21</td><td><span class="status info">P2</span></td><td>CH2</td><td><code>model1_v4</code> 홀드아웃이 재적합(표본내) → 표본외 아님</td><td>Model2의 <code>frozen-gm</code> 방식 이식</td><td>model1_v4_final.py L138-145</td><td class="num">1.5h</td><td><span class="status ok">✅ 줄번호 확인(run_two_part)</span></td></tr>
+    <tr><td>22</td><td><span class="status info">P2</span></td><td>CH2</td><td><code>Y_bin = 피해 1본 이상</code>(기저율 41~81%)</td><td>상위 25% 또는 피해등급 임계로 재정의</td><td>스크립트</td><td class="num">1.5h</td><td><span class="status warn">⚠️ 미독립검증</span></td></tr>
+    <tr><td>23</td><td><span class="status info">P2</span></td><td>CH2</td><td>공간전파 항 SE 7.68·8.68(준분리)</td><td>Model2에서 제거, 부록에 사유 기록</td><td>model2_final_재구현.py</td><td class="num">30m</td><td><span class="status ok">✅ 7차 보고서로 기확인</span></td></tr>
+    <tr><td>24</td><td><span class="status info">P2</span></td><td>CH2</td><td>도메인 상호상관 0.416/0.343인데 동일가중</td><td>상관 보고 + 대안가중 민감도 부록</td><td>부록</td><td class="num">1h</td><td><span class="status warn">⚠️ 미독립검증</span></td></tr>
+    <tr><td>25</td><td><span class="status info">P2</span></td><td>CH2</td><td>옹진군(임상도 아티팩트) 우선지원 2위, 강원 고성군 제외 근거 없음</td><td>아티팩트 6곳 제외 기준 통일, 민감도 표</td><td>스크립트, 부록</td><td class="num">2h</td><td><span class="status warn">⚠️ 과거 메모리와 일치(양구·철원·고성 제외근거 없음)</span></td></tr>
+    <tr><td>26</td><td><span class="status info">P2</span></td><td>CH1</td><td><code>gridComposition100m</code>과 <code>gridDynamics100m</code> 중복(지속% vs 지속률%)</td><td>하나만 유지, 다른 분모는 각주</td><td>ch1/data.js</td><td class="num">30m</td><td><span class="status warn">⚠️ 미독립검증</span></td></tr>
+    <tr><td>27</td><td><span class="status info">P2</span></td><td>CH3</td><td>실행가능성 y축이 17개 시도값 → 계단형 산점도</td><td>시도 단위로 강등 또는 <code>방제법인수</code> 등 시군구 변수로 교체</td><td>ch3/*</td><td class="num">2h</td><td><span class="status ok">✅ 브라우저에서 직접 확인</span></td></tr>
+    <tr><td>28</td><td><span class="status info">P2</span></td><td>CH1</td><td>발생 시군구 수 추이 차트에 점 3개(2020/2025/2026)</td><td>차트 삭제 → KPI 텍스트</td><td>ch1/ch1.html</td><td class="num">20m</td><td><span class="status warn">⚠️ 미독립검증</span></td></tr>
+    <tr><td>29</td><td><span class="status info">P2</span></td><td>정합</td><td>지역 수 표기 난립: 148/166/167/180/193/222/229/240</td><td>분석단위 정합표 1개 신설(§3-6 참조)</td><td>개요 탭</td><td class="num">1h</td><td><span class="status ok">✅ 개선안에 부분구현(3개 누락)</span></td></tr>
+    <tr><td>30</td><td><span class="status info">P2</span></td><td>CH1</td><td><code>반복관측비율: 62.51160986422832</code> 미반올림</td><td>소수 1자리 통일</td><td>ch1/data.js</td><td class="num">10m</td><td><span class="status warn">⚠️ 미독립검증</span></td></tr>
+    <tr><td>31</td><td><span class="status info">P2</span></td><td>CH1</td><td><code>gradeDist.현재입력_시군구수</code>가 전부 0(미사용 필드)</td><td>필드 삭제 또는 차트에서 제외</td><td>ch1/data.js</td><td class="num">10m</td><td><span class="status warn">⚠️ 미독립검증</span></td></tr>
+  </table></div>
+  <p class="lede"><b>P0 합계 약 12시간 / P1 약 15시간.</b> P0만 처리해도 제출 가능 상태가 됩니다.</p>
+</section>
+
+<!-- ══════════════ 6. 다음 단계 ══════════════ -->
+<section id="s6">
+  <h2><span class="num">6</span>다음 단계 제안</h2>
+
+  <h3>가장 빠르게 가장 큰 효과 (검증된 것 위주, 총 1시간 내외)</h3>
+  <ol style="padding-left:20px">
+    <li>P0_5(AUC 수정, 5분) → P0_6(KPI 문구, 5분) → P1_17-corollary(CDN 로컬화, 10분) → P1_15(교차기준 확대, 20분)</li>
+    <li>P0_4를 ch1/ch2/ch3 세 파일 모두에 적용(강원 18곳 복구, 30분)</li>
+    <li>P0_1 JSON 결과를 ch3.html 렌더링에 실제로 연동(공식은 이미 검증됨, 반영 작업만 남음)</li>
+    <li>P1_17에 <code>PYTHONIOENCODING=utf-8</code> 가이드 추가 후 실행</li>
+  </ol>
+
+  <div class="card warn">
+    <div class="ch">⚠️ 미검증 항목 주의</div>
+    표에서 ⚠️로 표기된 항목(특히 CH4 전체, CH1 #9·10·11·14·16·19·22·24·26·28·30·31)은 아직 제가 직접 파일을 열어 재확인하지 않았습니다. 실제 적용 전 하나씩 대조 확인을 권장합니다.
+  </div>
+
+  <p>시작할 준비가 되면 어느 항목부터 실제 코드로 옮길지 말씀해주세요.</p>
+</section>
+
+<footer>
+  GENERATED FROM SESSION TRANSCRIPT · I'mPine 2026 임업통계 활용 경진대회 · 검증 항목 표기: ✅ 직접확인 / ⚠️ 미검증(보고서 주장) · v2: 누락 보완(오차0.67%, 기후해상도, CH4단가표, 남길것, 심사Q&A 12개, 일정표 등) · v3: 우선순위 공식 최종결정(§3-10) — 검증보고서 대안공식(C) 자기충족성 발견·철회, RiskPct 단독(E) 최종채택, 수식감사.html 최종본 교차검증 반영
+</footer>
+
+</main>
+</div>
+</body>
+</html>

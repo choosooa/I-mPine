@@ -1,0 +1,9 @@
+# I'mPine — Python 의존성
+# 실행: pip install -r requirements.txt
+# 검증된 Python 버전: 3.10+
+
+pandas>=1.5
+numpy>=1.23
+statsmodels>=0.13
+scipy>=1.9
+scikit-learn>=1.1

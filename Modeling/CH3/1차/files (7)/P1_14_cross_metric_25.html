@@ -1,0 +1,62 @@
+<!--
+  P1 #14 — ch1/ch1.html §03 교차기준 패널 교체
+  
+  기존: "7은 산림청이 지정한 특별방제구역 개수와 같은 규모로 맞춘 것"
+  → 독립 분석 결과를 정답에 맞춰 자른 것으로 읽힘 (순환논리)
+  
+  교체: 25곳 전체 공개 + 외부 타당성 검증 (87.5% 재현율)
+  
+  아래 HTML을 ch1.html의 해당 <div class="card"> 블록과 교체하세요.
+  crossMetric 데이터(25개)는 이미 ch1/data.js에 있으므로 data 수정 불필요.
+-->
+
+<div class="card">
+  <div class="ct">구조적 복합 고위험 시군구 — 25곳 전체 
+    <span class="tag">4개 지표 3분위 교차 · 높음 3개 이상</span>
+    <span class="tag" style="background:#dcf4c0;color:#0b3300">외부 타당성 검증</span>
+  </div>
+  <div class="note">
+    누적 규모·면적당 부담·반복관측률·장기지속 격자 수, 네 지표 중 <b>3개 이상이 상위 구간(높음)</b>에 속하는
+    시군구 <span id="cross-total-note"></span>입니다.
+    이 목록은 산림청 발표 명단을 입력으로 쓰지 않고 <b>과거 공간 원자료만으로</b> 도출했습니다.
+  </div>
+
+  <!-- 외부 타당성 배너 -->
+  <div class="diag-banner" style="margin-top:12px;background:#e4f0da;border-color:#3a9a6e">
+    <div class="ic">✓</div>
+    <div class="tx">
+      <b>외부 타당성 검증:</b> 산림청이 2025~2026년에 별도로 지명·공개한 피해집중 8개 지역 중
+      <b style="color:#0b3300">7곳(87.5%)</b>을 이 기준이 독립적으로 포착합니다.
+      미포착 1곳(양평군)은 4개 지표 중 2개만 상위 구간이었습니다.
+      <br>역으로 <b>정부가 지명하지 않은 잠재 고위험 후보군 18곳</b>이 추가로 식별되었습니다.
+    </div>
+  </div>
+
+  <table class="rtbl" id="cross-tbl" style="margin-top:8px"></table>
+  
+  <div class="note" style="margin-top:8px">
+    <b>🏛️ 산림청 지명 매칭 현황</b> — 
+    ✅ 포항(남·북구)·경주·안동·울주·밀양·창녕: 4지표 중 3~4개 상위 → 위 표에 포함.
+    ❌ 양평: 높음 2개(기준 미충족) → 미포함. 
+    ※ 산림청이 어떤 지역을 왜 선정했는지는 비공개이므로, 방법론이 다를 가능성이 있습니다.
+  </div>
+</div>
+
+<!--
+  JS 수정 (ch1.html 하단 스크립트):
+  
+  기존 코드에서 .slice(0,7) 또는 .head(7) 을 제거하고
+  crossMetric 전체 25개를 표에 렌더링하세요.
+  
+  // BEFORE:
+  const top7 = D.crossMetric.sort(...).slice(0, 7);
+  
+  // AFTER:
+  const all25 = D.crossMetric.sort((a,b) => b.누적피해고사목 - a.누적피해고사목);
+  
+  // 산림청 지명 여부 표시 (선택사항):
+  const KFS_NAMED = new Set(['포항시 북구','포항시 남구','경주시','안동시','울주군','밀양시','창녕군']);
+  all25.forEach(r => {
+    r._kfs = KFS_NAMED.has(r.시군구명) ? '🏛️' : '';
+  });
+-->
