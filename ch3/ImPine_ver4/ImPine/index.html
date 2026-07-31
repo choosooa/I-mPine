@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소나무재선충병 방제 취약지역 분석 대시보드</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f3ee; --bg2:#ffffff; --bg3:#ede9e1;
+  --border:rgba(88,72,48,.08); --border2:rgba(88,72,48,.18);
+  --text:#2c2a24; --text2:#5e5a50; --text3:#918b7e;
+  --green:#3a9a6e; --amber:#b8860b; --red:#c04b3a; --blue:#2a78d6;
+  --pine:#2d6b3f;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Pretendard','Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:16px;padding:14px 24px;background:linear-gradient(135deg,#faf9f5,#ffffff);border-bottom:1px solid var(--border);flex-shrink:0;box-shadow:0 2px 8px rgba(88,72,48,.05)}
+.brand{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.5px;display:flex;align-items:center;gap:12px}
+.brand .mono{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);font-weight:500}
+.brand-logo{width:38px;height:38px;background:linear-gradient(135deg,#2d6b3f,#3a9a6e);color:#fff;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 4px 12px rgba(45,107,63,.25)}
+nav.tabs{display:flex;gap:6px;margin-left:auto}
+.tab{display:flex;align-items:center;gap:8px;padding:9px 18px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px;color:var(--text2);transition:all .15s;user-select:none;font-weight:500}
+.tab:hover{border-color:var(--border2);color:var(--text);background:#e5e1d8}
+.tab .num{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--text3);background:var(--bg2);border:1px solid var(--border);padding:2px 7px;border-radius:4px}
+.tab.active{color:var(--text);font-weight:600}
+.tab.green.active{border-color:var(--green);background:rgba(58,154,110,.12);color:var(--green)}
+.tab.green.active .num{color:#fff;background:var(--green);border-color:var(--green)}
+.tab.amber.active{border-color:var(--amber);background:rgba(184,134,11,.12);color:var(--amber)}
+.tab.amber.active .num{color:#fff;background:var(--amber);border-color:var(--amber)}
+.tab.red.active{border-color:var(--red);background:rgba(192,75,58,.12);color:var(--red)}
+.tab.red.active .num{color:#fff;background:var(--red);border-color:var(--red)}
+.tab.blue.active{border-color:var(--blue);background:rgba(42,120,214,.12);color:var(--blue)}
+.tab.blue.active .num{color:#fff;background:var(--blue);border-color:var(--blue)}
+.pathbar{display:flex;align-items:center;gap:10px;padding:7px 24px;background:#eef3e7;
+  border-bottom:1px solid var(--border);flex-shrink:0;font-size:11.5px;color:var(--text2);flex-wrap:wrap}
+.pathbar b{color:var(--pine)}
+.pathbar .st{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--border2);
+  border-radius:14px;padding:2px 10px}
+.pathbar .st i{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--green);font-weight:700;font-style:normal}
+.frames{flex:1;position:relative;overflow:hidden}
+iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg);display:none}
+iframe.active{display:block}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="brand-logo">🌲</div>소나무재선충병 방제 취약지역 분석 대시보드<span class="mono">2026 임업통계 활용 경진대회</span></div>
+  <nav class="tabs">
+    <div class="tab green active" onclick="show(0)"><span class="num">CH.1</span>발생 현황</div>
+    <div class="tab amber" onclick="show(1)"><span class="num">CH.2</span>취약도 분석</div>
+    <div class="tab red" onclick="show(2)"><span class="num">CH.3</span>우선지원 전략</div>
+    <div class="tab blue" onclick="show(3)"><span class="num">CH.4</span>맞춤형 방제 설계</div>
+  </nav>
+</header>
+<div class="pathbar">
+  <b>5분 핵심 경로</b>
+  <span class="st"><i>1</i>반복 발생 확인</span>→
+  <span class="st"><i>2</i>구조적 취약지역 선별</span>→
+  <span class="st"><i>3</i>예산배분 간극 확인</span>→
+  <span class="st"><i>4</i>지역 유형별 정책 제안</span>
+  <span style="margin-left:auto;color:var(--text3)">공식통계 대조 완료 · 6개 분석연도 평균 절대오차 0.18% · 최대 0.67%</span>
+</div>
+<div class="frames">
+  <iframe id="f0" class="active" src="ch1/ch1.html"></iframe>
+  <iframe id="f1" data-src="ch2/ch2.html"></iframe>
+  <iframe id="f2" data-src="ch3/ch3.html"></iframe>
+  <iframe id="f3" data-src="ch4/ch4.html"></iframe>
+</div>
+<script>
+function show(i){
+  document.querySelectorAll('.tab').forEach(function(t,j){ t.classList.toggle('active', i===j); });
+  document.querySelectorAll('iframe').forEach(function(f,j){
+    f.classList.toggle('active', i===j);
+    if (i===j && !f.src && f.dataset.src) { f.src = f.dataset.src; }
+  });
+}
+</script>
+</body>
+</html>

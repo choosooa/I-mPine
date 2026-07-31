@@ -1,0 +1,167 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>I'mPine - CH4 v4 맞춤형 방제 설계</title>
+<script src="data.js"></script>
+<style>
+:root{--gd:#0b3300;--gm:#1a5a0a;--gl:#2d7016;--risk:#c0392b;--wa:#e67e22;--b:#2a78d6;--t:#1baf7a;--bg:#f6f8f3;--sf:#fff;--bd:#dde8d0;--tx:#1a1a18;--mu:#6b7560;--mu2:#8a9482}
+*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans KR","Malgun Gothic",system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.55}.mono{font-family:Consolas,"JetBrains Mono",monospace}
+.hdr{background:linear-gradient(135deg,var(--gd),var(--gm));padding:12px 24px;color:#fff;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:5}.hdr h1{font-size:20px;margin:0}.hdr .sub{font-size:12px;color:#cde9b7}.hdr a{margin-left:auto;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.45);border-radius:18px;padding:5px 12px;font-size:12px}
+.basis{padding:8px 24px;background:#eef4e6;border-bottom:1px solid var(--bd);font-size:12px;color:var(--gd)}.tag{display:inline-block;border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700}.tag.d{background:#fdebd2;color:#9a4a0a}.tag.c{background:#dcecff;color:#1d4ed8}.tag.b{background:#eaf3e0;color:#1a5a0a}.tag.a{background:#dcf4ea;color:#0f7a52}
+.pg{max-width:1420px;margin:0 auto;padding:16px 24px 28px}.grid{display:grid;grid-template-columns:360px 1fr;gap:14px;align-items:start}@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:15px 17px;margin-bottom:14px}.ct{font-weight:700;color:var(--gd);margin-bottom:9px;display:flex;gap:8px;align-items:center}.field{margin-bottom:13px}.field label{display:flex;justify-content:space-between;color:var(--mu);font-size:12px;margin-bottom:5px}.field input,.field select{width:100%;padding:7px 9px;border:1px solid var(--bd);border-radius:7px;background:#fff}.field input[type=range]{padding:0;accent-color:var(--gl)}.val{font-family:Consolas,monospace;color:var(--gd);font-weight:700}
+.notice{font-size:11.5px;background:#fff8ee;border-left:4px solid var(--wa);border-radius:8px;padding:9px 11px;color:#7a4a0a;margin-top:8px}.info{font-size:11.5px;background:#eef6ff;border-left:4px solid var(--b);border-radius:8px;padding:9px 11px;color:#1d4ed8;margin-top:8px}
+.recobox{background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border-radius:12px;padding:18px 20px;margin-bottom:14px}.recobox .l{font-size:11px;color:#cde9b7}.recobox .v{font-size:23px;font-weight:800}.recobox .why{font-size:12px;margin-top:6px;color:#eaf7de}.recobox.warn{background:linear-gradient(135deg,#7a2b0f,#a3401a)}
+.krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}.kpi{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:12px 14px;border-left:4px solid var(--gl)}.kl{font-size:11px;color:var(--mu)}.kv{font-size:20px;font-weight:800;font-family:Consolas,monospace}.ks{font-size:10.5px;color:var(--mu2);margin-top:3px}
+table{width:100%;border-collapse:collapse;font-size:12px}th{background:#f0f5ea;text-align:left;padding:7px 9px;border-bottom:2px solid var(--bd);color:var(--mu)}td{padding:7px 9px;border-bottom:1px solid #eee;vertical-align:top}td.num{text-align:right;font-family:Consolas,monospace}tr.best td{background:#eaf6f0}.pill{border-radius:9px;padding:2px 8px;font-size:10px;font-weight:700}.ok{background:#dcf4ea;color:#0f7a52}.no{background:#fde2e1;color:#a33}
+</style>
+</head>
+<body>
+<div class="hdr"><h1>I'mPine</h1><div class="sub">CH4 v4 맞춤형 방제 설계</div><a href="../../../../ch3/ImPine_ver4/ImPine/ch3/ch3.html">CH3로 돌아가기</a></div>
+<div class="basis"><span class="tag d">추정 포함</span> 재선충명시 예산을 공식 기준으로 우선 사용하고, 산림병해충 포괄 예산은 보조 참고값으로 표시합니다. 본 화면은 확정 견적이 아닙니다.</div>
+<section class="pg">
+  <div class="grid">
+    <div>
+      <div class="card">
+        <div class="ct">지역 선택</div>
+        <div class="field"><label>CH3 우선지원 지역 <span class="val" id="v-region">-</span></label><select id="region-select"></select></div>
+        <div class="info" id="region-note"></div>
+      </div>
+      <div class="card">
+        <div class="ct">현장 조건 입력</div>
+        <div class="field"><label>실제 방제면적 treatment_area_ha <span class="val" id="v-area">-</span></label><input type="range" id="in-area" min="1" max="300" step="1"></div>
+        <div class="field"><label>피해목 기준 treeCount <span class="val" id="v-tree">-</span></label><input type="range" id="in-tree" min="0" max="20000" step="10"></div>
+        <div class="field"><label>예산 기준 <span class="val" id="v-budget-mode">-</span></label><select id="budget-mode"><option value="primary">재선충명시 우선 기준</option><option value="explicit">재선충명시만</option><option value="broad">산림병해충 포괄 참고</option><option value="manual">수동 입력</option></select></div>
+        <div class="field"><label>비교 예산 <span class="val" id="v-budget">-</span></label><input type="range" id="in-budget" min="0" max="300000" step="100"></div>
+        <div class="field"><label>보유 인력 <span class="val" id="v-workers">-</span></label><input type="range" id="in-workers" min="1" max="100" step="1"></div>
+        <div class="field"><label>현장까지 거리 <span class="val" id="v-distance">-</span></label><input type="range" id="in-distance" min="0" max="150" step="1"></div>
+        <div class="field"><label>목표 작업일수 <span class="val" id="v-days">-</span></label><input type="range" id="in-days" min="1" max="30" step="1"></div>
+        <label style="font-size:12px"><input type="checkbox" id="in-residential"> 주거지 인접 또는 비산 민원 우려</label>
+        <div class="notice">면적은 소나무류 면적 참고값이 아니라 실제 방제면적을 사용해야 합니다. 기본값은 임시값이며 현장 설계자료로 확정하세요.</div>
+      </div>
+    </div>
+    <div>
+      <div class="recobox" id="recobox"><div class="l">추천 방제방법</div><div class="v" id="reco-name">-</div><div class="why" id="reco-why"></div></div>
+      <div class="krow" id="kpi-row"></div>
+      <div class="card"><div class="ct">예산·데이터 신뢰도</div><table id="budget-table"></table></div>
+      <div class="card"><div class="ct">방제방법 비교</div><table id="compare-table"></table><div class="notice">단가·작업량은 D등급 추정치입니다. 인건비 20만원/인/일은 C등급 근사 실측 참고치로만 병기합니다.</div></div>
+    </div>
+  </div>
+</section>
+<script>
+const INPUT = window.CH4_V4_INPUT;
+const DATA = window.CH4_DATA;
+const rows = (INPUT.sgg_data || []).slice().sort((a,b)=>a.priority_rank-b.priority_rank);
+const fmt = n => n==null || isNaN(n) ? '-' : Math.round(Number(n)).toLocaleString('ko-KR');
+const moneyMan = n => n==null || isNaN(n) ? '-' : fmt(Number(n)/10000)+'만원';
+const qs = new URLSearchParams(location.search);
+const els = {
+  select: document.getElementById('region-select'), area: document.getElementById('in-area'), tree: document.getElementById('in-tree'),
+  budgetMode: document.getElementById('budget-mode'), budget: document.getElementById('in-budget'), workers: document.getElementById('in-workers'),
+  distance: document.getElementById('in-distance'), days: document.getElementById('in-days'), residential: document.getElementById('in-residential')
+};
+function rowCode(r){ return (r.sgg_codes||[])[0] || ''; }
+function labelRow(r){ return `${r.priority_rank}. ${r.시도명} ${r.시군구명} (${r.grade})`; }
+function findInitial(){
+  const code = qs.get('sgg') || qs.get('code');
+  const name = qs.get('name');
+  return rows.find(r => code && (r.sgg_codes||[]).includes(code)) || rows.find(r => name && r.시군구명 === name) || rows[0];
+}
+rows.forEach(r => {
+  const opt = document.createElement('option');
+  opt.value = rowCode(r);
+  opt.textContent = labelRow(r);
+  els.select.appendChild(opt);
+});
+function selectedRow(){ return rows.find(r => (r.sgg_codes||[]).includes(els.select.value)) || rows[0]; }
+function budgetFor(r, mode){
+  if(mode === 'explicit') return Number(r.budget_won_explicit || 0);
+  if(mode === 'broad') return Number(r.budget_won_broad || 0);
+  if(mode === 'manual') return Number(els.budget.value || 0) * 10000;
+  return Number(r.budget_won_primary || 0);
+}
+function setBudgetSlider(won){
+  const man = Math.max(0, Math.round((Number(won||0))/10000));
+  els.budget.max = Math.max(300000, Math.ceil((man || 3000) * 1.3 / 100) * 100);
+  els.budget.value = man || 3000;
+}
+function applyRow(r){
+  els.select.value = rowCode(r);
+  const area = Number(qs.get('area') || r.treatment_area_ha_default || DATA.defaults.treatment_area_ha);
+  const tree = Number(qs.get('tree') || r.treeCount_reference || DATA.defaults.treeCount);
+  els.area.max = Math.max(300, Math.ceil((Number(r.pine_area_ha_reference || area || 300))/100)*100);
+  els.area.value = Math.max(1, Math.round(area));
+  els.tree.max = Math.max(20000, Math.ceil((Number(r.treeCount_scaled_current || tree || 20000))/1000)*1000);
+  els.tree.value = Math.max(0, Math.round(tree));
+  els.days.value = Number(qs.get('days') || r.targetDays_suggested || DATA.defaults.targetDays);
+  els.workers.value = Number(qs.get('workers') || DATA.defaults.workers);
+  els.distance.value = Number(qs.get('distance') || DATA.defaults.distance_km);
+  els.residential.checked = qs.get('residential') === '1';
+  setBudgetSlider(budgetFor(r, els.budgetMode.value));
+  render();
+}
+function methodQty(method, ctx){ return method.unit === 'ha' ? ctx.area : ctx.tree; }
+function calc(method, ctx){
+  const qty = methodQty(method, ctx);
+  const baseCost = qty * method.unitCost;
+  const overKm = Math.max(0, ctx.distance - DATA.distanceSurcharge.freeKm);
+  const totalCost = baseCost + baseCost * (overKm * DATA.distanceSurcharge.pctPerKm / 100);
+  const neededWorkers = method.dailyCapacityPerWorker > 0 ? Math.ceil(qty / (method.dailyCapacityPerWorker * Math.max(1, ctx.days))) : null;
+  const daysWithCurrentWorkers = method.dailyCapacityPerWorker > 0 ? Math.ceil(qty / (method.dailyCapacityPerWorker * Math.max(1, ctx.workers))) : null;
+  const meetsMinQty = qty >= (method.minQuantity || 0);
+  const meetsResidential = !(method.needsResidentialDistance && ctx.residential);
+  const meetsBudget = totalCost <= ctx.budget;
+  const feasible = meetsMinQty && meetsResidential && meetsBudget;
+  return {...method, qty, totalCost, neededWorkers, daysWithCurrentWorkers, feasible, meetsMinQty, meetsResidential, meetsBudget};
+}
+function render(){
+  const r = selectedRow();
+  if(els.budgetMode.value !== 'manual') setBudgetSlider(budgetFor(r, els.budgetMode.value));
+  const ctx = { area:Number(els.area.value), tree:Number(els.tree.value), budget:Number(els.budget.value)*10000, workers:Number(els.workers.value), distance:Number(els.distance.value), days:Number(els.days.value), residential:els.residential.checked };
+  document.getElementById('v-region').textContent = `${r.시군구명} ${r.grade}`;
+  document.getElementById('v-area').textContent = `${fmt(ctx.area)} ha`;
+  document.getElementById('v-tree').textContent = `${fmt(ctx.tree)} 본`;
+  document.getElementById('v-budget').textContent = moneyMan(ctx.budget);
+  document.getElementById('v-workers').textContent = `${fmt(ctx.workers)}명`;
+  document.getElementById('v-distance').textContent = `${fmt(ctx.distance)} km`;
+  document.getElementById('v-days').textContent = `${fmt(ctx.days)}일`;
+  document.getElementById('v-budget-mode').textContent = els.budgetMode.options[els.budgetMode.selectedIndex].textContent;
+  document.getElementById('region-note').innerHTML = `<b>${r.시도명} ${r.시군구명}</b> · CH3 우선순위 ${r.priority_rank}위(${r.grade}) · 정책 ${r.recommended_policy}<br>treeCount 원자료 기준 ${fmt(r.treeCount_reference)}본, 2026 전국배율 참고 ${fmt(r.treeCount_scaled_current)}본 · 소나무류 면적 참고 ${fmt(r.pine_area_ha_reference)}ha`;
+  const results = DATA.methods.map(m => calc(m, ctx));
+  const feasible = results.filter(x=>x.feasible).sort((a,b)=>a.totalCost-b.totalCost);
+  const best = feasible[0];
+  const reco = document.getElementById('recobox');
+  if(best){
+    reco.classList.remove('warn');
+    document.getElementById('reco-name').textContent = best.name;
+    document.getElementById('reco-why').innerHTML = `${best.condition}<br>예상비용 <b>${moneyMan(best.totalCost)}</b> · 보유인력 기준 ${fmt(best.daysWithCurrentWorkers)}일`;
+  }else{
+    reco.classList.add('warn');
+    document.getElementById('reco-name').textContent = '조건 내 적용 가능 방식 없음';
+    document.getElementById('reco-why').textContent = '예산, 주거지 인접, 최소 물량 조건을 조정해 확인하세요.';
+  }
+  const kpis = best ? [
+    ['예상 최소비용', moneyMan(best.totalCost), best.name],
+    ['필요인력', fmt(best.neededWorkers)+'명', `목표 ${ctx.days}일 기준`],
+    ['예산 대비', ctx.budget ? (best.totalCost/ctx.budget*100).toFixed(0)+'%' : '-', els.budgetMode.options[els.budgetMode.selectedIndex].textContent],
+    ['기준 treeCount', fmt(ctx.tree)+'본', r.treeCount_scale_note]
+  ] : [['적용 가능','없음','조건 조정 필요']];
+  document.getElementById('kpi-row').innerHTML = kpis.map(k=>`<div class="kpi"><div class="kl">${k[0]}</div><div class="kv">${k[1]}</div><div class="ks">${k[2]}</div></div>`).join('');
+  document.getElementById('budget-table').innerHTML =
+    '<tr><th>항목</th><th class="num">금액</th><th>해석</th></tr>' +
+    `<tr><td>재선충명시 대응예산 <span class="tag a">공식</span></td><td class="num">${moneyMan(r.budget_won_explicit)}</td><td>CH2 공식 분석축. 0이면 전용 편성 확인 필요</td></tr>`+
+    `<tr><td>산림병해충 포괄 대응예산 <span class="tag b">보조</span></td><td class="num">${moneyMan(r.budget_won_broad)}</td><td>재선충 전용 재원으로 해석 금지, 참고 상한</td></tr>`+
+    `<tr><td>예찰진단 예산</td><td class="num">${moneyMan(r.surveillance_budget_won_broad)}</td><td>직접 방제비가 아니라 탐지·진단 역량</td></tr>`+
+    `<tr><td>이동통제 예산</td><td class="num">${moneyMan(r.movement_control_budget_won_broad)}</td><td>인위적 확산 차단 보조지표</td></tr>`;
+  document.getElementById('compare-table').innerHTML =
+    '<tr><th>방법</th><th>신뢰</th><th class="num">물량</th><th class="num">단가</th><th class="num">예상비용</th><th class="num">필요인력</th><th>판정</th></tr>' +
+    results.map(x=>`<tr class="${best&&x.key===best.key?'best':''}"><td><b>${x.name}</b><br><span style="color:var(--mu2);font-size:10.5px">${x.basis} · ${x.condition}</span></td><td><span class="tag d">${x.trust}</span></td><td class="num">${fmt(x.qty)}${x.unit}</td><td class="num">${fmt(x.unitCost)}원/${x.unit}</td><td class="num">${moneyMan(x.totalCost)}</td><td class="num">${fmt(x.neededWorkers)}명</td><td>${x.feasible?'<span class="pill ok">가능</span>':'<span class="pill no">불가</span>'}</td></tr>`).join('');
+}
+els.select.addEventListener('change', ()=>applyRow(selectedRow()));
+els.budgetMode.addEventListener('change', ()=>render());
+[els.area,els.tree,els.budget,els.workers,els.distance,els.days,els.residential].forEach(el=>el.addEventListener('input', ()=>{ if(el===els.budget) els.budgetMode.value='manual'; render(); }));
+applyRow(findInitial());
+</script>
+</body>
+</html>
