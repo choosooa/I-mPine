@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I'mPine CH1-CH4 섹션별 설명 가이드</title>
+<style>
+:root{
+  --green-900:#123819;
+  --green-700:#1f6b3a;
+  --green-500:#45a05c;
+  --mint:#e8f4eb;
+  --blue:#2f6fb3;
+  --amber:#a86100;
+  --red:#b33b2f;
+  --ink:#1d241f;
+  --muted:#66746a;
+  --line:#d8e4d7;
+  --panel:#ffffff;
+  --bg:#f6f8f3;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Noto Sans KR","Malgun Gothic",Arial,sans-serif;
+  font-size:15px;
+  line-height:1.65;
+}
+a{color:var(--green-700);text-decoration:none}
+a:hover{text-decoration:underline}
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:12px 28px;
+  background:var(--green-900);
+  color:white;
+  border-bottom:1px solid rgba(255,255,255,.16);
+}
+.brand{font-weight:800;font-size:18px;white-space:nowrap}
+.topbar nav{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.topbar nav a{
+  color:white;
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:8px;
+  padding:5px 10px;
+  font-size:12px;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 24px 52px}
+.intro{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:22px;
+  align-items:start;
+  padding:10px 0 22px;
+}
+h1{font-size:30px;line-height:1.25;margin:0 0 12px;color:var(--green-900);letter-spacing:0}
+h2{font-size:23px;line-height:1.35;margin:0 0 10px;color:var(--green-900);letter-spacing:0}
+h3{font-size:16px;margin:0 0 8px;color:var(--green-900);letter-spacing:0}
+p{margin:0 0 10px}
+.lead{font-size:17px;color:#334238;max-width:760px}
+.summary{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:16px;
+}
+.summary .k{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px}
+.summary .v{font-size:20px;font-weight:800;color:var(--green-900)}
+.flow{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin:10px 0 28px;
+}
+.flow .step{
+  position:relative;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:14px 14px 13px;
+  min-height:118px;
+}
+.flow .step::after{
+  content:"";
+  position:absolute;
+  right:-10px;
+  top:50%;
+  width:10px;
+  height:1px;
+  background:var(--green-500);
+}
+.flow .step:last-child::after{display:none}
+.num{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:var(--green-700);
+  color:#fff;
+  font-weight:800;
+  font-size:12px;
+  margin-bottom:8px;
+}
+.step b{display:block;font-size:15px;color:var(--green-900);margin-bottom:3px}
+.step span{display:block;font-size:12px;color:var(--muted);line-height:1.45}
+.section{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:22px;
+  margin:14px 0;
+}
+.section-head{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+  margin-bottom:14px;
+}
+.badge{
+  flex:none;
+  min-width:58px;
+  padding:7px 10px;
+  border-radius:8px;
+  background:var(--mint);
+  color:var(--green-900);
+  text-align:center;
+  font-weight:800;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+.box{
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:14px;
+  background:#fbfdf9;
+}
+.box ul{margin:0;padding-left:18px}
+.box li{margin:5px 0}
+.talk{
+  border-left:4px solid var(--green-500);
+  background:#f1f7ef;
+  padding:12px 14px;
+  border-radius:0 8px 8px 0;
+  margin-top:12px;
+}
+.warn{
+  border-color:#f0d4a7;
+  background:#fff8ec;
+}
+.warn h3{color:var(--amber)}
+.danger{
+  border-color:#ecc2bd;
+  background:#fff5f3;
+}
+.danger h3{color:var(--red)}
+.tag{
+  display:inline-block;
+  font-size:11px;
+  font-weight:800;
+  border-radius:999px;
+  padding:2px 8px;
+  margin-right:5px;
+}
+.tag.real{background:#daf2e3;color:#146b39}
+.tag.model{background:#e4eefc;color:#245e9e}
+.tag.est{background:#fff1d6;color:#8a5400}
+.tag.warn{background:#ffe1dc;color:#9a3025}
+.links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+}
+.links a{
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:7px 10px;
+  background:white;
+  font-size:12px;
+}
+.checklist{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:12px;
+}
+.check{
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:11px 12px;
+  background:white;
+  font-size:13px;
+}
+.check b{color:var(--green-900)}
+footer{
+  margin-top:22px;
+  color:var(--muted);
+  font-size:12px;
+}
+@media(max-width:920px){
+  .intro,.flow,.grid,.checklist{grid-template-columns:1fr}
+  .flow .step::after{display:none}
+  .topbar{align-items:flex-start;flex-direction:column;gap:10px}
+  .topbar nav{margin-left:0}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">I'mPine CH1-CH4 설명 가이드</div>
+  <nav aria-label="section navigation">
+    <a href="#flow">흐름</a>
+    <a href="#ch1">CH1</a>
+    <a href="#ch2">CH2</a>
+    <a href="#ch3">CH3</a>
+    <a href="#ch4">CH4</a>
+    <a href="#cautions">주의사항</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <section class="intro">
+    <div>
+      <h1>대시보드 섹션별 발표 설명</h1>
+      <p class="lead">이 페이지는 최종 대시보드를 설명할 때 사용할 짧은 해설문입니다. 전체 흐름은 현황 파악, 구조 진단, 우선지원 선정, 실행 설계 순서입니다.</p>
+      <div class="links">
+        <a href="../ch3/ImPine_ver4/ImPine/ch1/ch1.html">CH1 대시보드</a>
+        <a href="../ch3/ImPine_ver4/ImPine/ch2/ch2.html">CH2 대시보드</a>
+        <a href="../ch3/ImPine_ver4/ImPine/ch3/ch3.html">CH3 대시보드</a>
+        <a href="CH4/2차/ch4.html">CH4 실행 화면</a>
+      </div>
+    </div>
+    <aside class="summary">
+      <div class="k">한 문장 설명</div>
+      <div class="v">피해 현황을 보고, 취약 원인을 찾고, 우선순위를 정한 뒤, 방제 실행 조건을 계산한다.</div>
+      <p style="margin-top:10px;color:var(--muted)">CH4는 구현 화면은 있으나 최종 분석보고서는 아직 작성 전이므로, 이 설명서는 분석 방향과 연결 흐름 중심으로 정리했습니다.</p>
+    </aside>
+  </section>
+
+  <section id="flow" class="flow" aria-label="analysis flow">
+    <div class="step"><span class="num">1</span><b>CH1 현황</b><span>전국 발생 규모와 지역별 피해 집중을 확인한다.</span></div>
+    <div class="step"><span class="num">2</span><b>CH2 구조 진단</b><span>시군구별 취약성, 예산배분 갭, 조기경보를 분리해 본다.</span></div>
+    <div class="step"><span class="num">3</span><b>CH3 우선지원</b><span>CH2 결과를 바탕으로 어디부터, 무엇을 지원할지 정한다.</span></div>
+    <div class="step"><span class="num">4</span><b>CH4 실행 설계</b><span>선정 지역의 방제 방식, 비용, 인력, 기간을 계산한다.</span></div>
+  </section>
+
+  <section id="ch1" class="section">
+    <div class="section-head">
+      <div class="badge">CH1</div>
+      <div>
+        <h2>방제 현황 파악</h2>
+        <p>CH1은 복잡한 모델링보다 현재 소나무재선충병 발생과 방제 현황을 빠르게 파악하는 출발점입니다. 전국 피해 규모, 지역별 집중, 반복 발생 여부를 보면서 왜 이후 CH2~CH4 분석이 필요한지 보여줍니다.</p>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="box">
+        <h3>분석 방향</h3>
+        <ul>
+          <li>전국 발생 규모와 최근 증가세를 보여준다.</li>
+          <li>피해가 특정 지역에 집중되는지 확인한다.</li>
+          <li>누적·반복 발생지역을 찾아 구조적 대응 필요성을 제시한다.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>화면에서 말할 내용</h3>
+        <ul>
+          <li>2025.6~2026.5 공식 발표 기준 피해고사목은 약 177만 그루다.</li>
+          <li>지역 세부분석은 검증 가능한 2016.5~2022.4 원자료를 사용한다.</li>
+          <li>CH1은 “어디서 문제가 보이는가”를 확인하는 현황판이다.</li>
+        </ul>
+      </div>
+      <div class="box warn">
+        <h3>주의할 점</h3>
+        <ul>
+          <li>최신 전국 공식 통계와 시군구 원자료의 시점이 다르다.</li>
+          <li>2022.5~2023.4 원자료는 공식 총계 대비 포함률이 낮아 세부 분석에서 제외했다.</li>
+          <li>CH1의 누적피해고사목은 실행 물량이 아니라 장기 부담 지표다.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="talk"><b>발표용 한 문장:</b> CH1은 “현재 피해가 얼마나 커졌고, 어느 지역에 반복적으로 쌓였는가”를 보여주는 현황 파악 단계입니다.</div>
+  </section>
+
+  <section id="ch2" class="section">
+    <div class="section-head">
+      <div class="badge">CH2</div>
+      <div>
+        <h2>방제취약성지수와 예산배분 진단</h2>
+        <p>CH2는 단기 예측 하나로 모든 것을 설명하지 않고, 구조적 취약성 진단(Model 1)과 재발위험 조기경보(Model 2)를 분리합니다. 최종 기준은 CH2 7차 최종판과 최종보정4 패널입니다.</p>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="box">
+        <h3>분석 방향</h3>
+        <ul>
+          <li>Model 1은 시군구가 왜 구조적으로 취약한지 설명한다.</li>
+          <li>Model 2는 다음 관리주기 재발 가능성을 조기경보 관점에서 본다.</li>
+          <li>예산배분 갭은 위험 대비 예산이 상대적으로 부족한 지역을 찾는 보조 지표다.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>분석 과정</h3>
+        <ul>
+          <li>229개 시군구, 2016~2023년 패널을 기반으로 최종보정4 데이터를 사용했다.</li>
+          <li>노출도, 기후위험도, 지자체대응역량, 인위적확산 도메인을 구성했다.</li>
+          <li>예산은 재선충명시 예산을 본사양으로 두고 산림병해충 포괄 예산은 민감도 분석으로 확인했다.</li>
+        </ul>
+      </div>
+      <div class="box warn">
+        <h3>꼭 알아야 할 수정사항</h3>
+        <ul>
+          <li>도로소나무비율은 최종보정4 재검증에서 신호가 소멸해 인위적확산 도메인에서 제외했다.</li>
+          <li>인위적확산 도메인은 원목생산업체수 중심으로 정리했다.</li>
+          <li>Model2 홀드아웃 AUC는 0.947이다. 0.911 정정안은 폐기됐다.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="talk"><b>발표용 한 문장:</b> CH2는 “피해가 난 곳”만 보는 것이 아니라, 장기적으로 취약한 구조와 현행 예산 배분의 상대적 부족을 함께 진단합니다.</div>
+  </section>
+
+  <section id="ch3" class="section">
+    <div class="section-head">
+      <div class="badge">CH3</div>
+      <div>
+        <h2>우선지원 대상 선정과 정책 매칭</h2>
+        <p>CH3는 CH2의 구조적 위험을 실제 의사결정 순위로 바꾸는 단계입니다. 최종 결정은 B안, 즉 CH2 7차 최종판의 원본 부호를 유지하는 방향입니다.</p>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="box">
+        <h3>분석 방향</h3>
+        <ul>
+          <li>우선지원 점수는 RiskPct, 즉 위험지수 백분위 단독으로 산정한다.</li>
+          <li>배분갭과 재발위험확률은 순위 산식에 넣지 않고 참고 또는 교차조건으로만 사용한다.</li>
+          <li>우세 도메인에 따라 예찰, 기본 대응체계, 산업기반 지원 등 정책 트랙을 매칭한다.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>분석 결과</h3>
+        <ul>
+          <li>TOP15는 남해안권과 부산·경남 지역이 강하게 나타난다.</li>
+          <li>완도군은 B안 기준 6위, S등급으로 유지된다.</li>
+          <li>CH3 표에서 선택 지역을 CH4 실행 설계 화면으로 넘기는 링크를 제공한다.</li>
+        </ul>
+      </div>
+      <div class="box warn">
+        <h3>꼭 알아야 할 수정사항</h3>
+        <ul>
+          <li>A안은 1차 검토 기록이며 최종 채택안이 아니다.</li>
+          <li>B안은 원본 부호 유지가 최종이며, 처방 어색함은 recommended_policy 재분류로 해결한다.</li>
+          <li>재발위험확률은 “우선순위 점수”가 아니라 urgentList 교차조건용이다.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="talk"><b>발표용 한 문장:</b> CH3는 CH2의 구조적 위험을 정책 우선순위로 바꾸되, 재발확률을 점수에 섞지 않아 자기충족적 순위가 되지 않게 설계했습니다.</div>
+  </section>
+
+  <section id="ch4" class="section">
+    <div class="section-head">
+      <div class="badge">CH4</div>
+      <div>
+        <h2>맞춤형 방제 실행 설계</h2>
+        <p>CH4는 CH3에서 선정된 지역을 대상으로 방제 방식별 비용, 필요 인력, 목표 기간을 계산하는 마지막 실행 단계입니다. 현재 구현 화면은 있으나 최종 보고서는 아직 작성 전이므로, 분석 방향과 흐름 중심으로 설명합니다.</p>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="box">
+        <h3>분석 방향</h3>
+        <ul>
+          <li>CH3 선택 지역의 소나무류 면적, 피해목 수, 목표 완료일수를 받아 방제 시나리오를 계산한다.</li>
+          <li>방제 방식별 비용·인력·기간을 비교하고, 예산 범위 내 실행 가능성을 표시한다.</li>
+          <li>재선충명시 예산을 공식 기준으로 우선 사용하고 산림병해충 포괄 예산은 보조 참고값으로 둔다.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>구현 상태</h3>
+        <ul>
+          <li>CH4 HTML과 v4 데이터 스키마는 2차 폴더에 구현돼 있다.</li>
+          <li>CH3에서 CH4로 지역 코드와 grade 기반 목표일수를 전달하는 링크가 들어가 있다.</li>
+          <li>인건비 20만원/인/일은 실측 참고치로 병기하되 단가 전체를 실측으로 간주하지 않는다.</li>
+        </ul>
+      </div>
+      <div class="box danger">
+        <h3>꼭 알아야 할 한계</h3>
+        <ul>
+          <li>treeCount는 2021.5~2022.4 단일 관리주기 원자료 기준이므로 2026년 현재 물량보다 작을 수 있다.</li>
+          <li>2026년 전국 피해 규모는 해당 기준주기보다 약 4.7배 커져 참고 스케일업을 함께 봐야 한다.</li>
+          <li>방제 방식별 unitCost는 대부분 추정치이며 실제 계약 전 최신 현장자료로 교체해야 한다.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="talk"><b>발표용 한 문장:</b> CH4는 “우선지원 지역을 정했다면 실제로 며칠 안에, 몇 명으로, 어느 방식이 가능한가”를 투명한 추정 조건 아래 계산하는 실행 설계 단계입니다.</div>
+  </section>
+
+  <section id="cautions" class="section">
+    <div class="section-head">
+      <div class="badge">주의</div>
+      <div>
+        <h2>전체 발표에서 먼저 선을 그어야 할 부분</h2>
+        <p>심사위원이 가장 물어볼 만한 지점은 데이터 시점, 추정치, 예산 정의, A/B안 결정입니다. 아래 문구를 먼저 말하면 방어력이 좋아집니다.</p>
+      </div>
+    </div>
+    <div class="checklist">
+      <div class="check"><span class="tag real">공식</span><b>CH2 예산 기준</b><br>본사양은 재선충명시 예산이다. 산림병해충 포괄 예산은 보조 민감도 또는 참고 상한으로만 쓴다.</div>
+      <div class="check"><span class="tag model">모형</span><b>CH3 점수 기준</b><br>우선순위는 RiskPct 단독이다. 배분갭과 재발위험확률은 점수에 넣지 않는다.</div>
+      <div class="check"><span class="tag est">추정</span><b>CH4 비용 기준</b><br>인건비 일부만 실측 참고치이며, 방식별 총단가와 작업량은 추정이 포함된다.</div>
+      <div class="check"><span class="tag warn">시점</span><b>CH4 treeCount 기준</b><br>검증 가능한 2021.5~2022.4 원자료 기준값과 2026년 전국 증가율 참고값을 나란히 봐야 한다.</div>
+      <div class="check"><span class="tag warn">결정</span><b>A/B안 기록</b><br>1차 A안 검토 기록은 과거기록이다. 최종 설명은 B안 원본부호 유지로 통일한다.</div>
+      <div class="check"><span class="tag model">해석</span><b>인과효과 아님</b><br>CH2·CH3 시뮬레이션은 정책개입 가능 변수 변화에 따른 지수 변화이지 실제 피해 감소 효과 추정이 아니다.</div>
+    </div>
+  </section>
+
+  <footer>
+    작성 기준: CH2 7차 최종판, CH3 2차 B안 최종 보고서, CH4 v4 최종수정2 분석계획 및 CH4 2차 구현 화면. 이 파일은 발표 설명용 보조 HTML입니다.
+  </footer>
+</main>
+</body>
+</html>
