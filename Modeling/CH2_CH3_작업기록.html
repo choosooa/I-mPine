@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>CH2→CH3 작업기록 · I'mPine</title>
+<style>
+:root{
+  --bg:#f5f6f1;
+  --surface:#ffffff;
+  --ink:#1c231d;
+  --ink-soft:#4c5a4d;
+  --ink-faint:#7c8a7a;
+  --line:#dee2d6;
+  --line-strong:#c7cebd;
+  --accent:#2f5d40;
+  --accent-ink:#1f4530;
+  --accent-soft:#e6ede5;
+  --flag:#a15a1f;
+  --flag-soft:#f3e6d8;
+  --ok:#2f6d4c;
+  --ok-soft:#e2efe6;
+  --warn:#a15a1f;
+  --warn-soft:#f5e9d9;
+  --mono: ui-monospace, "JetBrains Mono", "Cascadia Mono", Consolas, "SF Mono", monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "Apple SD Gothic Neo", "Segoe UI", "Pretendard Variable", Pretendard, sans-serif;
+}
+:root[data-theme="dark"]{
+  --bg:#12150f;
+  --surface:#191d15;
+  --ink:#e7ebe1;
+  --ink-soft:#a9b3a2;
+  --ink-faint:#75816e;
+  --line:#2b3225;
+  --line-strong:#3a4331;
+  --accent:#7bb28e;
+  --accent-ink:#a9d4b8;
+  --accent-soft:#1f2a20;
+  --flag:#e0a35e;
+  --flag-soft:#2e2417;
+  --ok:#7bc79a;
+  --ok-soft:#1c2a20;
+  --warn:#e0a35e;
+  --warn-soft:#2e2417;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12150f;
+    --surface:#191d15;
+    --ink:#e7ebe1;
+    --ink-soft:#a9b3a2;
+    --ink-faint:#75816e;
+    --line:#2b3225;
+    --line-strong:#3a4331;
+    --accent:#7bb28e;
+    --accent-ink:#a9d4b8;
+    --accent-soft:#1f2a20;
+    --flag:#e0a35e;
+    --flag-soft:#2e2417;
+    --ok:#7bc79a;
+    --ok-soft:#1c2a20;
+    --warn:#e0a35e;
+    --warn-soft:#2e2417;
+  }
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:var(--accent-soft);color:var(--accent-ink)}
+
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 120px}
+
+/* ── header ───────────────────────────────────────────── */
+header.top{
+  padding:64px 0 40px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:48px;
+}
+.eyebrow{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--accent);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none}
+h1{
+  font-size:clamp(28px,4vw,38px);
+  line-height:1.2;
+  font-weight:700;
+  letter-spacing:-.01em;
+  margin:0 0 14px;
+  text-wrap:balance;
+  color:var(--ink);
+}
+.lede{
+  font-size:16px;
+  color:var(--ink-soft);
+  max-width:62ch;
+  margin:0 0 24px;
+}
+.meta-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 10px;
+  font-family:var(--mono);
+  font-size:12.5px;
+  color:var(--ink-faint);
+}
+.meta-row span{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:5px;
+  padding:4px 10px;
+}
+.meta-row b{color:var(--ink-soft);font-weight:600}
+
+/* ── stat strip ───────────────────────────────────────── */
+.statstrip{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:1px;
+  background:var(--line);
+  border:1px solid var(--line);
+  border-radius:10px;
+  overflow:hidden;
+  margin-bottom:8px;
+}
+.stat{
+  background:var(--surface);
+  padding:16px 18px;
+}
+.stat .n{
+  font-family:var(--mono);
+  font-size:22px;
+  font-weight:600;
+  color:var(--accent-ink);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;
+}
+.stat .l{font-size:11.5px;color:var(--ink-faint);margin-top:3px}
+
+/* ── timeline ─────────────────────────────────────────── */
+.timeline{position:relative}
+.timeline::before{
+  content:'';
+  position:absolute;
+  left:27px;
+  top:8px;
+  bottom:8px;
+  width:1px;
+  background:var(--line-strong);
+}
+.phase{
+  position:relative;
+  padding-left:70px;
+  margin-bottom:8px;
+}
+.phase:last-child{margin-bottom:0}
+.phase-num{
+  position:absolute;
+  left:0;
+  top:2px;
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  background:var(--surface);
+  border:1.5px solid var(--line-strong);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--mono);
+  font-size:18px;
+  font-weight:600;
+  color:var(--ink-soft);
+  z-index:1;
+}
+.phase.milestone .phase-num{
+  border-color:var(--accent);
+  color:var(--accent-ink);
+  background:var(--accent-soft);
+}
+.phase-body{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:22px 24px 24px;
+  margin-bottom:40px;
+}
+.phase-head{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:6px;
+}
+.phase-head h2{
+  font-size:18px;
+  font-weight:700;
+  margin:0;
+  color:var(--ink);
+  text-wrap:balance;
+}
+.phase-tag{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:.03em;
+  padding:2px 8px;
+  border-radius:20px;
+  background:var(--accent-soft);
+  color:var(--accent-ink);
+  white-space:nowrap;
+}
+.phase-tag.warn{background:var(--warn-soft);color:var(--warn)}
+.phase-desc{
+  color:var(--ink-soft);
+  font-size:14.5px;
+  margin:0 0 16px;
+  max-width:66ch;
+}
+.phase-desc + .phase-desc{margin-top:-10px}
+
+.detail-block{
+  border-top:1px dashed var(--line);
+  padding-top:14px;
+  margin-top:14px;
+}
+.detail-block:first-of-type{border-top:none;padding-top:0;margin-top:0}
+.detail-label{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin-bottom:8px;
+}
+
+ul.plain{margin:0;padding:0;list-style:none}
+ul.plain li{
+  position:relative;
+  padding-left:16px;
+  margin-bottom:6px;
+  font-size:14px;
+  color:var(--ink-soft);
+}
+ul.plain li::before{
+  content:'—';
+  position:absolute;
+  left:0;
+  color:var(--ink-faint);
+}
+ul.plain li b{color:var(--ink);font-weight:600}
+ul.plain li .num{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--accent-ink);font-weight:600}
+ul.plain li .flagnum{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--flag);font-weight:600}
+
+.filelist{
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px 14px;
+  font-family:var(--mono);
+  font-size:12.5px;
+  color:var(--ink-soft);
+  line-height:1.9;
+  overflow-x:auto;
+}
+.filelist .f{display:block;white-space:nowrap}
+.filelist .f b{color:var(--ink);font-weight:600}
+.filelist .f .c{color:var(--ink-faint)}
+
+.findbox{
+  border-left:3px solid var(--accent);
+  background:var(--accent-soft);
+  border-radius:0 8px 8px 0;
+  padding:12px 16px;
+  font-size:14px;
+  color:var(--ink);
+  margin:12px 0;
+}
+.findbox.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+.findbox b{color:var(--accent-ink)}
+.findbox.warn b{color:var(--warn)}
+
+table.data{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+  margin:10px 0;
+}
+table.data th{
+  text-align:left;
+  font-family:var(--mono);
+  font-weight:600;
+  font-size:11px;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  padding:6px 10px;
+  border-bottom:1.5px solid var(--line-strong);
+  white-space:nowrap;
+}
+table.data td{
+  padding:6px 10px;
+  border-bottom:1px solid var(--line);
+  color:var(--ink-soft);
+}
+table.data td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;color:var(--ink)}
+.tablewrap{overflow-x:auto}
+
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{
+  font-family:var(--mono);
+  font-size:12px;
+  padding:5px 11px;
+  border-radius:20px;
+  background:var(--bg);
+  border:1px solid var(--line);
+  color:var(--ink-soft);
+}
+.chip b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* ── footer ───────────────────────────────────────────── */
+footer{
+  margin-top:56px;
+  padding-top:24px;
+  border-top:1px solid var(--line);
+  font-size:12.5px;
+  color:var(--ink-faint);
+  font-family:var(--mono);
+}
+
+@media (max-width:640px){
+  .timeline::before{left:21px}
+  .phase{padding-left:52px}
+  .phase-num{width:42px;height:42px;font-size:14px}
+  .phase-body{padding:18px 16px 20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow"><span class="dot"></span>I'mPine · CH2/CH3 작업기록</div>
+    <h1>목업 대시보드에서 실측 데이터 대시보드까지 — 전체 작업 순서</h1>
+    <p class="lede">CH2 대시보드가 전부 목업이라는 걸 확인한 시점부터, Model 1 재구현·지도 연결·Model 2(7차) 재구현·
+    산림산업조사 데이터 결합·CH3 대시보드 완성까지 진행한 작업을 순서대로 정리했습니다.</p>
+    <div class="meta-row">
+      <span><b>범위</b> CH2 대시보드 실측화 → 7차(Model 2) → CH3 대시보드</span>
+      <span><b>날짜</b> 2026-07-30</span>
+      <span><b>산출물</b> data.js ×2, docx 보고서 ×1, py 스크립트 ×2</span>
+    </div>
+  </header>
+
+  <div class="statstrip">
+    <div class="stat"><div class="n">11</div><div class="l">작업 단계</div></div>
+    <div class="stat"><div class="n">222</div><div class="l">시군구 실측 반영</div></div>
+    <div class="stat"><div class="n">6/7</div><div class="l">6차 긴급지역 재확인</div></div>
+    <div class="stat"><div class="n">434p</div><div class="l">산업조사 PDF 대조</div></div>
+    <div class="stat"><div class="n">2</div><div class="l">대시보드 목업→실측 전환</div></div>
+  </div>
+
+  <div class="timeline">
+
+    <!-- 1 -->
+    <div class="phase milestone">
+      <div class="phase-num">01</div>
+      <div class="phase-body">
+        <div class="phase-head"><h2>CH2 대시보드 상태 점검 — 전부 목업이었음을 확인</h2><span class="phase-tag">발견</span></div>
+        <p class="phase-desc">"이거 이제 실제 데이터인거야?"라는 질문에서 시작. <code style="font-family:var(--mono)">ch2/data.js</code>를 열어보니
+        시드 고정 난수로 생성한 가짜 시군구별 지수였고, 변수 구성도 6차 최종 확정본(평균풍속·SPI3·도로소나무비율 제외)과 어긋나 있었다.</p>
+        <div class="findbox warn"><b>발견 1</b> — 헤더에 "MOCK" 배지, data.js 상단 주석에 "실제값이 하나도 없다"고 이미 명시돼 있었음.<br>
+        <b>발견 2</b> — 변수 목록이 평균풍속_ms·SPI3_최저월·도로소나무비율_500m을 "주" 변수로 표시 — 6차에서 이미 제외 확정된 것들.</div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="phase milestone">
+      <div class="phase-num">02</div>
+      <div class="phase-body">
+        <div class="phase-head"><h2>Model 1(구조적취약성지수) 재구현 — 실측 산출</h2><span class="phase-tag">실행</span></div>
+        <p class="phase-desc">원본 <code style="font-family:var(--mono)">model1_final.py</code>가 프로젝트 어디에도 없어(전체 폴더 검색 완료),
+        6차에서 이미 검증된 표본정의·방법론을 그대로 재구현해 222개 시군구 전체의 실제 지수·도메인 점수·배분갭·유형화를 산출했다.</p>
+        <div class="detail-block">
+          <div class="detail-label">검증 결과 — 보고서 원문과 대조</div>
+          <div class="tablewrap">
+          <table class="data">
+            <tr><th>지표</th><th>재구현</th><th>6차 원문</th></tr>
+            <tr><td>표본 카스케이드</td><td class="num">1832→1816→1804→1753</td><td class="num">정확히 일치</td></tr>
+            <tr><td>Model1 between(훈련/홀드아웃)</td><td class="num">1.138 / 1.200</td><td class="num">1.138 / 1.200</td></tr>
+            <tr><td>배분갭 R²</td><td class="num">2.39%</td><td class="num">2.39%</td></tr>
+            <tr><td>2×3 유형화 매트릭스</td><td class="num">20/29/23·16/20/27·38/25/24</td><td class="num">동일</td></tr>
+          </table>
+          </div>
+        </div>
+        <div class="findbox"><b>결론</b> — 재구현 결과가 6차 보고서 수치와 소수점 단위까지 일치 확인. 이 재현 스크립트를 대시보드 데이터 산출 근거로 채택.</div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="phase">
+      <div class="phase-num">03</div>
+      <div class="phase-body">
+        <div class="phase-head"><h2>ch2/data.js 전면 재작성 + ch2.html 렌더링 로직 수정</h2><span class="phase-tag">구축</span></div>
+        <p class="phase-desc">목업 생성 함수(mulberry32 시드 난수)를 걷어내고, 재구현 결과를 그대로 담은 정적 데이터로 교체.
+        존재하지 않던 강건성 지표(PCA 지수·기하평균 지수)는 삭제하고, 6차에 실제 있는 축A 임계값 민감도(§8)로 교체했다.</p>
+        <div class="filelist">
+          <span class="f"><b>ch2/data.js</b> <span class="c">— 전면 재작성, 222개 시군구 실측치</span></span>
+          <span class="f"><b>ch2/ch2.html</b> <span class="c">— 섹션 01~04 렌더링 스크립트 전면 수정</span></span>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">바뀐 것</div>
+          <ul class="plain">
+            <li>KPI 행 — <b>목업 난수</b> → <b>실측 AUC·between계수·배분갭 R²</b></li>
+            <li>지수 안정성 검증표 — 가짜 LOO/몬테카를로 → <b>실측 축A 임계값 민감도(±0.3/±0.5/±0.7)</b></li>
+            <li>모형 사양 비교표 — 가짜 3사양 비교 → <b>훈련 vs 홀드아웃 실측 계수표</b></li>
+            <li>표본외 검증 차트 — RMSE(미산출 목업) → <b>rolling-origin 실측 AUC</b></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="phase milestone">
+      <div class="phase-num">04</div>
+      <div class="phase-body">
+        <div class="phase-head"><h2>지도가 안 그려지는 문제 — 원인 파악 및 해결</h2><span class="phase-tag">문제해결</span></div>
+        <p class="phase-desc">ch2.html이 <code style="font-family:var(--mono)">../ch1/korea_geo.js</code>를 불러오려 했는데, 이 파일 자체가
+        프로젝트에 존재한 적이 없었다 — 지도는 처음부터 10개짜리 fallback 목록으로만 작동해왔다.</p>
+        <div class="findbox warn"><b>원인</b> — 실제 경계 GeoJSON은 <code style="font-family:var(--mono)">ch1/data.js</code> 안에
+        <code style="font-family:var(--mono)">CH1_GEOJSON</code>이라는 이름으로 이미 있었음(240개 일반구 분리 단위, sgg_cd 기준).</div>
+        <div class="detail-block">
+          <div class="detail-label">해결 순서</div>
+          <ul class="plain">
+            <li>사용자가 제공한 <span class="num">sigungu_code_crosswalk_2023.csv</span>로 시도+시군구명 → 5자리 코드 매핑</li>
+            <li>전북특별자치도/전라남도 등 도명 표기 차이 1건 보정 → <span class="num">222개 전부</span> 코드 매칭 성공</li>
+            <li>다구시(수원시 등 11곳)는 세부구 코드 여러 개가 같은 시군구 값을 공유하도록 <code style="font-family:var(--mono)">sgg_codes</code> 배열 추가</li>
+            <li>ch2.html의 지도 참조를 <code style="font-family:var(--mono)">KOREA_GEO</code> → <code style="font-family:var(--mono)">CH1_GEOJSON</code>, 매칭 키를 이름 → <code style="font-family:var(--mono)">sgg_cd</code>로 전환</li>
+          </ul>
+        </div>
+        <div class="findbox"><b>결과</b> — 취약성지수 지도·배분갭 지도 둘 다 실제 경계선으로 정상 렌더링 확인.</div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="phase">
+      <div class="phase-num">05</div>
+      <div class="phase-body">
+        <div class="phase-head"><h2>임상도 이원화(2019판 vs 2024판) 점검</h2><span class="phase-tag">검증</span></div>
+        <p class="phase-desc">전국임상도 원본 2개년(2019_sgg_pine_forest.csv, 2024_sgg_pine_forest.csv)을 직접 대조해,
+        접경 6곳(양구·철원·고성·연천·파주·옹진)의 극단적 수치 변화가 최종보정4.csv에서 어떻게 처리됐는지 확인했다.</p>
+        <div class="tablewrap">
+        <table class="data">
+          <tr><th>지역</th><th>처리방식</th></tr>
+          <tr><td>양구군 · 철원군 · 강원 고성군</td><td>보정(harmonize) — 8개년 값 통일, 보정_flag로 표시</td></tr>
+          <tr><td>강화군 · 인천 동구</td><td>보정 — log_소나무림면적이 8개년 내내 고정값</td></tr>
+          <tr><td>연천군 · 파주시 · 옹진군</td><td><span class="flagnum">미보정</span> — 대신 2016~2019 자료유효_flag=0으로 표본 자동 제외</td></tr>
+        </table>
+        </div>
+        <div class="findbox"><b>결론</b> — 처리 방식은 지역마다 다르지만, 어느 쪽이든 두 판이 섞여 모델에 오염되어 들어가는 경우는 없음을 확인.</div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="phase">
+      <div class="phase-num">06</div>
+      <div class="phase-body">
+        <div class="phase-head"><h2>CH3 작업 범위 정리 — 모델링이 더 필요한가?</h2><span class="phase-tag">판단</span></div>
+        <p class="phase-desc">"이거 모델링 따로 돌려야돼 아니면 대시보드만 만들면 돼?" 질문에 ch3.html 기존 틀을 분석해 답을 정리했다.</p>
+        <div class="detail-block">
+          <div class="detail-label">결론</div>
+          <ul class="plain">
+            <li><b>대시보드만으로 충분한 것</b> — 우선지원 순위(취약성지수−배분갭 수식), 정책 매칭(룰베이스), 산업기반 현황(설문 통계 정리)</li>
+            <li><b>모델을 한 번 더 돌려야 하는 것</b> — 단기 경보 결합에 쓸 Model 2(조기경보모형)의 시군구별 현재 재발위험확률 — 이건 아직 아무도 실행한 적이 없었음</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="phase milestone">
+      <div class="phase-num">07</div>
+      <div class="phase-body">
+        <div class="phase-head"><h2>Model 2(조기경보모형) 재구현 — 7차</h2><span class="phase-tag">실행</span></div>
+        <p class="phase-desc">t-1 확산이력(연속발생연수·집단발생여부·인접시군 피해밀도)을 frozen-gm 방식(훈련기간에서만 그룹평균 계산 후 고정 적용)으로
+        결합한 CRE 로지스틱 모형을 재구현했다.</p>
+        <div class="tablewrap">
+        <table class="data">
+          <tr><th>지표</th><th>재구현</th><th>6차 원문</th><th>판정</th></tr>
+          <tr><td>훈련 AUC</td><td class="num">0.976</td><td class="num">0.976</td><td>일치</td></tr>
+          <tr><td>홀드아웃 AUC</td><td class="num">0.911</td><td class="num">0.947</td><td>3.6%p 낮음</td></tr>
+          <tr><td>Rolling ≤2020→2021</td><td class="num">0.926</td><td class="num">0.934</td><td>근접</td></tr>
+          <tr><td>Rolling ≤2021→2022</td><td class="num">0.913</td><td class="num">0.933</td><td>근접</td></tr>
+        </table>
+        </div>
+        <div class="findbox"><b>정성적 교차검증</b> — 6차 §9.3이 지목한 최우선 대응지역 7곳(고령군·포항시·성주군·대구동구·영주시·횡성군·제천시) 중
+        <b>7곳 전부</b> 이번 재구현 모형에서도 상위 24~37% 구간(재발위험확률 0.83 이상)으로 재확인됨 — 절대 수치는 다르지만 방향성은 일치.</div>
+        <div class="detail-block">
+          <div class="detail-label">시도한 대안 (기각)</div>
+          <p style="margin:0;font-size:14px;color:var(--ink-soft)">신청서 초안의 "Model 1 전체" 표현을 근거로 통합지수 대신 4개 도메인 점수를 개별 투입하는 사양도 시도했으나,
+          개선폭이 미미하고 일부 계수 표준오차가 폭발(SE=5.8)해 불채택 — 원래의 단일지수 사양을 최종 채택.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="phase">
+      <div class="phase-num">08</div>
+      <div class="phase-body">
+        <div class="phase-head"><h2>7차 폴더 정리 + 분석보고서 작성</h2><span class="phase-tag">문서화</span></div>
+        <p class="phase-desc">Node.js가 설치돼 있지 않아 docx-js 대신 python-docx로 보고서를 작성, 기존 2~6차와 같은 형식을 유지했다.</p>
+        <div class="filelist">
+          <span class="f"><b>Modeling/7차/model2_final_재구현.py</b> <span class="c">— 재현 스크립트</span></span>
+          <span class="f"><b>Modeling/7차/Model2_final_로그.txt</b> <span class="c">— 전체 실행 로그</span></span>
+          <span class="f"><b>Modeling/7차/Model2_재발위험확률_2022기준_final.csv</span> <span class="c">— 222개 시군구 CH3 연동용</span></span>
+          <span class="f"><b>Modeling/7차/CH2_분석보고서_7차.docx</b> <span class="c">— 7개 장, 재현 한계 §5에 정직하게 기록</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="phase milestone">
+      <div class="phase-num">09</div>
+      <div class="phase-body">
+        <div class="phase-head"><h2>산림산업조사 PDF(434쪽)에서 시도별 데이터 추출</h2><span class="phase-tag">추출</span></div>
+        <p class="phase-desc">『2025년 산림산업조사(2024년 기준)』 보고서에서 17개 시도 전부의 지역별 통계를 찾아 대조했다.
+        지역별 분해가 없을까 걱정했던 항목들도 전부 존재했다.</p>
+        <div class="chip-row">
+          <span class="chip">표4-2 <b>사업체수</b></span>
+          <span class="chip">표4-62 <b>국내판매 애로</b></span>
+          <span class="chip">표4-63 <b>정부지원필요도</b></span>
+          <span class="chip">표4-66 <b>지원사업 참여경험</b></span>
+          <span class="chip">표4-67 <b>향후 지원 희망</b></span>
+        </div>
+        <div class="findbox"><b>확인</b> — 5개 지표 전부 17개 시도 단위 지역별 분해가 실제로 존재 — 초기 우려(전국 단위만 있을 것)와 달리 근사가 아닌 진짜 지역값 확보.</div>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="phase">
+      <div class="phase-num">10</div>
+      <div class="phase-body">
+        <div class="phase-head"><h2>ch3/data.js 작성 — CH2 + Model2(7차) + 산업조사 결합</h2><span class="phase-tag">구축</span></div>
+        <p class="phase-desc">세 데이터 소스를 하나로 묶었다. 우선지원 순위는 CH2의 배분갭·유형화를 그대로 재사용하고,
+        긴급도는 7차 Model2 확률을, 실행가능성은 산업조사 수치를 결합했다.</p>
+        <div class="detail-block">
+          <div class="detail-label">핵심 설계 결정</div>
+          <ul class="plain">
+            <li>우세 도메인은 임의 4-도메인 argmax가 아니라 <b>6차가 실제 쓰는 축A_위험요인유형</b>(노출도/인위적확산-우세형/복합형)을 그대로 재사용</li>
+            <li>취약성 상위 + 관할 시도 지원필요도 ≥3.2 또는 참여경험 ≤0.5% 인 곳은 <b>"산업기반부족형"</b>으로 재분류하는 4번째 트랙 추가</li>
+            <li>단기경보결합 — 배분갭 "부족" <span class="num">74개</span> 시군구 × 7차 재발위험확률 ≥0.83 → <span class="num">6개</span> 최우선 대응지역 도출</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <div class="phase milestone">
+      <div class="phase-num">11</div>
+      <div class="phase-body">
+        <div class="phase-head"><h2>ch3.html 렌더링 로직 수정 및 최종 검증</h2><span class="phase-tag">완료</span></div>
+        <p class="phase-desc">ch2 때와 동일하게 <code style="font-family:var(--mono)">CH1_GEOJSON</code>·<code style="font-family:var(--mono)">sgg_codes</code> 매칭으로 지도를 연결하고,
+        MOCK 배지를 전부 제거, 04번 섹션에 실제 "단기 경보 결합" 표를 새로 추가했다.</p>
+        <div class="filelist">
+          <span class="f"><b>ch3/data.js</b> <span class="c">— 전면 작성(신규), 222개 시군구 + 17개 시도</span></span>
+          <span class="f"><b>ch3/ch3.html</b> <span class="c">— 지도 연결·DOMAIN_LABEL·섹션04 표 추가</span></span>
+        </div>
+        <div class="findbox"><b>최종 확인</b> — 콘솔 에러 없음, 01~04 전 섹션 실측 렌더링 확인.
+        단기경보결합 표에 6차 §9.3과 <b>6/7 일치</b>하는 최우선 대응지역(고령군·포항시·성주군·대구동구·횡성군·제천시)이 정상 표시됨.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    남은 한계 — 산업기반 데이터는 시군구가 아닌 17개 시도 단위 근사치 · 5차의 예산 재배분(water-filling) 시군구별 결과는 04번 섹션에 아직 미반영 ·
+    Model2 홀드아웃 AUC 차이의 정확한 원인은 원본 스크립트 없이는 확정 불가(7차 보고서 §5 기록)
+  </footer>
+
+</div>
+</body>
+</html>
