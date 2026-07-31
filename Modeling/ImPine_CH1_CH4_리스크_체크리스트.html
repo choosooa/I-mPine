@@ -181,6 +181,7 @@ footer{margin-top:18px;color:var(--muted);font-size:12px}
     <a href="#must">무조건 수정</a>
     <a href="#report">보고서 명시</a>
     <a href="#summary">요약 문구</a>
+    <a href="#extra">추가 점검</a>
   </nav>
 </header>
 
@@ -212,7 +213,7 @@ footer{margin-top:18px;color:var(--muted);font-size:12px}
         <h2>1. 무조건 바꿔야 되는 것</h2>
         <p>사용자가 화면에서 바로 오해할 수 있거나, 파일 간 버전이 충돌하거나, CH1-CH4 연결 흐름을 깨는 항목입니다.</p>
       </div>
-      <div class="count">12개 항목</div>
+      <div class="count">15개 항목</div>
     </div>
     <div class="list">
       <div class="item">
@@ -234,7 +235,7 @@ footer{margin-top:18px;color:var(--muted);font-size:12px}
         <span class="level high">높음</span>
         <span class="status done">완료</span>
         <div class="risk"><b>CH2 버전 표기</b><span>CH2 6차가 남아 있으면 최종 기준이 흔들립니다.</span></div>
-        <div class="answer">ver6 CH3의 표시 문구를 `CH2(7차 최종판)`으로 통일했습니다.</div>
+        <div class="answer">ver6 CH3의 상단 배너·본문 노트·출처 모달 meta.source 문구를 `CH2 7차 최종판` 기준으로 통일했습니다.</div>
       </div>
       <div class="item">
         <input class="check" type="checkbox" checked>
@@ -255,28 +256,28 @@ footer{margin-top:18px;color:var(--muted);font-size:12px}
         <span class="level high">높음</span>
         <span class="status done">완료</span>
         <div class="risk"><b>CH4 treeCount 기준 시점</b><span>2021.5~2022.4 기준값만 쓰면 2026 현재 물량을 과소추정할 수 있습니다.</span></div>
-        <div class="answer">ver6 CH4에 기준 treeCount와 2026 전국배율 참고값을 함께 표시하도록 반영했습니다.</div>
+        <div class="answer">ver6 CH4에 기준 treeCount와 2026 전국배율 참고값을 함께 표시하도록 반영했습니다. 발표에서는 `2021.5~2022.4 공개 원자료(378,079본) 기준이며, 산림청 2026년 소나무재선충병 방제 결과(2025.6~2026.5 피해고사목 177만 본) 대비 약 4.68배 증가해 과소추정 가능성이 있다`고 출처를 명시해서 말해야 합니다. 국가방제전략(2026~2030) 문서의 2025.5 기준 수치(148.6만 본)로 계산하면 약 3.93배가 되므로, 반드시 "2026년 산림청 방제 결과 기준"이라고 못박아야 다른 기준 문서와의 배율 차이로 공격받지 않습니다.</div>
       </div>
       <div class="item">
-        <input class="check" type="checkbox">
+        <input class="check" type="checkbox" checked>
         <span class="level high">높음</span>
-        <span class="status todo">확인 필요</span>
+        <span class="status done">완료</span>
         <div class="risk"><b>예산 기준의 우선순위</b><span>산림병해충 포괄 예산을 주 기준처럼 쓰면 CH2 분석축과 충돌합니다.</span></div>
-        <div class="answer">상세표에는 재선충명시와 포괄 예산이 구분되어 있습니다. 다만 재선충명시가 0인 지역은 KPI의 예산 대비 비율이 포괄 예산 fallback 기준이 될 수 있으므로, 화면 또는 발표에서 `포괄 예산 기준 참고값`이라고 별도 설명해야 합니다.</div>
+        <div class="answer">ver6 및 Modeling/CH4/2차 화면에서 재선충명시 예산이 0인 지역은 예산 기준에 `포괄 예산 대체 적용중`이 표시되고, 지역 설명에도 포괄 예산 참고 기준임을 안내하도록 반영했습니다.</div>
       </div>
       <div class="item">
-        <input class="check" type="checkbox">
+        <input class="check" type="checkbox" checked>
         <span class="level high">높음</span>
-        <span class="status todo">확인 필요</span>
+        <span class="status done">완료</span>
         <div class="risk"><b>일부 지역 treeCount 결측의 조용한 기본값 대체</b><span>완도군처럼 CH1 원자료가 없거나 강릉시처럼 플래그는 true인데 핵심 필드가 null인 지역은 기본값으로 대체될 수 있습니다.</span></div>
-        <div class="answer">현재 화면은 50ha, 800본 등 범용 기본값으로 계산을 이어갈 수 있습니다. 발표에서는 `결측 지역은 최신 지자체 자료 확인 대상`이라고 말하고, 가능하면 화면에 결측 경고를 추가해야 합니다.</div>
+        <div class="answer">ver6 및 Modeling/CH4/2차 화면에서 treeCount 또는 pine_area가 결측이면 `결측(...)` 경고와 기본값 대체 안내, 최신 지자체 자료 확인 대상 문구가 표시되도록 반영했습니다.</div>
       </div>
       <div class="item">
-        <input class="check" type="checkbox">
+        <input class="check" type="checkbox" checked>
         <span class="level high">높음</span>
-        <span class="status todo">확인 필요</span>
+        <span class="status done">완료</span>
         <div class="risk"><b>ch1_data_available 플래그와 실제 필드 결측 불일치</b><span>강릉시처럼 ch1_data_available은 true지만 pine_area와 treeCount가 null인 사례가 있습니다.</span></div>
-        <div class="answer">결측 판정은 지역 단위 플래그만이 아니라 treeCount, pine_area 등 항목별 유효성으로 세분화해야 합니다. 고치기 전에는 `항목별 결측 확인 필요`라고 설명합니다.</div>
+        <div class="answer">ver6 및 Modeling/CH4/2차 화면에서 ch1_data_available 플래그와 무관하게 treeCount, pine_area를 항목별로 검사해 결측 항목명을 직접 표시하도록 반영했습니다.</div>
       </div>
       <div class="item">
         <input class="check" type="checkbox" checked>
@@ -286,11 +287,39 @@ footer{margin-top:18px;color:var(--muted);font-size:12px}
         <div class="answer">ver6에서는 CH3 링크가 내부 `../ch4/ch4.html`을 가리키도록 수정했고, ver6 내부 ch4 폴더도 v4 구현본으로 교체했습니다. 최종 제출은 ver6 기준으로 묶어야 합니다.</div>
       </div>
       <div class="item">
-        <input class="check" type="checkbox">
+        <input class="check" type="checkbox" checked>
         <span class="level high">높음</span>
-        <span class="status todo">확인 필요</span>
+        <span class="status done">완료</span>
         <div class="risk"><b>targetDays 산출 설명</b><span>재발위험확률로 일수를 계산한 것처럼 보이면 CH3/CH4 논리가 꼬입니다.</span></div>
-        <div class="answer">화면과 보고서에서 `CH3 grade 기반 내부 기본값`으로 쓰고, 재발위험확률은 `urgentList 교차조건용`이라고 분리 표기해야 합니다.</div>
+        <div class="answer">ver6 및 Modeling/CH4/2차 화면에서 목표 작업일수 근거를 `CH3 grade 기반 내부 추정`으로 표시하고, 재발위험확률은 `targetDays 산정값이 아니라 urgentList 교차조건용 참고값`이라고 분리 표기했습니다.</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox" checked>
+        <span class="level high">높음</span>
+        <span class="status done">완료</span>
+        <div class="risk"><b>CH4 생성 스크립트·메타데이터의 CH2 6차 경로</b><span>생성 스크립트와 data.js meta에 CH2 6차 경로가 남으면 최종 기준이 흔들려 보입니다.</span></div>
+        <div class="answer">CH2 7차 폴더에 기준 CSV를 복사했고, ver6 및 Modeling/CH4/2차 data.js 메타와 build_ch4_v4_assets.ps1 생성 스크립트가 `CH2 7차 최종판 데이터 기준`을 사용하도록 정리했습니다.</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox" checked>
+        <span class="level mid">중간</span>
+        <span class="status done">완료</span>
+        <div class="risk"><b>CH4 분석계획서의 미구현 문구 잔존</b><span>v4 계획서에는 CH3→CH4 연결이 아직 미구현이라고 되어 있지만 ver6에서는 구현 완료됐습니다.</span></div>
+        <div class="answer">CH4 분석계획서의 미구현·검증 필요 문구를 `ver6 기준 CH3→CH4 URL 전달 및 CH4→CH3 복귀 경로 구현 완료, 제출 전 내부 상대경로 확인 필요`로 갱신했습니다.</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox" checked>
+        <span class="level mid">중간</span>
+        <span class="status done">완료</span>
+        <div class="risk"><b>CH4 결과를 추천 방제방식으로 과장</b><span>현재 로직은 정책 효과 검증이 아니라 입력 조건을 만족하는 방식을 비교한 것입니다.</span></div>
+        <div class="answer">ver6 및 Modeling/CH4/2차 화면의 결과 라벨을 `추천 방제방법`이 아니라 `조건 내 최소비용 방식`으로 수정했습니다. 발표와 보고서에서도 같은 표현을 유지합니다.</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox" checked>
+        <span class="level low">낮음</span>
+        <span class="status done">완료</span>
+        <div class="risk"><b>수정 우선순위 불명확</b><span>남은 항목이 많아 보이면 발표 직전 작업 순서가 흐려질 수 있습니다.</span></div>
+        <div class="answer">필수 수정은 ver6 화면·데이터·스크립트·계획서 문구까지 반영 완료했습니다. 남은 항목은 보고서에 명시할 한계와 발표 보완 사항으로 분리해 관리합니다.</div>
       </div>
     </div>
   </section>
@@ -301,7 +330,7 @@ footer{margin-top:18px;color:var(--muted);font-size:12px}
         <h2>2. 보고서에 명시하면 되는 것</h2>
         <p>데이터 한계나 모델 해석 한계입니다. 산출물을 바꿀 문제라기보다 심사위원 질문 전에 먼저 밝혀야 하는 항목입니다.</p>
       </div>
-      <div class="count">12개 항목</div>
+      <div class="count">18개 항목</div>
     </div>
     <div class="list">
       <div class="item">
@@ -317,6 +346,13 @@ footer{margin-top:18px;color:var(--muted);font-size:12px}
         <span class="status todo">보고서 필요</span>
         <div class="risk"><b>CH2 2016~2023 데이터 사용</b><span>2026 현재 발생을 직접 예측하는 값처럼 말하면 위험합니다.</span></div>
         <div class="answer">CH2는 장기 구조요인 기반 취약성 진단이며 실시간 예측이 아니라고 명시합니다.</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox">
+        <span class="level high">높음</span>
+        <span class="status todo">보고서 필요</span>
+        <div class="risk"><b>CH4 기준 데이터의 시간 격차</b><span>CH4는 실행 물량·비용·인력을 계산하므로 과거 treeCount 사용 한계를 반드시 밝혀야 합니다.</span></div>
+        <div class="answer">`CH4의 피해목 수는 시군구 단위로 검증 가능한 공개 원자료의 최신 완결 주기인 2021.5~2022.4 기준값을 사용했다. 다만 산림청 2026년 방제 결과(2025.6~2026.5 피해고사목 177만 본) 기준으로는 해당 주기 대비 약 4.68배 증가했으므로, 본 계산값은 현재 실제 방제 물량을 과소추정할 수 있다. 국가방제전략의 2025.5 기준 148.6만 본을 쓰면 배율은 약 3.93배가 되므로, 발표에서는 어떤 공식 기준을 사용했는지 함께 밝힌다.`</div>
       </div>
       <div class="item">
         <input class="check" type="checkbox">
@@ -378,8 +414,8 @@ footer{margin-top:18px;color:var(--muted);font-size:12px}
         <input class="check" type="checkbox">
         <span class="level high">높음</span>
         <span class="status todo">보고서 필요</span>
-        <div class="risk"><b>CH4 보고서 부재</b><span>CH1~CH3보다 문서 근거가 약해 보일 수 있습니다.</span></div>
-        <div class="answer">현재는 CH4 구현 화면과 v4 분석계획 기준이며, 최종 보고서는 추후 작성 예정이라고 솔직히 말합니다.</div>
+        <div class="risk"><b>CH4 보고서 최신화 필요</b><span>CH4 2차 보고서는 작성됐지만 도메인 지침과 최신 구현 상태를 더 반영해야 합니다.</span></div>
+        <div class="answer">`CH4_분석보고서_2차`는 작성 완료 상태입니다. 다만 항공방제 중지·효과검증 성격, 드론방제 분류, 단위체계, 계절 제약, 공식 단가 벤치마크는 본문 또는 각주에 추가 반영해야 최종본으로 볼 수 있습니다.</div>
       </div>
       <div class="item">
         <input class="check" type="checkbox">
@@ -387,6 +423,41 @@ footer{margin-top:18px;color:var(--muted);font-size:12px}
         <span class="status todo">보고서 필요</span>
         <div class="risk"><b>전체 흐름의 역할 구분</b><span>현황, 구조 진단, 우선순위, 실행 설계를 같은 성격으로 말하면 논리가 약해집니다.</span></div>
         <div class="answer">CH1 현황, CH2 구조 진단, CH3 정책 우선순위, CH4 실행 가능성 비교로 고정합니다.</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox">
+        <span class="level high">높음</span>
+        <span class="status todo">보고서 필요</span>
+        <div class="risk"><b>항공방제 상시가능 오인</b><span>CH4가 항공방제를 다른 방식과 동등하게 상시 선택 가능한 옵션처럼 비교합니다.</span></div>
+        <div class="answer">산림청은 2023년부터 소나무재선충병 유인헬기 항공방제를 중지하고 드론정밀·지상방제로 전환한다고 발표했습니다. 2026년 포항 등 일부 지역의 유인항공기 방제도 80ha·3회 규모의 효과검증 성격으로 보는 것이 안전합니다. CH4에서 항공방제 결과가 나오더라도 "상시 가능 옵션이 아닌 참고·검증 시나리오"라고 명시해야 합니다.</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox">
+        <span class="level mid">중간</span>
+        <span class="status todo">보고서 필요</span>
+        <div class="risk"><b>드론방제 독립방식 오분류</b><span>CH4가 드론방제를 항공·지상방제와 나란한 독립 정책수단으로 다룹니다.</span></div>
+        <div class="answer">소나무재선충병 방제지침 원문 기준으로 드론방제는 독립 대분류라기보다 약제살포의 정밀·소면적 옵션으로 해석하는 것이 타당합니다. CH4에서는 독립 방식으로 비교하되, 정책 분류상 "정밀 약제살포 옵션"이라는 각주를 병기해야 합니다.</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox">
+        <span class="level mid">중간</span>
+        <span class="status todo">보고서 필요</span>
+        <div class="risk"><b>지상방제 단위체계 불일치</b><span>CH4는 지상방제를 피해목 본 단위로 계산합니다.</span></div>
+        <div class="answer">소나무재선충병 방제지침의 공식 서식은 ha 또는 ㎥ 등 면적·재적 단위를 중심으로 계획·정산합니다. 따라서 CH4가 지상방제·수간주사·훈증·벌채를 모두 피해목 본 단위로 묶어 계산하는 것은 실행 비교용 단순화라는 각주가 필요합니다.</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox">
+        <span class="level high">높음</span>
+        <span class="status todo">보고서 필요</span>
+        <div class="risk"><b>방제 시기 계절 제약 미반영</b><span>targetDays 판정 로직이 방제 가능 시기를 전혀 고려하지 않습니다.</span></div>
+        <div class="answer">방제지침상 벌채한 피해고사목은 매개충 우화기 전인 10월~다음해 3월말 등 정해진 방제 가능 기간 안에 파쇄·훈증·반출을 완료해야 합니다. 긴급 등급(S/A)의 targetDays가 이 제한 기간과 겹치면 CH4가 "가능"으로 판정해도 실제로는 시기상 제약에 걸릴 수 있다는 한계를 명시해야 합니다.</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox">
+        <span class="level low">낮음</span>
+        <span class="status todo">보고서 권장</span>
+        <div class="risk"><b>unitCost 공식 벤치마크 미활용</b><span>unitCost가 전부 D등급 내부 추정으로만 표기돼 있습니다.</span></div>
+        <div class="answer">소나무재선충병 방제지침 별표29의 파쇄 35,000원/㎥ 등 공식 벤치마크와 지자체 지원단가(예: 포항시 25,000원/㎥)가 확인됩니다. 해당 항목은 완전 내부추정(D)이라기보다 공식 참고단가 기반 보조추정(C) 수준으로 신뢰도 표기를 올릴 수 있습니다.</div>
       </div>
     </div>
   </section>
@@ -397,7 +468,61 @@ footer{margin-top:18px;color:var(--muted);font-size:12px}
     <div class="card"><b>CH4 방어문</b><br>CH4는 확정 견적이 아니라 공개자료와 사용자 입력을 결합한 실행 가능성 비교 시뮬레이션입니다.</div>
   </section>
 
-  <footer>작성 기준: CH2 7차 최종판, CH3 2차 B안 최종, CH4 v4 최종수정2 분석계획 및 CH4 2차 구현 화면, ver6 대시보드 적용 상태.</footer>
+  <section id="extra" class="section">
+    <div class="section-head">
+      <div>
+        <h2>3. 추가로 챙기면 좋은 것</h2>
+        <p>체크리스트의 오류 수정과 별개로, 발표 흐름과 분석 정당화를 더 단단하게 만드는 문구입니다. 특히 성능이 낮거나 추정이 많은 분석은 역할을 낮춰 설명해야 합니다.</p>
+      </div>
+      <div class="count">6개 항목</div>
+    </div>
+    <div class="list">
+      <div class="item">
+        <input class="check" type="checkbox">
+        <span class="level high">높음</span>
+        <span class="status todo">보고서 권장</span>
+        <div class="risk"><b>CH1에서 CH2로 넘어가는 논리</b><span>피해 현황에서 바로 모델로 넘어가면 분석 흐름이 튈 수 있습니다.</span></div>
+        <div class="answer">`CH1에서 확인한 피해 확산은 단순 발생량 문제가 아니라 지역별 구조적 취약성과 대응역량 차이의 문제로 이어진다. 따라서 CH2에서는 단기 예측보다 반복 피해에 취약한 지역 구조를 진단한다.`</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox">
+        <span class="level high">높음</span>
+        <span class="status todo">보고서 권장</span>
+        <div class="risk"><b>CH2 성능 방어</b><span>성능이 애매한 모델을 예측모형으로 말하면 공격받기 쉽습니다.</span></div>
+        <div class="answer">`본 모델은 개별 시군구의 다음 해 발생을 정확히 맞히기 위한 예측모형이 아니라, 반복 피해와 취약성이 누적되는 지역을 선별하기 위한 구조 진단 지표다.`</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox">
+        <span class="level high">높음</span>
+        <span class="status todo">보고서 권장</span>
+        <div class="risk"><b>CH3 점수 정당화</b><span>정책 효과 검증이나 정답 정책 추천처럼 말하면 근거가 과장됩니다.</span></div>
+        <div class="answer">`CH3의 우선순위와 정책 매칭은 정책 효과를 검증한 결과가 아니라, CH2에서 도출된 취약성 유형을 행정 대응 방향으로 변환한 의사결정 보조 기준이다.`</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox">
+        <span class="level high">높음</span>
+        <span class="status todo">보고서 권장</span>
+        <div class="risk"><b>CH4 정당화</b><span>CH4는 추정값이 많으므로 정확한 계산기보다 입력값 조정 가능성을 강조해야 합니다.</span></div>
+        <div class="answer">`CH4는 고정된 예산 산출기가 아니라, 공개자료 기반 초기값을 사용자가 현장자료로 교체해 방제 방식별 비용·인력·기간을 비교하는 실행 설계 도구다.`</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox">
+        <span class="level mid">중간</span>
+        <span class="status todo">발표 권장</span>
+        <div class="risk"><b>전체 한계 문장 통일</b><span>각 장의 한계를 따로 말하면 방어가 길어지고 산만해질 수 있습니다.</span></div>
+        <div class="answer">`본 프로젝트는 피해 발생을 단일 모델로 확정 예측하는 방식이 아니라, 현황 파악(CH1), 구조적 취약성 진단(CH2), 정책 우선순위화(CH3), 실행 가능성 검토(CH4)를 단계적으로 연결한 의사결정 지원 체계다.`</div>
+      </div>
+      <div class="item">
+        <input class="check" type="checkbox">
+        <span class="level mid">중간</span>
+        <span class="status todo">발표 권장</span>
+        <div class="risk"><b>하면 안 되는 해석과 주장할 해석 분리</b><span>성능이 낮은 분석은 주장 범위를 낮춰야 신뢰성이 살아납니다.</span></div>
+        <div class="answer">CH1은 미래 예측이 아니라 현황 파악, CH2는 정확한 발생 예측이 아니라 구조 진단, CH3는 정책 효과 검증이 아니라 취약성 기반 우선순위, CH4는 확정 견적이 아니라 실행 가능성 비교로 설명합니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>작성 기준: CH2 7차 최종판, CH3 3차 최종(B안 원본부호 유지), CH4 v4 최종수정2 분석계획 및 CH4 2차 구현 화면, ver6 대시보드 적용 상태.</footer>
 </main>
 </body>
 </html>
