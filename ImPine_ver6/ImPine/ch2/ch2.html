@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>I'mPine — CH2 방제취약성 및 예산배분</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ch1/vendor/leaflet/leaflet.css"/>
+<script src="../ch1/vendor/leaflet/leaflet.js"></script>
+<script src="../ch1/vendor/chart.umd.js"></script>
+<script>if(window.Chart){Chart.defaults.maintainAspectRatio=false;}</script>
+<script src="../ch1/data.js"></script>
+<script src="data.js"></script>
+<style>
+/* ══════════ CH1과 동일한 디자인 토큰 (통일성) ══════════ */
+:root{
+  --gd:#0b3300;--gm:#1a5a0a;--gl:#2d7016;--gp:#4a9c23;--ga:#dcf4c0;
+  --r:#e34948;--a:#eda100;--b:#2a78d6;--t:#1baf7a;--pu:#8b5cf6;
+  --bg:#f6f8f3;--sf:#fff;--bd:#dde8d0;--tx:#1a1a18;--mu:#6b7560;--mu2:#8a9482;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Pretendard','Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.55}
+.mono{font-family:'JetBrains Mono',monospace}
+.hdr{background:linear-gradient(135deg,var(--gd),var(--gm));padding:12px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 10px rgba(0,0,0,.25);position:sticky;top:0;z-index:999}
+.hdr h1{color:#fff;font-size:20px;font-weight:700}
+.hdr .sub{color:#aad88a;font-size:11px}
+.tabs{margin-left:auto;display:flex;gap:6px}
+.tab{padding:7px 15px;border-radius:20px;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.75);font-size:12px;cursor:pointer;background:transparent;transition:.18s;font-family:inherit;display:flex;align-items:center;gap:6px;text-decoration:none}
+.tab .n{font-family:'JetBrains Mono',monospace;font-size:9.5px;opacity:.7}
+.tab.on,.tab:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.8);color:#fff}
+
+.basisbar{position:sticky;top:49px;z-index:998;background:#eef4e6;border-bottom:1px solid var(--bd);
+  padding:7px 24px;display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--gd)}
+.basisbar b{color:var(--gd)}
+.basisbar .infobtn{margin-left:auto;background:#fff;border:1px solid var(--gl);color:var(--gl);
+  border-radius:14px;padding:3px 12px;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.basisbar .infobtn:hover{background:var(--gl);color:#fff}
+
+.pg{padding:16px 24px 10px;max-width:1420px;margin:0 auto;scroll-margin-top:96px}
+.qhead{display:flex;align-items:baseline;gap:10px;margin:4px 0 14px}
+.qhead h2{font-size:16px;color:var(--gd)}
+.qhead .q{font-size:12px;color:var(--mu);font-style:italic}
+.sec-divider{height:1px;background:var(--bd);max-width:1420px;margin:8px auto 0}
+
+.callout{background:linear-gradient(135deg,#123a1f,#1a5a0a);border-radius:12px;padding:16px 20px;margin-bottom:14px;
+  color:#fff;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.callout .big{font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#c8f0a8}
+.callout .tx{font-size:13px;line-height:1.5}
+.callout .badge2{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:5px 12px;font-size:11.5px;margin-left:auto}
+
+.krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--gl)}
+.kpi.r::before{background:var(--r)}.kpi.a::before{background:var(--a)}.kpi.b::before{background:var(--b)}.kpi.t::before{background:var(--t)}.kpi.pu::before{background:var(--pu)}
+.kl{font-size:11px;color:var(--mu);margin-bottom:6px;font-weight:500}
+.kv{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px}
+.ks{font-size:10.5px;color:var(--mu2);margin-top:5px}
+
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.ct{font-size:13.5px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ct .cap{font-size:11px;font-weight:500;color:var(--mu)}
+.tag{font-size:10px;font-weight:500;background:var(--ga);color:var(--gd);padding:2px 8px;border-radius:10px;cursor:help}
+.tag.gray{background:#eee;color:#666}
+.tag.warn{background:#fff3d6;color:#92600a}
+.tag.official{background:#dcecff;color:#1d4ed8}
+.tag.blue{background:#dcecff;color:#1d4ed8}
+.note{font-size:11px;color:var(--mu);background:#f4f7f0;border-radius:8px;padding:7px 11px;margin-top:8px;line-height:1.6}
+.note b{color:var(--tx)}
+.note.warn{background:#fff8e6;border-left:3px solid var(--a)}
+.infobox{font-size:11.5px;color:#1d4ed8;background:#dcecff;border-radius:8px;border-left:3px solid var(--b);padding:9px 12px;margin-top:8px;line-height:1.6}
+.infobox b{color:#0d3a8c}
+.warnbox{font-size:11.5px;color:#9a4a0a;background:#fff3d6;border-radius:8px;border-left:3px solid var(--a);padding:9px 12px;margin-top:8px;line-height:1.6}
+.warnbox b{color:#7a3405}
+.concl{background:#eaf3e0;border-left:4px solid var(--gl);border-radius:8px;padding:12px 15px;margin-top:6px;font-size:12.5px;line-height:1.7}
+.concl .lbl{font-size:10.5px;font-weight:700;color:var(--gl);letter-spacing:.5px;margin-bottom:4px}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+/* ── [2026-07-31] 카드 죽은 공백 제거 ─────────────────────────────
+   .g2/.g3는 grid이므로 같은 행 카드가 큰 쪽 높이로 stretch된다.
+   내부 콘텐츠는 고정높이여서 카드 아래쪽에 빈 공간이 남았다.
+   카드를 flex column으로 만들고 차트 래퍼가 남은 높이를 채우게 한다. */
+.g2>.card,.g3>.card{display:flex;flex-direction:column}
+.g2>.card>.g3,.g3>.card>.g3{flex:1 1 auto;min-height:0}
+.g2>.card>.cw,.g3>.card>.cw{flex:1 1 auto;height:auto!important;min-height:165px}
+.g2>.card>.g3>.cw,.g3>.card>.g3>.cw{height:auto!important;min-height:165px}
+.g2>.card>.foldbody,.g2>.card>ul:last-child{flex:0 0 auto}
+.cw{position:relative}
+
+table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
+.rtbl th{background:#f0f5ea;text-align:left;padding:6px 9px;font-weight:600;color:var(--mu);border-bottom:2px solid var(--bd)}
+.rtbl td{padding:6px 9px;border-bottom:1px solid #eee}
+.rtbl td.num{text-align:right;font-family:'JetBrains Mono',monospace}
+.rtbl tr:hover td{background:#f8faf5}
+.rtbl .rk{display:inline-flex;width:18px;height:18px;border-radius:50%;background:var(--gl);color:#fff;
+  align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.lvl{font-size:11px;font-weight:600;padding:2px 8px;border-radius:9px;display:inline-block}
+.lvl.과소배분{background:#fde2e1;color:#b91c1c}
+.lvl.노출도{background:#e4f0da;color:var(--gd)}
+.lvl.기후위험도{background:#dcecff;color:#1d4ed8}
+.lvl.역량부족{background:#fff3d6;color:#92600a}
+.lvl.산업유통기반{background:#ece4fd;color:#6d28d9}
+
+.lmap{width:100%;height:400px;border-radius:8px;background:#eaeef3}
+.leaflet-container{background:#eaeef3!important;font-family:'Pretendard','Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif!important}
+.gu-tooltip{background:#1a2332!important;border:none!important;color:#f5f7fa!important;font-size:11.5px!important;padding:8px 11px!important;border-radius:6px!important;line-height:1.6!important}
+.gu-tooltip b{color:#8fd19e}
+
+.legend-box{position:absolute;bottom:14px;left:14px;background:rgba(255,255,255,.95);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;font-size:11px;z-index:500;box-shadow:0 2px 8px rgba(0,0,0,.1);max-width:220px}
+.legend-row{display:flex;align-items:center;gap:6px;margin:2px 0}
+.legend-sw{width:13px;height:13px;border-radius:3px;border:1px solid rgba(0,0,0,.15);flex:none}
+.legend-cap{font-size:9.5px;color:var(--mu);margin-top:5px;line-height:1.4}
+
+.maptoggle{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.mtbtn{padding:6px 13px;border-radius:14px;border:1px solid var(--bd);background:#fff;font-size:11.5px;cursor:pointer;color:var(--mu);font-family:inherit}
+.mtbtn.on{background:var(--gl);color:#fff;border-color:var(--gl)}
+
+.diag-banner{background:#f0f5ea;border:1.5px dashed var(--gl);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start}
+.diag-banner .ic{font-size:20px}
+.diag-banner .tx{font-size:12px;color:var(--gd);line-height:1.6}
+
+.chiprow{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.chip{background:#f7faf3;border:1px solid var(--bd);border-radius:9px;padding:9px 13px;flex:1;min-width:160px}
+.chip .l{font-size:10.5px;color:var(--mu)}
+.chip .v{font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--gd)}
+
+/* 접기 카드 (변수목록·강건성 세부) */
+.foldbtn{background:#fff;border:1px solid var(--bd);color:var(--gl);border-radius:14px;padding:4px 13px;
+  font-size:11.5px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+.foldbtn:hover{background:var(--ga)}
+.foldbtn .arw{transition:.2s}
+.foldbtn.open .arw{transform:rotate(90deg)}
+.foldbody{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--bd)}
+.foldbody.open{display:block}
+
+.varblock{margin-bottom:12px}
+.varblock h4{font-size:12px;color:var(--gd);margin-bottom:6px}
+.varrow{display:flex;align-items:baseline;gap:8px;padding:4px 0;border-bottom:1px dashed #eee;font-size:12px}
+.varrow .vn{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx);flex:1;min-width:0}
+.varrow .vnote{font-size:10.5px;color:var(--mu)}
+.tag.v-주{background:var(--ga);color:var(--gd)}
+.tag.v-제외{background:#fde2e1;color:#a33}
+.tag.v-진단,.tag.v-보조{background:#eee;color:#666}
+.tag.v-민감도,.tag.v-주의{background:#fff3d6;color:#92600a}
+
+/* 2×2 예산배분 매트릭스 */
+.quadwrap{display:grid;grid-template-columns:34px 1fr;grid-template-rows:1fr 26px;gap:6px 8px}
+.quad-y{grid-row:1;grid-column:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;font-size:11px;color:var(--mu)}
+.quad-grid{grid-row:1;grid-column:2;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;min-height:230px}
+.quad-x{grid-row:2;grid-column:2;text-align:center;font-size:11px;color:var(--mu)}
+.qcell{border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between;border:1.5px solid transparent}
+.qcell .qn{font-size:11.5px;font-weight:700}
+.qcell .qc{font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace;margin:4px 0}
+.qcell .qe{font-size:10.5px;line-height:1.6;opacity:.85}
+.qcell.top-r{background:#fdeceb;border-color:#f3b7b3}.qcell.top-r .qn{color:#b91c1c}.qcell.top-r .qc{color:#b91c1c}
+.qcell.top-g{background:#eaf3e0;border-color:var(--gp)}.qcell.top-g .qn{color:var(--gd)}.qcell.top-g .qc{color:var(--gd)}
+.qcell.bot-a{background:#fff6e4;border-color:#f0d090}.qcell.bot-a .qn{color:#92600a}.qcell.bot-a .qc{color:#92600a}
+.qcell.bot-b{background:#eaf1fb;border-color:#a9c8ee}.qcell.bot-b .qn{color:#1d4ed8}.qcell.bot-b .qc{color:#1d4ed8}
+
+.chklist{list-style:none}
+.chklist li{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #eee;font-size:12.5px;align-items:flex-start}
+.chklist li:last-child{border-bottom:none}
+.chklist .ico{flex:none;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-top:1px}
+.chklist .ico.ok{background:var(--t)}.chklist .ico.warn{background:var(--a)}
+.chklist b{color:var(--tx)}
+.chklist .sub{display:block;color:var(--mu);font-size:11px;margin-top:2px}
+
+.pagefoot{max-width:1420px;margin:18px auto 30px;padding:0 24px;font-size:11px;color:var(--mu2);line-height:1.7;text-align:center}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;padding:40px 20px;overflow-y:auto}
+.modal-bg.on{display:block}
+.modal{background:#fff;max-width:900px;margin:0 auto;border-radius:14px;padding:24px 28px;position:relative}
+.modal h3{font-size:16px;margin-bottom:12px;color:var(--gd)}
+.modal .close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu)}
+.modal hr{border:none;border-top:1px solid var(--bd);margin:18px 0}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>🌲 I'mPine</h1>
+  <div class="sub">방제취약성 및 예산배분 · CH2</div>
+  <div class="tabs">
+    <a class="tab" href="#sec01" data-i="0"><span class="n">01</span> 지역별 방제취약성</a>
+    <a class="tab" href="#sec02" data-i="1"><span class="n">02</span> 지수 신뢰도 검증</a>
+    <a class="tab" href="#sec03" data-i="2"><span class="n">03</span> 예산배분 갭 진단</a>
+    <a class="tab" href="#sec04" data-i="3"><span class="n">04</span> 강건성 확인</a>
+  </div>
+</div>
+<div class="basisbar">
+  📌 분석 기준: <b>시군구 단위 · 확정 변수 기반</b> · 방제취약성지수 및 예산배분 갭 진단
+  <button class="infobtn" onclick="openModal()">ⓘ 분석 기준 및 분석 사양</button>
+</div>
+
+<!-- ══════════ SECTION 01 · 지역별 방제취약성 ══════════ -->
+<section class="pg" id="sec01">
+  <div class="qhead"><h2>01. 지역별 방제취약성</h2><span class="q">어느 시군구가 구조적으로 취약한가?</span></div>
+
+  <div class="krow" id="kpi-row-01"></div>
+
+  <div class="card" style="position:relative">
+    <div class="ct">시군구별 통합 취약성지수 지도 <span class="cap">보기 전환</span></div>
+    <div class="maptoggle" id="maptoggle"></div>
+    <div class="g3">
+      <div style="position:relative"><div id="mapIndex" class="lmap"></div>
+        <div class="legend-box" id="legIndex"></div></div>
+      <div><table class="rtbl" id="top10-index-tbl"></table></div>
+    </div>
+    <div class="note"><b>지도 표시 범위</b> — 행정경계 자료가 확보된 <b>177개</b> 분석단위만 지도에 표시됩니다. 경계 미확보 45개 시군구(여수시·옹진군 등)도 지수 산정과 순위표에는 모두 포함했으며, 표에서 <b>*</b>는 지도 미표시 지역입니다.</div>
+  </div>
+
+  <div class="card">
+    <div class="ct">도메인별 기여도 <span class="cap" id="domainTop-cap">취약성 상위 5개 시군구</span></div>
+    <div class="cw" style="height:150px"><canvas id="c_domainTop10"></canvas></div>
+    <button class="foldbtn" id="domainTop-toggle" onclick="toggleDomainTop()"><span class="arw">▸</span> 나머지 5곳 보기</button>
+  </div>
+
+  <div class="card">
+    <button class="foldbtn" id="fold-var" onclick="toggleFold('fold-var','body-var')"><span class="arw">▸</span> 변수 구성 보기</button>
+    <div class="foldbody" id="body-var">
+      <div id="varlist-body"></div>
+      <div style="margin-top:10px">
+        <div class="ct" style="font-size:12px">축A 임계값 민감도 <span class="tag gray">결과 안정성 참고</span></div>
+        <table class="rtbl" id="loo-tbl"></table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">해석</div>
+    <ul style="margin:6px 0 10px 18px;font-size:12.5px;line-height:1.8">
+      <li>완도군·옹진군·신안군 등 상위권은 <b>산업·유통 기반 취약성</b> 도메인 기여가 두드러짐</li>
+      <li>고령군·영양군·대구 동구 등은 <b>노출도</b>(소나무류 면적비율) 기여가 큰 노출도-우세형</li>
+      <li>같은 "취약" 판정도 원인 도메인이 다르면 처방(예찰 인프라 확충 vs 방제 수행기반·유통관리 강화)이 달라짐</li>
+    </ul>
+    <div class="warnbox"><b>변수 해석의 한계</b> — 이 도메인은 <b>원목생산업체 수</b> 한 변수로 구성되며, 업체 수와 피해밀도의 실측 상관은 <b>음의 방향</b>입니다(업체가 <b>적은</b> 지역에서 위험도가 높게 잡힘). 다만 업체 수는 인위적 확산을 직접 측정하는 변수가 아니라 <b>지역의 목재산업 및 방제 수행 기반을 나타내는 대리지표</b>로 제한적으로 해석했습니다. 농산어촌 구조·접근성 등 미관측 요인이 반영됐을 수 있어 <b>인과관계로 해석하지 않습니다</b>. 따라서 처방도 "업체 수를 늘리면 확산이 줄어든다"가 아니라 등록업체 교육·방제품질 관리, 감염목 이동이력 관리, 공동 장비·인력 지원 방향으로 제시합니다.</div>
+  </div>
+</section>
+<div class="sec-divider"></div>
+
+<!-- ══════════ SECTION 02 · 지수 신뢰도 검증 ══════════ -->
+<section class="pg" id="sec02">
+  <div class="qhead"><h2>02. 지수 신뢰도 검증</h2><span class="q">이 지수는 실제 피해와 방향이 맞는가?</span></div>
+
+  <div class="callout">
+    <div class="big">5.5배</div>
+    <div class="tx">구조적 취약성 <b>상위 10%</b> 지역은 하위 10%보다 평균 피해밀도가 <b>5.5배</b> 높았고,<br>발생률도 <b>80.7% 대 47.2%</b>로 나타났습니다.</div>
+    <div class="badge2">지수 십분위 실측 대조</div>
+  </div>
+  <div class="infobox">본 지수는 특정 연도의 발생 여부를 맞히는 <b>단기 예측모형이 아니라</b>, 장기간 반복적으로 피해가 누적될 가능성이 높은 지역을 선별하는 <b>정책 스크리닝 지수</b>입니다. 따라서 아래 검증표의 AUC·within 계수는 이 지수의 목적에 대한 완전한 평가지표가 아니며, 상·하위 집단의 실제 피해 격차와 홀드아웃 결과를 함께 제시합니다.</div>
+
+  <div class="krow" id="kpi-row-02"></div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ct">분위별 실제 피해 <span class="cap">지수 십분위별 발생률·평균 피해밀도</span></div>
+      <div class="cw" style="height:230px"><canvas id="c_decile"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">지수 vs 피해밀도 <span class="cap">산점도</span></div>
+      <div class="cw" style="height:230px"><canvas id="c_scatterValidity"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">CRE 2부문모형 — 훈련 vs 홀드아웃 <span class="tag blue">between/within 분리</span></div>
+    <div class="note"><b>훈련(2017-2020)</b>=모형을 만드는 데 쓴 기간, <b>홀드아웃(2021-2022)</b>=모형이 한 번도 보지 않은 기간으로 성능을 검증. 홀드아웃 성능이 훈련과 비슷해야 "우연히 맞춘 것"이 아닙니다.</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin:10px 0">
+      <div style="display:flex;align-items:center;gap:10px;background:#eaf3e0;border-radius:8px;padding:10px 12px">
+        <span style="font-size:16px;flex-shrink:0">✓</span>
+        <span style="font-size:12.5px">어느 지역이 <b>만성적으로</b> 더 취약한지는 안 본 기간(홀드아웃)에서도 <b>일관되게</b> 맞습니다</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;background:#fff3d6;border-radius:8px;padding:10px 12px">
+        <span style="font-size:16px;flex-shrink:0">△</span>
+        <span style="font-size:12.5px">같은 지역의 <b>올해·내년 변동</b>은 이 지수로 예측하지 못합니다(단기 예측이 아닌 참고용 지표)</span>
+      </div>
+    </div>
+    <button class="foldbtn" id="fold-cre" onclick="toggleFold('fold-cre','body-cre')"><span class="arw">▸</span> 통계 수치 원본 표 펼치기</button>
+    <div class="foldbody" id="body-cre">
+      <table class="rtbl" id="modelcompare-tbl" style="margin-top:8px"></table>
+      <div class="note warn" id="detectionbias-note"></div>
+    </div>
+  </div>
+
+  <div class="concl"><div class="lbl">해석</div>지자체 간 만성적 차이는 일관되게 포착하지만, 같은 지자체의 연도별 변동은 설명하지 못합니다 — 단기 예측이 아닌 장기 우선순위 선별 지수로 사용합니다.</div>
+</section>
+<div class="sec-divider"></div>
+
+<!-- ══════════ SECTION 03 · 예산배분 갭 진단 ══════════ -->
+<section class="pg" id="sec03">
+  <div class="qhead"><h2>03. 예산배분 갭 진단</h2><span class="q">취약한데 현행 배분관행 대비 예산이 상대적으로 적게 배정된 곳은 어디인가?</span></div>
+
+  <div class="callout">
+    <div class="big" id="gap-big">·</div>
+    <div class="tx">취약성 상위 지역 중 상대적으로<br>예산이 적게 배정된 후보입니다.</div>
+    <div class="badge2" id="gap-badge">–</div>
+  </div>
+
+  <div class="card" style="position:relative">
+    <div class="ct">시군구별 예산배분갭 지도 <span class="cap">과소배분에만 빨강 사용</span></div>
+    <div class="note">행정경계 확보 <b>177개</b>만 지도에 표시 · 경계 미확보 45개 시군구도 갭 산정에는 포함</div>
+    <div class="g3">
+      <div style="position:relative"><div id="mapGap" class="lmap"></div>
+        <div class="legend-box" id="legGap"></div></div>
+      <div><table class="rtbl" id="gap-tbl"></table></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">위험도 × 예산배분 2×2 진단</div>
+    <div class="quadwrap">
+      <div class="quad-y"><span>취약도</span><span style="font-weight:600">높음</span><span style="font-size:9px">↑</span><span style="font-weight:600">낮음</span></div>
+      <div class="quad-grid" id="quad-grid"></div>
+      <div class="quad-x">예산갭 충분 → 부족</div>
+    </div>
+    <div class="note">이 갭은 <b>현행 평균 배분관행 대비 상대적 편차</b>이며, 법정 필요액이나 실제 부족 예산액을 계산한 것이 아닙니다. 따라서 "예산 부족액"이 아니라 <b>상대적 과소배분 추정</b>으로 해석해야 합니다.</div>
+  </div>
+
+  <div class="concl"><div class="lbl">해석</div>현행 예산배분과 구조적 위험도의 상관은 매우 낮아(R²=<span id="gap-r2c">–</span>%), 배분이 위험이 아니라 과거 피해 실적을 따라가는 사후대응형 구조에 가깝습니다.</div>
+</section>
+<div class="sec-divider"></div>
+
+<!-- ══════════ SECTION 04 · 강건성 확인 ══════════ -->
+<section class="pg" id="sec04">
+  <div class="qhead"><h2>04. 강건성 확인</h2><span class="q">결과가 특정 사양에만 의존한 것은 아닌가?</span></div>
+
+  <div class="diag-banner">
+    <div class="ic">✓</div>
+    <div class="tx" id="robust-summary"><b>사양을 바꿔도 결론 방향이 유지됩니다.</b> 국가대응수준 서브모형·표본외 검증·결과 확인 전 확정한 분석 사양이 같은 방향을 가리킵니다.
+    <span class="tag gray" style="margin-left:6px">결과 확인 전 확정</span></div>
+  </div>
+
+  <div class="card">
+    <button class="foldbtn" id="fold-robust" onclick="toggleFold('fold-robust','body-robust')"><span class="arw">▸</span> 세부 검증 보기</button>
+    <div class="foldbody" id="body-robust">
+      <div class="g2">
+        <div>
+          <div class="ct" style="font-size:12px">국가대응수준 서브모형 <span class="tag warn">로버스트니스 전용</span></div>
+          <div id="natl-summary"></div>
+        </div>
+        <div>
+          <div class="ct" style="font-size:12px">표본외 검증 <span class="cap">rolling-origin AUC</span></div>
+          <div class="cw" style="height:190px"><canvas id="c_holdout"></canvas></div>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="ct" style="font-size:12px">결과 확인 전 확정한 분석 사양</div>
+        <table class="rtbl" id="prespec-tbl"></table>
+        <div class="note" id="appendix-note"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 분석 기준 및 분석 사양 모달 -->
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="close" onclick="closeModal()">×</button>
+    <h3>분석 기준 및 분석 사양</h3>
+    <div class="note" id="modal-sample"></div>
+    <div id="funnel-body" style="margin-top:10px;font-size:11.5px;color:var(--mu)"></div>
+    <hr>
+    <div class="ct">결과 확인 전 확정한 분석 사양 (강건성 조합 방지)</div>
+    <div class="note">외부 기관에 등록한 사전분석계획서(pre-registration)가 아니라, <b>결과를 확인하기 전에 팀 내부에서 확정해 기록한 분석 사양</b>이라는 의미입니다.</div>
+    <table class="rtbl" id="modal-prespec-tbl"></table>
+    <div class="note" id="modal-appendix" style="margin-top:8px"></div>
+    <hr>
+    <div class="note">본 대시보드는 방제취약성의 구조적 우선순위를 제시하는 도구이며, 개별 지자체의 실제 예산 확정액을 대체하지 않습니다. 예산배분 갭은 현행 배분관행 대비 상대적 편차로 해석합니다.</div>
+  </div>
+</div>
+
+<div class="pagefoot">본 대시보드는 방제취약성의 구조적 우선순위를 제시하는 도구이며, 개별 지자체의 실제 예산 확정액을 대체하지 않습니다.</div>
+
+<script>
+const D = CH2_DATA;
+function openModal(){ document.getElementById('modal-bg').classList.add('on'); }
+function closeModal(){ document.getElementById('modal-bg').classList.remove('on'); }
+function toggleFold(btnId, bodyId){
+  document.getElementById(btnId).classList.toggle('open');
+  document.getElementById(bodyId).classList.toggle('open');
+}
+const fmt = n => n==null||isNaN(n) ? '–' : Number(n).toLocaleString('ko-KR');
+
+// ── 스크롤 네비게이션 ──────────────────────────────────────────────────────
+const navTabs = document.querySelectorAll('.tab');
+navTabs.forEach(a=>a.addEventListener('click', e=>{
+  e.preventDefault();
+  document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth', block:'start'});
+}));
+const sections = ['sec01','sec02','sec03','sec04'].map(id=>document.getElementById(id));
+// 배치 내 콜백 처리 순서에 따라 엉뚱한 탭이 활성화되던 문제 수정 — 교차 중인
+// 섹션을 누적해두고 문서 순서상 가장 나중 섹션을 활성 탭으로 결정한다.
+const visibleSecs = new Set();
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting) visibleSecs.add(en.target); else visibleSecs.delete(en.target);
+  });
+  let activeIdx = -1;
+  sections.forEach((s,i)=>{ if(visibleSecs.has(s)) activeIdx = i; });
+  if(activeIdx === -1) return;
+  navTabs.forEach((t,i)=>t.classList.toggle('on', i===activeIdx));
+}, {rootMargin:'-100px 0px -70% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+let mapIndex, mapGap;
+window.addEventListener('load', ()=> setTimeout(()=>{
+  [mapIndex, mapGap].forEach(m=>m&&m.invalidateSize());
+}, 200));
+
+function resolveSggCode(code){ const s=String(code); return s.startsWith('42') ? '51'+s.slice(2) : s; }
+const GEOSET = new Set((typeof CH1_GEOJSON!=='undefined'?CH1_GEOJSON.features:[])
+  .map(f=>resolveSggCode(f.properties.sgg_cd)));
+/* 지도에 폴리곤이 있는 시군구인지 — 표의 * 표기에 사용 */
+function onMap(r){ return (r.sgg_codes||[]).some(c=>GEOSET.has(String(c))); }
+/* 축A 유형 표시 라벨 — 데이터 값은 그대로 두고 화면 표기만 통일 */
+const AXISA_LABEL = {'인위적확산-우세형':'산업·유통기반-우세형'};
+function axisALabel(v){ return AXISA_LABEL[v] || v; }
+const sggMap = {};
+D.sggIndex.forEach(r=>{ (r.sgg_codes||[]).forEach(code=>{ sggMap[code]=r; }); });
+
+// 도메인 기여도 필드 → 주요 원인 라벨
+const DOM_FIELDS = [['기여_노출도','노출도'],['기여_기후위험도','기후위험도'],['기여_지자체역량','역량부족'],['기여_인위적확산','산업유통기반']];
+function mainCause(r){
+  let best=DOM_FIELDS[0];
+  DOM_FIELDS.forEach(f=>{ if(r[f[0]] > r[best[0]]) best=f; });
+  return best[1];
+}
+
+// ═══════════════════════ SECTION 01 ═══════════════════════
+const sorted01 = [...D.sggIndex].sort((a,b)=>b.index_main-a.index_main);
+const top1 = sorted01[0];
+const top10 = sorted01.slice(0,10);
+const meanTop10 = top10.reduce((s,r)=>s+r.index_main,0)/10;
+const typeCounts={}; top10.forEach(r=>typeCounts[r.축A_위험요인유형]=(typeCounts[r.축A_위험요인유형]||0)+1);
+const domType = Object.entries(typeCounts).sort((a,b)=>b[1]-a[1])[0];
+
+const kpis01 = [
+  ['gl','전체 대상 시군구', D.meta.n_sgg+'개', D.meta.period],
+  ['r','최고 취약지역', top1.시도명.slice(0,2)+' '+top1.시군구명, '지수 '+top1.index_main.toFixed(3)],
+  ['b','상위 10 평균점수', meanTop10.toFixed(3), '전체 평균 대비 상위권 격차'],
+  ['pu','주요 우세 유형', domType[0], `상위 10 중 ${domType[1]}곳`],
+];
+document.getElementById('kpi-row-01').innerHTML = kpis01.map(([c,l,v,s])=>
+  `<div class="kpi ${c}"><div class="kl">${l}</div><div class="kv">${v}</div><div class="ks">${s}</div></div>`).join('');
+
+const INDEX_LAYERS = {
+  index_main: {label:'구조적취약성지수'},
+  위험지수:    {label:'위험지수 (예산 제외)'},
+};
+let curIndexLayer = 'index_main';
+document.getElementById('maptoggle').innerHTML = Object.entries(INDEX_LAYERS).map(([k,v])=>
+  `<button class="mtbtn ${k===curIndexLayer?'on':''}" data-k="${k}">${v.label}</button>`).join('');
+
+const GREEN5 = ['#eef4e6','#cbe3ae','#9fce77','#5ea23c','#2d7016'];
+function quantileColor(v, arr, colors){
+  if(v==null||isNaN(v)) return '#eeeeee';
+  const sorted=[...arr].sort((a,b)=>a-b);
+  const q=[0.2,0.4,0.6,0.8].map(p=>sorted[Math.floor(p*sorted.length)]);
+  let i=0; while(i<q.length && v>q[i]) i++;
+  return colors[i];
+}
+function indexVals(k){ return D.sggIndex.map(r=>r[k]).filter(v=>v!=null); }
+function styleIndex(f, k){
+  const b = sggMap[resolveSggCode(f.properties.sgg_cd)];
+  if(!b || b[k]==null) return {fillColor:'#e3e3e3', weight:.5, color:'#bbb', fillOpacity:.5};
+  return {fillColor: quantileColor(b[k], indexVals(k), GREEN5), weight:.5, color:'#999', fillOpacity:.85};
+}
+mapIndex = L.map('mapIndex',{scrollWheelZoom:false}).setView([36.3,127.8],7);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:12}).addTo(mapIndex);
+const geoIndex = (typeof CH1_GEOJSON!=='undefined') ? L.geoJSON(CH1_GEOJSON,{style:f=>styleIndex(f,curIndexLayer), onEachFeature:(f,l)=>{
+    l.bindTooltip('', {className:'gu-tooltip', sticky:true});
+    l.on({mouseover:e=>e.target.setStyle({weight:2,color:'#222'}), mouseout:e=>l.setStyle(styleIndex(f,curIndexLayer))});
+  }}).addTo(mapIndex) : null;
+
+function renderIndexMap(){
+  document.querySelectorAll('.mtbtn').forEach(b=>b.classList.toggle('on', b.dataset.k===curIndexLayer));
+  document.getElementById('legIndex').innerHTML = `<b>${INDEX_LAYERS[curIndexLayer].label}</b>` +
+    GREEN5.map((c,i)=>`<div class="legend-row"><span class="legend-sw" style="background:${c}"></span>${i===0?'낮음':i===GREEN5.length-1?'높음':''}</div>`).join('') +
+    `<div class="legend-cap">within-year z-score 5분위 · 진할수록 취약<br>행정경계 확보 177개만 표시</div>`;
+  if(!geoIndex) return;
+  geoIndex.eachLayer(l=>{
+    const b = sggMap[resolveSggCode(l.feature.properties.sgg_cd)];
+    l.setStyle(styleIndex(l.feature, curIndexLayer));
+    if(b){
+      l.setTooltipContent(`<b>${b.시도명} ${b.시군구명}</b><br>${INDEX_LAYERS[curIndexLayer].label}: <b>${b[curIndexLayer].toFixed(3)}</b> (순위 ${b.rank_within}/${D.meta.n_sgg})<br>주요원인: ${mainCause(b)} · 유형 ${axisALabel(b.축A_위험요인유형)}`);
+    } else {
+      l.setTooltipContent(`<b>${l.feature.properties.sgg_cd}</b><br>분석대상 아님`);
+    }
+  });
+  const rows = [...D.sggIndex].sort((a,b)=>b[curIndexLayer]-a[curIndexLayer]).slice(0,10);
+  document.getElementById('top10-index-tbl').innerHTML =
+    `<tr><th>순위</th><th>시군구</th><th class="num">지수</th><th>주요원인</th><th>유형</th></tr>` +
+    rows.map((r,i)=>`<tr><td><span class="rk">${i+1}</span></td><td>${r.시도명.slice(0,2)} ${r.시군구명}${onMap(r)?'':'<b title="행정경계 자료 미확보로 지도에서는 미표시">*</b>'}</td>
+      <td class="num"><b>${r[curIndexLayer].toFixed(3)}</b></td>
+      <td><span class="lvl ${mainCause(r)==='역량부족'?'역량부족':mainCause(r)==='기후위험도'?'기후위험도':mainCause(r)==='산업유통기반'?'산업유통기반':'노출도'}">${mainCause(r)}</span></td>
+      <td style="font-size:11px;color:var(--mu)">${axisALabel(r.축A_위험요인유형)}</td></tr>`).join('');
+}
+document.querySelectorAll('.mtbtn').forEach(b=>b.addEventListener('click', ()=>{ curIndexLayer=b.dataset.k; renderIndexMap(); }));
+renderIndexMap();
+
+// 220px 고정 높이에 10개 가로막대를 넣었더니 Chart.js가 라벨/막대를 절반씩
+// 건너뛰어 5개만 보이던 문제(카테고리 대비 공간 부족) → 기본은 상위 5개만
+// 그리고, 필요할 때 "나머지 5곳 보기"로 펼쳐서 10개를 보여주되 그때는 카드
+// 높이도 같이 늘려 10개가 다시 절반만 보이는 일이 없게 한다.
+const top10DomFull = [...D.sggIndex].sort((a,b)=>b.index_main-a.index_main).slice(0,10).reverse();
+let domainChart = null, domainExpanded = false;
+function renderDomainTop(n){
+  const rows = top10DomFull.slice(10-n);
+  if(domainChart) domainChart.destroy();
+  document.querySelector('#c_domainTop10').parentElement.style.height = (n===5 ? 150 : 290)+'px';
+  domainChart = new Chart(document.getElementById('c_domainTop10').getContext('2d'),{type:'bar',data:{
+    labels: rows.map(r=>r.시도명.slice(0,2)+' '+r.시군구명),
+    datasets:[
+      {label:'노출도', data: rows.map(r=>r.dom_노출도), backgroundColor:'#2d7016'},
+      {label:'기후위험도', data: rows.map(r=>r.dom_기후위험도), backgroundColor:'#2a78d6'},
+      {label:'역량부족', data: rows.map(r=>r.dom_지자체역량_역), backgroundColor:'#eda100'},
+      {label:'산업유통기반', data: rows.map(r=>r.dom_인위적확산), backgroundColor:'#8b5cf6'},
+    ]},
+    options:{indexAxis:'y',plugins:{legend:{position:'top',labels:{boxWidth:11,font:{size:10}}}},
+    scales:{x:{stacked:true,title:{display:true,text:'도메인 점수(within-year z)'}}, y:{stacked:true, ticks:{autoSkip:false}}}}
+  });
+}
+renderDomainTop(5);
+function toggleDomainTop(){
+  domainExpanded = !domainExpanded;
+  renderDomainTop(domainExpanded ? 10 : 5);
+  document.getElementById('domainTop-cap').textContent = domainExpanded ? '취약성 상위 10개 시군구' : '취약성 상위 5개 시군구';
+  document.getElementById('domainTop-toggle').innerHTML = domainExpanded
+    ? '<span class="arw">▸</span> 상위 5개만 보기'
+    : '<span class="arw">▸</span> 나머지 5곳 보기';
+  document.getElementById('domainTop-toggle').classList.toggle('open', domainExpanded);
+}
+
+document.getElementById('loo-tbl').innerHTML =
+  '<tr><th>임계값</th><th class="num">노출도우세</th><th class="num">산업유통기반우세</th><th class="num">복합형</th></tr>' +
+  D.thresholdSensitivity.map(r=>`<tr><td>${r.threshold}</td><td class="num">${r.노출도우세}</td><td class="num">${r.인위적확산우세}</td><td class="num">${r.복합형}</td></tr>`).join('');
+
+function roleTagClass(role){
+  if(role.includes('제외')) return 'v-제외';
+  if(role.includes('진단')||role.includes('보조')||role.includes('로버스트')) return 'v-보조';
+  if(role.includes('민감도')||role.includes('주의')) return 'v-민감도';
+  return 'v-주';
+}
+document.getElementById('varlist-body').innerHTML = Object.entries(D.variableList).map(([domain, vars])=>`
+  <div class="varblock">
+    <h4>${domain === 'Y' ? '종속변수 (Y)' : domain.replace(/_/g,' ')}</h4>
+    ${vars.map(x=>`<div class="varrow"><span class="tag ${roleTagClass(x.role)}">${x.role}</span>
+      <span class="vn">${x.v}</span><span class="vnote">${x.note}</span></div>`).join('')}
+  </div>`).join('');
+
+// ═══════════════════════ SECTION 02 ═══════════════════════
+const kpis02 = [
+  ['gl','지수-피해 순위상관', D.validity.spearman_index_damage, 'Spearman (2017–2022 평균)'],
+  ['b','AUC 훈련/홀드아웃', `${D.validity.modelTrain.auc.toFixed(3)}/${D.validity.modelHoldout.auc.toFixed(3)}`, 'CRE 2부문모형(발생여부)'],
+  ['t','상위 10%↔하위 10% 피해차', (D.validity.decile[9].mean_damage/D.validity.decile[0].mean_damage).toFixed(1)+'배', `평균피해 ${D.validity.decile[0].mean_damage}→${D.validity.decile[9].mean_damage}`],
+];
+document.getElementById('kpi-row-02').innerHTML = kpis02.map(([c,l,v,s])=>
+  `<div class="kpi ${c}"><div class="kl">${l}</div><div class="kv">${v}</div><div class="ks">${s}</div></div>`).join('');
+
+new Chart(document.getElementById('c_decile').getContext('2d'),{data:{
+  labels: D.validity.decile.map(r=>'D'+r.decile),
+  datasets:[
+    {type:'bar', label:'평균 피해밀도', data: D.validity.decile.map(r=>r.mean_damage), backgroundColor:'#2d701680', yAxisID:'y'},
+    {type:'line', label:'발생률', data: D.validity.decile.map(r=>r.발생률), borderColor:'#e34948', pointBackgroundColor:'#e34948', yAxisID:'y1', tension:.2},
+  ]},
+  options:{plugins:{legend:{position:'top',labels:{boxWidth:11,font:{size:10}}}},
+  scales:{y:{title:{display:true,text:'평균 피해밀도'}}, y1:{position:'right',grid:{drawOnChartArea:false},title:{display:true,text:'발생률'}}}}
+});
+
+new Chart(document.getElementById('c_scatterValidity').getContext('2d'),{type:'scatter',data:{
+  datasets:[{label:'시군구', data: D.sggIndex.map(r=>({x:r.index_main, y:r.log_피해밀도, nm:r.시도명+' '+r.시군구명})),
+    backgroundColor:'#2d701655', pointRadius:3.5}]},
+  options:{plugins:{legend:{display:false},tooltip:{callbacks:{
+    label:ctx=>`${ctx.raw.nm}: 지수 ${ctx.raw.x.toFixed(2)}, 피해밀도 ${ctx.raw.y.toFixed(2)}`}}},
+  scales:{x:{title:{display:true,text:'취약성지수'}}, y:{title:{display:true,text:'log 피해밀도'}}}}
+});
+
+document.getElementById('modelcompare-tbl').innerHTML =
+  '<tr><th>구간</th><th class="num">n</th><th class="num">between 계수(p)</th><th class="num">within 계수(p)</th><th class="num">AUC</th></tr>' +
+  [['훈련(2017-2020)', D.validity.modelTrain], ['홀드아웃(2021-2022)', D.validity.modelHoldout]]
+    .map(([label,r])=>`<tr><td><b>${label}</b></td><td class="num">${r.n}</td>
+      <td class="num">${r.between_coef} (${r.between_p})</td>
+      <td class="num">${r.within_coef} (${r.within_p})</td><td class="num"><b>${r.auc}</b></td></tr>`).join('');
+document.getElementById('detectionbias-note').textContent =
+  'within 계수는 훈련·홀드아웃 모두 비유의(p>0.1) — 단기 변동보다 지자체 간 만성적 차이를 포착하는 지수입니다.';
+
+// ═══════════════════════ SECTION 03 ═══════════════════════
+document.getElementById('gap-big').textContent = D.budgetGapSummary.n_underfunded_highvuln+'개';
+document.getElementById('gap-badge').textContent = `순위상관 ${D.budgetGapSummary.spearman_budget_vs_index}`;
+document.getElementById('gap-r2c').textContent = D.budgetGapSummary.r2_pct;
+
+const GAPCOLORS = ['#e34948','#ef9490','#f4d9c8','#a9c8ee','#2a78d6'];
+function gapVals(){ return D.sggIndex.map(r=>r.배분갭); }
+function styleGap(f){
+  const b = sggMap[resolveSggCode(f.properties.sgg_cd)];
+  if(!b) return {fillColor:'#e3e3e3', weight:.5, color:'#bbb', fillOpacity:.5};
+  return {fillColor: quantileColor(b.배분갭, gapVals(), GAPCOLORS), weight:.5, color:'#999', fillOpacity:.85};
+}
+mapGap = L.map('mapGap',{scrollWheelZoom:false}).setView([36.3,127.8],7);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:12}).addTo(mapGap);
+const geoGap = (typeof CH1_GEOJSON!=='undefined') ? L.geoJSON(CH1_GEOJSON,{style:styleGap, onEachFeature:(f,l)=>{
+    const b = sggMap[resolveSggCode(f.properties.sgg_cd)];
+    l.bindTooltip(b ? `<b>${b.시도명} ${b.시군구명}</b><br>취약성지수 ${b.index_main.toFixed(3)}<br>배분갭 <b>${b.배분갭.toFixed(2)}</b> (${b.축B_배분적정성})`
+      : `<b>${f.properties.sgg_cd}</b><br>분석대상 아님`, {className:'gu-tooltip', sticky:true});
+    l.on({mouseover:e=>e.target.setStyle({weight:2,color:'#222'}), mouseout:e=>l.setStyle(styleGap(f))});
+  }}).addTo(mapGap) : null;
+document.getElementById('legGap').innerHTML = `<b>예산배분갭</b>` +
+  `<div class="legend-row"><span class="legend-sw" style="background:${GAPCOLORS[0]}"></span>과소배분</div>` +
+  `<div class="legend-row"><span class="legend-sw" style="background:${GAPCOLORS[2]}"></span>평균 수준</div>` +
+  `<div class="legend-row"><span class="legend-sw" style="background:${GAPCOLORS[4]}"></span>과다배분</div>`;
+
+const underRows = [...D.sggIndex].sort((a,b)=>a.배분갭-b.배분갭).slice(0,10);
+document.getElementById('gap-tbl').innerHTML =
+  '<tr><th>순위</th><th>시군구</th><th class="num">취약도</th><th class="num">갭</th></tr>' +
+  underRows.map((r,i)=>`<tr><td><span class="rk">${i+1}</span></td><td><b>${r.시도명.slice(0,2)} ${r.시군구명}</b></td>
+    <td class="num">${r.위험지수.toFixed(2)}</td><td class="num"><span class="lvl 과소배분">${r.배분갭.toFixed(2)}</span></td></tr>`).join('');
+
+// 2×2 매트릭스: 위험지수 median × 배분갭 median
+const riskArr = D.sggIndex.map(r=>r.위험지수).sort((a,b)=>a-b);
+const gapArr = D.sggIndex.map(r=>r.배분갭).sort((a,b)=>a-b);
+const riskMed = riskArr[Math.floor(riskArr.length/2)];
+const gapMed = gapArr[Math.floor(gapArr.length/2)];
+const Q = {Q1:{n:0,ex:[]}, Q2:{n:0,ex:[]}, Q3:{n:0,ex:[]}, Q4:{n:0,ex:[]}};
+D.sggIndex.forEach(r=>{
+  const hi = r.위험지수 >= riskMed, lowGap = r.배분갭 < gapMed;
+  const q = hi ? (lowGap?'Q1':'Q2') : (lowGap?'Q3':'Q4');
+  Q[q].n++; if(Q[q].ex.length<3) Q[q].ex.push(r.시도명.slice(0,2)+' '+r.시군구명);
+});
+const quadDefs = [
+  {k:'Q2', cls:'top-g', name:'관리 유지', sub:'취약도 높음 · 예산 충분'},
+  {k:'Q1', cls:'top-r', name:'최우선 지원', sub:'취약도 높음 · 예산 부족'},
+  {k:'Q4', cls:'bot-b', name:'조정 가능', sub:'취약도 낮음 · 예산 충분'},
+  {k:'Q3', cls:'bot-a', name:'모니터링', sub:'취약도 낮음 · 예산 부족'},
+];
+document.getElementById('quad-grid').innerHTML = quadDefs.map(q=>`
+  <div class="qcell ${q.cls}">
+    <div class="qn">${q.name}</div>
+    <div class="qc">${Q[q.k].n}<span style="font-size:13px;font-weight:500">곳</span></div>
+    <div class="qe">${q.sub}<br>${Q[q.k].ex.join(' · ')}</div>
+  </div>`).join('');
+
+// ═══════════════════════ SECTION 04 ═══════════════════════
+const nr = D.robustness.natlResponse;
+document.getElementById('natl-summary').innerHTML = `
+  <div class="chiprow">
+    <div class="chip"><div class="l">서브그룹 n / 전체 n</div><div class="v">${nr.subgroup} / ${nr.n}</div></div>
+    <div class="chip"><div class="l">t-통계량</div><div class="v">${nr.t}</div></div>
+    <div class="chip"><div class="l">p-value</div><div class="v">${nr.p}</div></div>
+  </div>
+  <div class="note">${nr.note}</div>`;
+
+new Chart(document.getElementById('c_holdout').getContext('2d'),{type:'bar',data:{
+  labels: D.validity.rollingOrigin.map(r=>r.origin),
+  datasets:[{data: D.validity.rollingOrigin.map(r=>r.auc), backgroundColor:'#2d7016'}]},
+  options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`AUC ${ctx.raw}`}}},
+  scales:{y:{suggestedMin:0.4,suggestedMax:0.7,title:{display:true,text:'AUC'}}}}
+});
+
+function prespecTable(){
+  return '<tr><th>구분</th><th>확정 내용</th></tr>' +
+    D.robustness.preRegisteredSpec.map(r=>`<tr><td><b>${r.item}</b></td><td>${r.value}</td></tr>`).join('');
+}
+document.getElementById('prespec-tbl').innerHTML = prespecTable();
+document.getElementById('modal-prespec-tbl').innerHTML = prespecTable();
+document.getElementById('appendix-note').innerHTML = `부록 전용(강건성 참고): ${D.robustness.appendixOnly.join(' · ')}`;
+document.getElementById('modal-appendix').innerHTML = document.getElementById('appendix-note').innerHTML;
+document.getElementById('modal-sample').innerHTML =
+  `표본: <b>${D.meta.n_sgg}개 시군구 · ${D.meta.period}</b><br>표준화: ${D.meta.standardization_main}`;
+document.getElementById('funnel-body').innerHTML = D.sampleFunnel.map(s=>`${s.step} → <b>${fmt(s.n)}행</b> (${s.note})`).join('<br>');
+</script>
+</body>
+</html>

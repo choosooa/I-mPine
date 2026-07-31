@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>I'mPine — CH1 소나무재선충병 발생현황</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css"/>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="vendor/chart.umd.js"></script>
+<script>if(window.Chart){Chart.defaults.maintainAspectRatio=false;}</script>
+<script src="data.js"></script>
+<style>
+:root{
+  --gd:#0b3300;--gm:#1a5a0a;--gl:#2d7016;--gp:#4a9c23;--ga:#dcf4c0;
+  --r:#e34948;--a:#eda100;--b:#2a78d6;--t:#1baf7a;--pu:#8b5cf6;
+  --bg:#f6f8f3;--sf:#fff;--bd:#dde8d0;--tx:#1a1a18;--mu:#6b7560;--mu2:#8a9482;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Pretendard','Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.55}
+.mono{font-family:'JetBrains Mono',monospace}
+.hdr{background:linear-gradient(135deg,var(--gd),var(--gm));padding:12px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 10px rgba(0,0,0,.25);position:sticky;top:0;z-index:999}
+.hdr h1{color:#fff;font-size:20px;font-weight:700}
+.hdr .sub{color:#aad88a;font-size:11px}
+.tabs{margin-left:auto;display:flex;gap:6px}
+.tab{padding:7px 15px;border-radius:20px;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.75);font-size:12px;cursor:pointer;background:transparent;transition:.18s;font-family:inherit;display:flex;align-items:center;gap:6px;text-decoration:none}
+.tab .n{font-family:'JetBrains Mono',monospace;font-size:9.5px;opacity:.7}
+.tab.on,.tab:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.8);color:#fff}
+
+.basisbar{position:sticky;top:49px;z-index:998;background:#eef4e6;border-bottom:1px solid var(--bd);
+  padding:7px 24px;display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--gd)}
+.basisbar b{color:var(--gd)}
+.basisbar .infobtn{margin-left:auto;background:#fff;border:1px solid var(--gl);color:var(--gl);
+  border-radius:14px;padding:3px 12px;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.basisbar .infobtn:hover{background:var(--gl);color:#fff}
+
+.pg{padding:16px 24px 10px;max-width:1420px;margin:0 auto;scroll-margin-top:96px}
+.qhead{display:flex;align-items:baseline;gap:10px;margin:4px 0 14px}
+.qhead h2{font-size:16px;color:var(--gd)}
+.qhead .q{font-size:12px;color:var(--mu);font-style:italic}
+.sec-divider{height:1px;background:var(--bd);max-width:1420px;margin:8px auto 0}
+
+.callout{background:linear-gradient(135deg,#123a1f,#1a5a0a);border-radius:12px;padding:16px 20px;margin-bottom:14px;
+  color:#fff;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.callout .big{font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#c8f0a8}
+.callout .tx{font-size:13px;line-height:1.5}
+.callout .badge2{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:5px 12px;font-size:11.5px;margin-left:auto}
+
+.krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--gl)}
+.kpi.r::before{background:var(--r)}.kpi.a::before{background:var(--a)}.kpi.b::before{background:var(--b)}.kpi.t::before{background:var(--t)}.kpi.pu::before{background:var(--pu)}
+.kl{font-size:11px;color:var(--mu);margin-bottom:6px;font-weight:500}
+.kv{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px}
+.ks{font-size:10.5px;color:var(--mu2);margin-top:5px}
+.chg{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:9px;margin-left:6px}
+.chg.up{background:#fde2e1;color:#b91c1c}
+
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.ct{font-size:13.5px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ct .cap{font-size:11px;font-weight:500;color:var(--mu)}
+.tag{font-size:10px;font-weight:500;background:var(--ga);color:var(--gd);padding:2px 8px;border-radius:10px;cursor:help}
+.tag.gray{background:#eee;color:#666}
+.tag.warn{background:#fff3d6;color:#92600a}
+.tag.official{background:#dcecff;color:#1d4ed8}
+.tag.raw{background:#fde8e8;color:#a33}
+.note{font-size:11px;color:var(--mu);background:#f4f7f0;border-radius:8px;padding:7px 11px;margin-top:8px;line-height:1.6}
+.note b{color:var(--tx)}
+.note.warn{background:#fff8e6;border-left:3px solid var(--a)}
+.concl{background:#eaf3e0;border-left:4px solid var(--gl);border-radius:8px;padding:12px 15px;margin-top:6px;font-size:12.5px;line-height:1.7}
+.concl .lbl{font-size:10.5px;font-weight:700;color:var(--gl);letter-spacing:.5px;margin-bottom:4px}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+/* ── [2026-07-31] 카드 죽은 공백 제거 ─────────────────────────────
+   .g2/.g3는 grid이므로 같은 행 카드가 큰 쪽 높이로 stretch된다.
+   내부 콘텐츠는 고정높이여서 카드 아래쪽에 빈 공간이 남았다.
+   카드를 flex column으로 만들고 차트 래퍼가 남은 높이를 채우게 한다. */
+.g2>.card,.g3>.card{display:flex;flex-direction:column}
+.g2>.card>.g3,.g3>.card>.g3{flex:1 1 auto;min-height:0}
+.g2>.card>.cw,.g3>.card>.cw{flex:1 1 auto;height:auto!important;min-height:165px}
+.g2>.card>.g3>.cw,.g3>.card>.g3>.cw{height:auto!important;min-height:165px}
+.g2>.card>.foldbody,.g2>.card>ul:last-child{flex:0 0 auto}
+.cw{position:relative}
+.vbadge{display:inline-flex;align-items:center;gap:6px;background:#eaf3e0;border:1px solid var(--gl);color:var(--gd);border-radius:20px;padding:3px 12px;font-size:11px;font-weight:500;margin-left:4px}
+
+table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
+.rtbl th{background:#f0f5ea;text-align:left;padding:6px 9px;font-weight:600;color:var(--mu);border-bottom:2px solid var(--bd)}
+.rtbl td{padding:6px 9px;border-bottom:1px solid #eee}
+.rtbl td.num{text-align:right;font-family:'JetBrains Mono',monospace}
+.rtbl tr:hover td{background:#f8faf5}
+.rtbl .rk{display:inline-flex;width:18px;height:18px;border-radius:50%;background:var(--gl);color:#fff;
+  align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.lvl{font-size:11px;font-weight:600;padding:2px 8px;border-radius:9px;display:inline-block}
+.lvl.높음{background:#fde2e1;color:#b91c1c}
+.lvl.보통{background:#fff3d6;color:#92600a}
+.lvl.낮음{background:#e4f0fc;color:#1d4ed8}
+
+.lmap{width:100%;height:420px;border-radius:8px;background:#eaeef3}
+.leaflet-container{background:#eaeef3!important;font-family:'Pretendard','Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif!important}
+.gu-tooltip{background:#1a2332!important;border:none!important;color:#f5f7fa!important;font-size:11.5px!important;padding:8px 11px!important;border-radius:6px!important;line-height:1.6!important}
+.gu-tooltip b{color:#8fd19e}
+
+.legend-box{position:absolute;bottom:14px;left:14px;background:rgba(255,255,255,.95);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;font-size:11px;z-index:500;box-shadow:0 2px 8px rgba(0,0,0,.1);max-width:220px}
+.legend-row{display:flex;align-items:center;gap:6px;margin:2px 0}
+.legend-sw{width:13px;height:13px;border-radius:3px;border:1px solid rgba(0,0,0,.15);flex:none}
+.legend-cap{font-size:9.5px;color:var(--mu);margin-top:5px;line-height:1.4}
+
+.maptoggle{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.mtbtn{padding:6px 13px;border-radius:14px;border:1px solid var(--bd);background:#fff;font-size:11.5px;cursor:pointer;color:var(--mu);font-family:inherit}
+.mtbtn.on{background:var(--gl);color:#fff;border-color:var(--gl)}
+
+.deflegend{display:flex;gap:14px;flex-wrap:wrap;background:#f4f7f0;border-radius:9px;padding:9px 13px;margin-bottom:10px;font-size:11.5px}
+.deflegend .it{display:flex;align-items:center;gap:6px}
+.deflegend .sw{width:12px;height:12px;border-radius:3px}
+.deflegend b{margin-right:2px}
+
+.cycle-bar{display:flex;align-items:center;gap:10px;margin-bottom:10px;background:#f4f7f0;border-radius:10px;padding:8px 12px}
+.cyc-nav{width:28px;height:28px;border-radius:50%;border:1px solid var(--bd);background:#fff;color:var(--gl);font-size:16px;cursor:pointer;flex:none}
+.cyc-nav:hover{background:var(--gl);color:#fff}
+.cyc-track{flex:1;display:flex;gap:4px}
+.cyc-dot{flex:1;text-align:center;padding:7px 4px;border-radius:7px;font-size:11px;color:var(--mu);cursor:pointer;border:1.5px solid transparent;font-family:'JetBrains Mono',monospace;transition:.15s}
+.cyc-dot:hover{background:#e8f0dc}
+.cyc-dot.on{background:var(--gl);color:#fff;font-weight:700;border-color:var(--gd)}
+
+.mini-kpi-col{display:flex;flex-direction:column;gap:8px;height:100%;justify-content:center}
+.mkpi{background:#f7faf3;border:1px solid var(--bd);border-radius:9px;padding:10px 13px}
+.mkpi .l{font-size:11px;color:var(--mu)}
+.mkpi .v{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.mkpi .pct{font-size:12px;font-weight:600;margin-left:5px}
+.mkpi.new .v{color:var(--b)} .mkpi.cont .v{color:var(--t)} .mkpi.recur .v{color:var(--a)} .mkpi.none .v{color:var(--mu2)}
+
+.donut-stat{display:flex;flex-direction:column;gap:8px}
+.donut-stat .dstat{background:#f7faf3;border:1px solid var(--bd);border-radius:9px;padding:8px 12px}
+.donut-stat .dstat .l{font-size:10.5px;color:var(--mu);display:flex;align-items:center;gap:6px}
+.donut-stat .dstat .l i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.donut-stat .dstat .v{font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-top:2px}
+.donut-stat .dstat.rate{background:linear-gradient(135deg,#f0f5ea,#e4f0da);border-color:var(--gl)}
+.donut-stat .dstat.rate .v{color:var(--gd);font-size:20px}
+
+.headline2{display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap}
+.hl-chip{background:#fff;border:1px solid var(--bd);border-left:4px solid var(--gl);border-radius:9px;padding:10px 16px;flex:1;min-width:200px}
+.hl-chip .l{font-size:11px;color:var(--mu)}
+.hl-chip .v{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--gd)}
+
+.diag-banner{background:#f0f5ea;border:1.5px dashed var(--gl);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start}
+.diag-banner .ic{font-size:20px}
+.diag-banner .tx{font-size:12px;color:var(--gd);line-height:1.6}
+.neutral-pin{width:13px;height:13px;border-radius:50%;background:#6b7560;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;padding:40px 20px;overflow-y:auto}
+.modal-bg.on{display:block}
+.modal{background:#fff;max-width:900px;margin:0 auto;border-radius:14px;padding:24px 28px;position:relative}
+.modal h3{font-size:16px;margin-bottom:12px;color:var(--gd)}
+.modal .close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu)}
+.modal hr{border:none;border-top:1px solid var(--bd);margin:18px 0}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>🌲 I'mPine</h1>
+  <div class="sub">소나무재선충병 발생현황 대시보드 · CH1</div>
+  <div class="tabs">
+    <a class="tab" href="#sec01" data-i="0"><span class="n">01</span> 최신 전국 발생현황</a>
+    <a class="tab" href="#sec02" data-i="1"><span class="n">02</span> 지역별 피해집중</a>
+    <a class="tab" href="#sec03" data-i="2"><span class="n">03</span> 누적·반복 발생지역</a>
+  </div>
+</div>
+<div class="basisbar">
+  📌 데이터 기준: <b>산림청 공식 발표 2025.6~2026.5</b> · 지역 세부분석은 검증된 <b>2016.5~2022.4</b> 원자료를 별도 사용합니다.
+  <span class="vbadge">✔ 공식통계 대조 완료 · 6개 분석연도 평균 절대오차 <b>0.18%</b> · 최대 <b>0.67%</b></span>
+  <button class="infobtn" onclick="openModal()">ⓘ 분석 기준 및 검증</button>
+</div>
+
+<!-- ══════════ SECTION 01 ══════════ -->
+<section class="pg" id="sec01">
+  <div class="qhead"><h2>01. 최신 전국 발생현황</h2><span class="q">현재 전국 피해는 얼마나 심한가?</span></div>
+
+  <div class="krow" id="kpi-row"></div>
+
+  <div class="card">
+    <div class="ct">전국 피해고사목 추이와 비교 가능 여부 <span class="cap">공식 발표 · 2017~2026</span></div>
+    <div class="cw" style="height:250px"><canvas id="c_trend"></canvas></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ct">2026년 방제 작업 구성</div>
+      <div class="g3" style="grid-template-columns:1fr 1.1fr;align-items:center">
+        <div class="cw" style="height:180px"><canvas id="c_donut"></canvas></div>
+        <div class="donut-stat" id="donut-stat"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">발생 시군구 수 추이 <span class="cap">공식 확인 연도만</span></div>
+      <div class="cw" style="height:190px"><canvas id="c_sgg_trend"></canvas></div>
+      <div class="note">2020·2025·2026년만 공식 문서에 전국 발생 시군구 수가 명시되어 그 해만 표시합니다.
+      2026.7 비공식 중간집계(167개)는 조사연도 기준이 달라 이 추이에 포함하지 않았으며,
+      <button class="infobtn" style="padding:1px 8px" onclick="openModal()">분석 기준 및 검증</button>에서 확인할 수 있습니다.</div>
+    </div>
+  </div>
+
+  <div class="concl"><div class="lbl">해석</div>2026년 피해고사목은 177만 그루이며, 피해가 일부 고위험 시군구에 집중되어 있다.</div>
+</section>
+<div class="sec-divider"></div>
+
+<!-- ══════════ SECTION 02 ══════════ -->
+<section class="pg" id="sec02">
+  <div class="qhead"><h2>02. 지역별 피해집중</h2><span class="q">피해는 어느 지역에 집중됐는가?</span></div>
+
+  <div class="callout">
+    <div class="big" id="concentration-big">·</div>
+    <div class="tx">상위 극심·심 시군구에<br>전국 피해가 집중되어 있습니다.</div>
+    <div class="badge2">2026-06-25 산림청 발표</div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ct">등급별 시군구 수 <span class="tag official" title="산림청 2026-06-25 발표 원문 수치">공식 발표</span></div>
+      <div class="g3" style="grid-template-columns:1fr 1.2fr">
+        <div class="cw" style="height:190px"><canvas id="c_gradebar"></canvas></div>
+        <div id="grade-interp" style="font-size:12.5px;line-height:2;display:flex;flex-direction:column;justify-content:center"></div>
+      </div>
+    </div>
+    <div class="card" style="position:relative">
+      <div class="ct">산림청 발표문에 개별 지명이 등장한 7곳</div>
+      <div style="font-size:11.5px;color:var(--mu);margin-bottom:8px">이 7곳이 전국 피해지역 전체는 아니며, 개별 지역의 공식 피해등급도 비공개입니다.</div>
+      <div class="g3" style="grid-template-columns:1.5fr 1fr">
+        <div id="map2" class="lmap" style="height:270px"></div>
+        <div id="named7-list" style="height:270px;overflow-y:auto;border:1px solid var(--bd);border-radius:8px;padding:4px 2px"></div>
+      </div>
+      <div class="note">7곳(포항·경주·안동·밀양·창녕·울주·양평)은 산림청이 극심·심 지역군으로 함께 언급했을 뿐,
+      개별 등급은 원문에도 없습니다. 지도 마커는 <b>모두 동일한 중립색</b>으로 표시합니다. 오른쪽 목록은 <b>과거 누적 피해고사목이 많은 순</b>입니다(공식 등급 순이 아님).</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">전년도 공개자료와 과거 이력 연결 <span class="tag warn">2025년, 2026 아님</span></div>
+    <table class="rtbl" id="ref2025-tbl"></table>
+    <div class="note">2025-07-09 보도자료에서만 예외적으로 개별 등급이 공개된 10개 지역입니다. 등급은 매년 바뀔 수 있어 2026년에도
+    동일하다고 가정하지 않았습니다. "반복관측"·"누적부담" 수준은 2016.5~2022.4 검증 원자료 기준 3분위 구간(낮음/보통/높음)입니다.</div>
+  </div>
+
+  <div class="concl"><div class="lbl">해석</div>2026년 피해는 일부 시군구에 집중되어 있지만 전체 지역별 등급 명단은 공개되지 않았다.
+  따라서 최신 공식자료는 전국 집중도를 파악하는 데 사용하고, 세부 지역 비교는 검증된 과거 공간 원자료를 사용한다.</div>
+</section>
+<div class="sec-divider"></div>
+
+<!-- ══════════ SECTION 03 ══════════ -->
+<section class="pg" id="sec03">
+  <div class="qhead"><h2>03. 누적·반복 발생지역</h2><span class="q">일시적 발생이 아니라 반복적으로 피해가 이어지는 곳은 어디인가?</span></div>
+
+  <div class="headline2">
+    <div class="hl-chip"><div class="l">전체 관측피해격자 반복관측비율 (2016.5~2022.4, 100m)</div><div class="v" id="hl-repeat">–</div></div>
+    <div class="hl-chip"><div class="l">장기지속 격자 수 (연속 3개 조사연도 이상)</div><div class="v" id="hl-long">–</div></div>
+  </div>
+
+  <div class="card" style="position:relative">
+    <div class="ct">조사연도별 신규·연속관측·공백 후 재관측 지도 <span class="tag" title="분모: 공간분석 대상 180개 시군구">시군구 기준</span></div>
+    <div class="deflegend">
+      <div class="it"><span class="sw" style="background:#2a78d6"></span><b>신규관측</b>직전 연도 미관측 → 현재 관측</div>
+      <div class="it"><span class="sw" style="background:#1baf7a"></span><b>연속관측</b>직전 연도와 현재 연도 모두 관측</div>
+      <div class="it"><span class="sw" style="background:#eda100"></span><b>공백 후 재관측</b>과거 이력은 있으나 직전 연도 미관측 → 재관측</div>
+      <div class="it"><span class="sw" style="background:#e8e8e0"></span><b>미관측</b>해당 연도 관측 없음</div>
+    </div>
+    <div class="cycle-bar">
+      <button class="cyc-nav" id="cyc-prev">‹</button>
+      <div class="cyc-track" id="cyc-track"></div>
+      <button class="cyc-nav" id="cyc-next">›</button>
+    </div>
+    <div class="g3">
+      <div style="position:relative"><div id="map3c" class="lmap" style="height:380px"></div></div>
+      <div><div class="mini-kpi-col" id="cyc-kpis"></div></div>
+    </div>
+    <div class="concl" id="cyc-concl"><div class="lbl">해석</div>·</div>
+    <div class="note">분모는 전국 시군구가 아니라 <b>공간분석 대상 180개 시군구</b>입니다. 조사연도는 해당 연도 5월~다음 해 4월입니다.</div>
+  </div>
+
+  <div class="card" style="position:relative">
+    <div class="ct">시군구별 지표 지도 <span class="cap">보기 전환</span></div>
+    <div class="maptoggle" id="maptoggle"></div>
+    <div class="g3">
+      <div style="position:relative">
+        <div id="mapMain" class="lmap" style="height:380px"></div>
+        <div class="legend-box" id="legMain"></div>
+      </div>
+      <div><table class="rtbl" id="top10-tbl"></table></div>
+    </div>
+    <div class="note" id="mapMain-note"></div>
+  </div>
+
+  <div class="card" style="position:relative">
+    <div class="qhead" style="padding:0 0 8px"><h2 style="font-size:14px">발생지역은 새로 확산됐나, 기존 지역에서 반복됐나?</h2></div>
+    <div class="ct">100m 격자 관측유형 구성 변화 <span class="tag" title="주 분석단위 100m 격자 기준. 500m·1km 민감도, 10m 진단용 비교는 분석 기준 모달 참고">100m 격자 기준</span></div>
+    <div style="font-size:11.5px;color:var(--mu);margin:2px 0 8px">당해 관측 격자를 신규·연속·공백 후 재관측으로 분류한 비율입니다(분모를 당해 전체 격자수로 통일해 항상 100%가 되도록 구성).</div>
+    <div class="g3" style="grid-template-columns:1.6fr 1fr">
+      <div class="cw" style="height:220px"><canvas id="c_gridComp"></canvas></div>
+      <div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:2px">전년 관측격자 유지율 <span style="color:var(--mu2)">· 보조지표, 직전연도 대비</span></div>
+        <div class="cw" style="height:150px"><canvas id="c_retainRate"></canvas></div>
+        <div style="font-size:12px;margin-top:8px;text-align:center">최근(<span id="retain-latest-year"></span>) <b id="retain-latest-val" style="color:var(--t)"></b></div>
+      </div>
+    </div>
+    <div class="concl" id="gridcomp-concl"><div class="lbl">해석</div>·</div>
+    <div class="note">이 차트는 <b>100m 격자</b> 기준입니다. 같은 신규·연속·재관측 개념을 <b>시군구</b> 기준으로 본 숫자는 위쪽 "조사연도별 신규·연속관측·공백 후 재관측 지도" 카드를 참고하십시오 — 두 기준을 같은 숫자로 비교하지 않도록 분리했습니다.</div>
+  </div>
+
+  <div class="card">
+    <div class="ct">과거 피해 구조가 복합적으로 나타난 시군구 <span class="tag">4개 지표 3분위 교차 · TOP 7</span></div>
+    <div class="note">누적 규모·면적당 부담·반복관측률·장기지속 격자 수, 네 지표 중 <b>3개 이상이 상위 구간(높음)</b>에 속하는
+    시군구 <span id="cross-total-note"></span>중 누적 피해규모 상위 7개만 표시합니다.
+    7은 산림청이 실제로 지정한 <b>특별방제구역 개수(7곳)</b>와 같은 규모로 맞춘 것입니다.</div>
+    <table class="rtbl" id="cross-tbl" style="margin-top:8px"></table>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ct">소나무류 면적 대비 누적 피해 분포</div>
+      <div class="cw" style="height:260px"><canvas id="c_scatter"></canvas></div>
+      <div class="note" id="scatter-note"></div>
+    </div>
+    <div class="card">
+      <div class="ct">구조적으로 설명되지 않는 시군구는 어디인가? <span class="tag warn">참고 분석</span></div>
+      <div class="note" id="residual-summary"></div>
+      <div class="g3" style="margin-top:10px;align-items:stretch">
+        <div>
+          <div style="font-size:11.5px;font-weight:600;color:var(--r);margin-bottom:4px">예측보다 훨씬 많은 지역 (실측÷예측, 배)</div>
+          <div class="cw" style="height:260px"><canvas id="c_resid_over"></canvas></div>
+        </div>
+        <div class="note" style="margin-top:0">
+          <div style="font-weight:700;color:var(--gd);margin-bottom:5px;font-size:12.5px">🏝️ 제주시</div>
+          도서지역이라는 공간적·생태적 특성이 있어 육지 시군구와 동일한 구조로 비교하는 데 한계가 있음
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="concl"><div class="lbl">해석</div>피해는 매년 완전히 새로운 지역으로 이동하기보다 기존 피해지역에서 지속·재발하는 경향이 강하다.
+  이 결론은 CH2 취약도 분석의 필요성으로 이어진다.</div>
+</section>
+
+<!-- 분석 기준 및 검증 모달 -->
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="close" onclick="closeModal()">×</button>
+    <h3>분석 기준 및 검증</h3>
+
+    <div class="ct">원자료 vs 공식통계 대조 <span class="tag raw">2016~2022 검증대상</span></div>
+    <div class="note" style="margin-bottom:6px"><b>포함률(%) = 원자료 피해고사목 ÷ 공식 발표 피해고사목 × 100</b> — 2022.5~2023.4는 포함률이 44.6%까지 크게 낮아져 분석에서 제외했습니다.</div>
+    <div class="cw" style="height:230px"><canvas id="c_verify"></canvas></div>
+    <div class="note" id="verify-note"></div>
+
+    <hr>
+    <div class="ct">발생 시군구 잠정치</div>
+    <div class="note">2026-07-06 보도자료(강원 평창 신규 발생)에 따르면 다음 관리주기 진행 중 누적 발생 시군구가
+    <b>167개</b>로 언급되었습니다. 이는 2026년 확정치(166개)와 조사기간 기준이 다른 <b>비공식 중간집계</b>이므로
+    본문 KPI·추이에는 반영하지 않았습니다.</div>
+
+    <hr>
+    <div class="ct">관리주기 내 월별 등록 분포</div>
+    <div class="cw" style="height:220px"><canvas id="c_month"></canvas></div>
+    <div class="note">이 분포는 감염 계절성이 아니라 조사·등록·방제가 집중되는 <b>행정 시기</b>를 보여줍니다.</div>
+
+    <hr>
+    <div class="note">
+      <b>격자 해상도</b> — 주 분석단위는 100m(산림청 100m×100m 630만 셀 관리체계 참고). 500m·1km는 민감도 비교, 10m(국가지점번호 실제 해상도)는 진단용이며 확산 근거로 사용하지 않습니다.<br><br>
+      <b>좌표계</b> — 원자료 좌표계는 후보 비교 검증을 통해 EPSG:5186(축 X,Y)으로 확정했습니다.<br><br>
+      <b>순위 신뢰기준</b> — 누적 피해부담은 소나무류 300ha↑·누적 1,000건↑, 반복관측비율은 격자 30개↑ 지역만 순위에 포함합니다. Wilson 95% 참고구간은 공간 자기상관을 반영하지 않는 순위 안정성 참고값입니다.<br><br>
+      <b>소나무류 면적 자료</b> — 임업통계 기준 특정 시점 자료이며, 2016.5~2022.4 누적 피해자료와 시간 기준이 다릅니다.
+    </div>
+  </div>
+</div>
+
+<script>
+const D = CH1_DATA;
+function openModal(){ document.getElementById('modal-bg').classList.add('on'); }
+function closeModal(){ document.getElementById('modal-bg').classList.remove('on'); }
+const fmt = n => n==null||isNaN(n) ? '–' : Number(n).toLocaleString('ko-KR');
+// 강원특별자치도 코드 개편(42xxx→51xxx) 대응 — CH1_GEOJSON은 구코드(42xxx)를 쓰는데
+// 데이터(sggBurden·cycleTimeline)는 신코드(51xxx)를 써서, 변환 없이 조회하면 강원권
+// 18개 시군구가 전부 "자료없음"으로 빠진다. ch2·ch3에는 이미 있던 처리를 여기도 추가.
+function resolveSggCode(code){ const s=String(code); return s.startsWith('42') ? '51'+s.slice(2) : s; }
+
+// ── 스크롤 네비게이션 (탭 전환 대신 앵커 스크롤 + 스크롤스파이) ──────────
+const navTabs = document.querySelectorAll('.tab');
+navTabs.forEach(a=>a.addEventListener('click', e=>{
+  e.preventDefault();
+  document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth', block:'start'});
+}));
+const sections = ['sec01','sec02','sec03'].map(id=>document.getElementById(id));
+// 여러 섹션의 교차 상태가 한 배치에 같이 들어올 수 있어, 콜백마다 즉시 활성탭을
+// 덮어쓰면 배치 내 처리 순서에 따라 엉뚱한 탭이 "마지막에 이겨버리는" 문제가
+// 있었음(특히 빠르게 위로 스크롤할 때). 현재 교차 중인 섹션들을 별도로 누적해두고,
+// 문서 순서상 가장 아래(= 가장 나중) 섹션을 활성 탭으로 정하면 콜백 처리 순서와
+// 무관하게 항상 같은 결과가 나온다.
+const visibleSecs = new Set();
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting) visibleSecs.add(en.target); else visibleSecs.delete(en.target);
+  });
+  let activeIdx = -1;
+  sections.forEach((s,i)=>{ if(visibleSecs.has(s)) activeIdx = i; });
+  if(activeIdx === -1) return;
+  navTabs.forEach((t,i)=>t.classList.toggle('on', i===activeIdx));
+}, {rootMargin:'-100px 0px -70% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+let map2, mapMain, map3c;
+window.addEventListener('load', ()=> setTimeout(()=>{
+  [map2, mapMain, map3c].forEach(m=>m&&m.invalidateSize());
+  // 그리드 레이아웃이 최종 크기로 자리잡은 뒤에 fitBounds를 실행해야 여백 없이
+  // 꽉 찬다 — invalidateSize보다 먼저 실행하면 컨테이너가 아직 확정되지 않은
+  // 크기 기준으로 계산돼 카드 옆에 빈 공간이 남는다.
+  if(map2 && named7Markers.length) map2.fitBounds(L.featureGroup(named7Markers).getBounds(), {padding:[24,24]});
+}, 200));
+
+// ═══════════════════════ SECTION 01 ═══════════════════════
+const latest = D.official.find(r=>r.공식연도===2026);
+const kpis = [
+  ['r','피해고사목', (latest.피해고사목_본/10000).toFixed(0)+'만 그루', `<span class="chg up">전년비 +28만</span> 2025.6~2026.5`],
+  ['b','발생 시군구', latest.발생시군구수+'개', '전국 16개 시·도'],
+  ['t','고피해 시군구', latest.심이상시군구수+'개', `극심 6 + 심 21 · 피해의 <b>81%</b> 집중`],
+  ['a','조사기간', latest.조사개월수+'개월', latest.조사기간+' · 산림청 '+latest.발표일+' 발표'],
+];
+document.getElementById('kpi-row').innerHTML = kpis.map(([c,l,v,s])=>
+  `<div class="kpi ${c}"><div class="kl">${l}</div><div class="kv">${v}</div><div class="ks">${s}</div></div>`).join('');
+
+new Chart(document.getElementById('c_trend').getContext('2d'),{type:'bar',data:{
+  labels: D.official.map(r=>r.공식연도),
+  datasets:[{data: D.official.map(r=>r.피해고사목_본/10000),
+    backgroundColor: D.official.map(r=> r.공식연도===2026?'#c1121f':(r.공식연도===2025?'#eda100':'#2d7016'))}]},
+  options:{plugins:{legend:{display:false},tooltip:{callbacks:{
+    label: ctx => {
+      const r = D.official[ctx.dataIndex];
+      let tag = r.공식연도===2026?'최신 발표':(r.공식연도===2025?'조사기간 13개월 (비교 특이)':'표준 비교가능');
+      return [`${r.조사기간} (${r.조사개월수}개월)`, `${fmt(r.피해고사목_본)}본`, tag];
+    }}}}, scales:{y:{title:{display:true,text:'만본'}}}}
+});
+
+new Chart(document.getElementById('c_donut').getContext('2d'),{type:'doughnut',data:{
+  labels:['피해고사목 제거','감염우려목 제거'],
+  datasets:[{data:[latest.피해고사목제거_본, latest.감염우려목제거_본],
+    backgroundColor:['#2a78d6','#8fd19e'], borderWidth:2, borderColor:'#fff'}]},
+  options:{plugins:{legend:{position:'bottom',labels:{boxWidth:11,font:{size:10}}},
+  tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${(ctx.raw/10000).toFixed(0)}만 그루`}}}}
+});
+const removeRate = (latest.피해고사목제거_본/latest.피해고사목_본*100);
+document.getElementById('donut-stat').innerHTML = `
+  <div class="dstat"><div class="l">발생한 피해고사목</div><div class="v">${(latest.피해고사목_본/10000).toFixed(0)}만 그루</div></div>
+  <div class="dstat"><div class="l"><i style="background:#2a78d6"></i>제거된 피해고사목</div><div class="v">${(latest.피해고사목제거_본/10000).toFixed(0)}만 그루</div></div>
+  <div class="dstat"><div class="l"><i style="background:#8fd19e"></i>예방목적 감염우려목 제거</div><div class="v">${(latest.감염우려목제거_본/10000).toFixed(0)}만 그루</div></div>
+  <div class="dstat rate"><div class="l">피해고사목 대비 제거 비율</div><div class="v">${removeRate.toFixed(1)}%</div></div>`;
+
+const sggPts = D.official.filter(r=>r.발생시군구수!=null);
+new Chart(document.getElementById('c_sgg_trend').getContext('2d'),{type:'line',data:{
+  labels: sggPts.map(r=>String(r.공식연도)),
+  datasets:[{data: sggPts.map(r=>r.발생시군구수), borderColor:'#2d7016', backgroundColor:'#2d701622',
+    fill:true, tension:.2, pointRadius:5, pointBackgroundColor:'#2d7016'}]},
+  options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`공식 발생 시군구 ${ctx.raw}개`}}},
+  scales:{y:{title:{display:true,text:'개'}}}}
+});
+
+// ═══════════════════════ SECTION 02 ═══════════════════════
+const GRADE_ORDER = ['극심','심','중','경','경미'];
+const GRADE_COLOR = {'극심':'#7f0000','심':'#c1121f','중':'#e8833a','경':'#f4d35e','경미':'#a8d08d'};
+document.getElementById('concentration-big').textContent = latest.심이상피해집중도_pct+'%';
+document.getElementById('concentration-big').nextElementSibling.innerHTML =
+  `상위 <b>${latest.심이상시군구수}개</b> 시군구(극심6+심21)에<br>전국 피해의 <b>${latest.심이상피해집중도_pct}%</b>가 집중되어 있습니다.`;
+
+const gCounts = {}; D.gradeDist.forEach(r=>gCounts[r.피해등급]=r);
+const totalSgg = D.gradeDist.reduce((s,r)=>s+r.공식발표_시군구수,0);
+new Chart(document.getElementById('c_gradebar').getContext('2d'),{type:'doughnut',data:{
+  labels: GRADE_ORDER,
+  datasets:[{data: GRADE_ORDER.map(g=>gCounts[g].공식발표_시군구수), backgroundColor: GRADE_ORDER.map(g=>GRADE_COLOR[g]),
+    borderWidth:2, borderColor:'#fff'}]},
+  options:{plugins:{legend:{position:'right',labels:{boxWidth:11,font:{size:10.5}}},tooltip:{callbacks:{
+    label: ctx => `${gCounts[GRADE_ORDER[ctx.dataIndex]].공식발표_시군구수}개 (${gCounts[GRADE_ORDER[ctx.dataIndex]]['비율(%)']}%)`}}}}
+});
+const sevr = gCounts['극심'].공식발표_시군구수+gCounts['심'].공식발표_시군구수;
+document.getElementById('grade-interp').innerHTML =
+  `전국 발생 시군구 <b>${totalSgg}곳</b> 중<br>
+   극심·심 지역은 <b style="color:${GRADE_COLOR['극심']}">${sevr}곳(${(sevr/totalSgg*100).toFixed(1)}%)</b><br>
+   경미 지역은 <b>${gCounts['경미'].공식발표_시군구수}곳(${gCounts['경미']['비율(%)']}%)</b>입니다.`;
+
+map2 = L.map('map2',{scrollWheelZoom:false}).setView([36.4,128.6],7);
+L.geoJSON(CH1_GEOJSON,{style:{fillColor:'#f4f6f2',weight:.5,color:'#ccc',fillOpacity:1}}).addTo(map2);
+const pinIcon = L.divIcon({className:'', html:'<div class="neutral-pin"></div>', iconSize:[13,13], iconAnchor:[7,7]});
+const named7Markers = [];
+D.namedLocations.group2026.forEach(p=>{
+  const m = L.marker(p.latlon,{icon:pinIcon}).addTo(map2)
+    .bindTooltip(`<b>${p.name}</b><br>과거 누적 피해고사목: ${fmt(p.누적피해고사목)}본<br>과거 반복관측비율: ${p.반복관측비율!=null?p.반복관측비율.toFixed(1)+'%':'–'}`,{className:'gu-tooltip'});
+  named7Markers.push(m);
+});
+document.getElementById('named7-list').innerHTML = [...D.namedLocations.group2026]
+  .sort((a,b)=>b.누적피해고사목-a.누적피해고사목)
+  .map((p,i)=>`<div style="display:flex;align-items:center;gap:6px;padding:5px 6px;font-size:11.5px;border-bottom:1px solid #eee">
+    <span style="flex-shrink:0;display:inline-flex;width:16px;height:16px;border-radius:50%;background:var(--gl);color:#fff;align-items:center;justify-content:center;font-size:9.5px;font-weight:700">${i+1}</span>
+    <span style="flex:1"><b>${p.name}</b></span>
+    <span style="color:var(--mu)">${fmt(p.누적피해고사목)}본</span>
+  </div>`).join('');
+
+const ref2025 = [...D.namedLocations.extreme2025, ...D.namedLocations.severe2025]
+  .sort((a,b)=>GRADE_ORDER.indexOf(a.grade)-GRADE_ORDER.indexOf(b.grade) || (b.반복관측비율||0)-(a.반복관측비율||0));
+document.getElementById('ref2025-tbl').innerHTML =
+  '<tr><th>지역</th><th>2025 공개등급</th><th>2016~2022 반복관측</th><th>누적피해부담</th></tr>' +
+  ref2025.map(p=>`<tr><td><b>${p.name}</b></td>
+    <td><span class="legend-sw" style="display:inline-block;background:${GRADE_COLOR[p.grade]};margin-right:5px"></span>${p.grade}</td>
+    <td><span class="lvl ${p.반복수준}">${p.반복수준}</span></td>
+    <td><span class="lvl ${p.부담수준}">${p.부담수준}</span></td></tr>`).join('');
+
+// ═══════════════════════ SECTION 03 ═══════════════════════
+document.getElementById('hl-repeat').textContent = D.headline.전체반복관측비율.toFixed(1)+'%';
+document.getElementById('hl-long').textContent = fmt(D.headline.장기지속격자수)+'개';
+
+// ── 3-1. 조사연도 선택 지도 ──────────────────────────────────────────────
+const STATUS_LABEL = {'신규':'신규관측','지속':'연속관측','재발':'공백 후 재관측','없음':'미관측'};
+const STATUS_COLOR = {'신규':'#2a78d6','지속':'#1baf7a','재발':'#eda100','없음':'#e8e8e0'};
+const timelineByCode = {}; D.cycleTimeline.rows.forEach(r=>timelineByCode[r.시군구코드]=r);
+const cyc = D.cycleTimeline.cycles;
+const TOTAL_SGG_ANALYZED = D.cycleTimeline.rows.length;
+
+let cycIdx = cyc.length - 1;
+map3c = L.map('map3c',{scrollWheelZoom:false}).setView([36.3,127.8],7);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:12}).addTo(map3c);
+function styleCyc(f){
+  const r = timelineByCode[resolveSggCode(f.properties.sgg_cd)];
+  const s = r ? r.상태[cycIdx] : null;
+  return {fillColor: s ? STATUS_COLOR[s] : '#eeeeee', weight:.5, color:'#999', fillOpacity:.85};
+}
+const geo3c = L.geoJSON(CH1_GEOJSON,{style:styleCyc, onEachFeature:(f,l)=>{
+    l.bindTooltip('', {className:'gu-tooltip', sticky:true});
+    l.on({mouseover:e=>e.target.setStyle({weight:2,color:'#222'}), mouseout:e=>l.setStyle(styleCyc(f))});
+  }}).addTo(map3c);
+function renderCycle(){
+  geo3c.eachLayer(l=>{
+    l.setStyle(styleCyc(l.feature));
+    const r = timelineByCode[resolveSggCode(l.feature.properties.sgg_cd)];
+    const s = r ? r.상태[cycIdx] : null;
+    l.setTooltipContent(`<b>${r?r.시도명:''} ${r?r.시군구명:l.feature.properties.sgg_cd}</b><br>${cyc[cycIdx]}: <b>${s?STATUS_LABEL[s]:'분석대상 아님'}</b>`);
+  });
+  document.querySelectorAll('.cyc-dot').forEach((d,i)=>d.classList.toggle('on', i===cycIdx));
+  const counts = {신규:0,지속:0,재발:0,없음:0};
+  D.cycleTimeline.rows.forEach(r=>{ counts[r.상태[cycIdx]] = (counts[r.상태[cycIdx]]||0)+1; });
+  const pct = k => (counts[k]/TOTAL_SGG_ANALYZED*100).toFixed(1);
+  document.getElementById('cyc-kpis').innerHTML = `
+    <div class="mkpi new"><div class="l">신규관측</div><div class="v">${counts.신규}개<span class="pct">${pct('신규')}%</span></div></div>
+    <div class="mkpi cont"><div class="l">연속관측</div><div class="v">${counts.지속}개<span class="pct">${pct('지속')}%</span></div></div>
+    <div class="mkpi recur"><div class="l">공백 후 재관측</div><div class="v">${counts.재발}개<span class="pct">${pct('재발')}%</span></div></div>
+    <div class="mkpi none"><div class="l">미관측</div><div class="v">${counts.없음}개<span class="pct">${pct('없음')}%</span></div></div>`;
+  const activeTot = counts.신규+counts.지속+counts.재발;
+  const repeatShare = activeTot ? ((counts.지속+counts.재발)/activeTot*100).toFixed(0) : 0;
+  document.getElementById('cyc-concl').innerHTML =
+    `<div class="lbl">해석</div>${cyc[cycIdx]} 발생 지역 ${activeTot}개 중 <b>${repeatShare}%</b>는 신규관측이 아니라
+    기존 지역의 연속관측·공백 후 재관측입니다 (분석대상 ${TOTAL_SGG_ANALYZED}개 시군구 기준).`;
+}
+document.getElementById('cyc-track').innerHTML = cyc.map((c,i)=>{
+  const y1 = c.split('~')[0].split('.')[0], y2 = (+y1+1).toString().slice(2);
+  return `<div class="cyc-dot" data-i="${i}">${y1}/${y2}</div>`;
+}).join('');
+document.querySelectorAll('.cyc-dot').forEach(d=>d.addEventListener('click', ()=>{ cycIdx=+d.dataset.i; renderCycle(); }));
+document.getElementById('cyc-prev').onclick = ()=>{ cycIdx=Math.max(0,cycIdx-1); renderCycle(); };
+document.getElementById('cyc-next').onclick = ()=>{ cycIdx=Math.min(cyc.length-1,cycIdx+1); renderCycle(); };
+renderCycle();
+
+// ── 3-2. 통합 토글 지도 (누적피해 / 소나무류면적 / 100ha당부담 / 반복관측률) ──
+function quantileColor(v, arr, colors){
+  if(v==null||isNaN(v)) return '#eeeeee';
+  const sorted=[...arr].sort((a,b)=>a-b);
+  const q=[0.2,0.4,0.6,0.8].map(p=>sorted[Math.floor(p*sorted.length)]);
+  let i=0; while(i<q.length && v>q[i]) i++;
+  return colors[i];
+}
+const ORRD=['#fee8c8','#fdbb84','#fc8d59','#e34a33','#b30000'];
+const YLGN=['#ffffcc','#d9f0a3','#78c679','#31a354','#006837'];
+const BLUES=['#eff3ff','#bdd7e7','#6baed6','#3182bd','#08519c'];
+const burdenMap = {}; D.sggBurden.forEach(b=>burdenMap[b.시군구코드]=b);
+const COL_NODATA = '#e3e3e3';    // 자료 자체가 없음 / 계산 불가
+const COL_ZERO    = '#f6f6ee';    // 실측 0(관측기간 내 미발생 등) — 자료없음이 아님
+const COL_BELOW   = '#ffffff';    // 실측값은 있으나 표본기준 미달(순위 제외)
+
+// 각 레이어의 상태 판정: 'nodata' | 'zero' | 'below' | 'ranked'
+const LAYERS = {
+  damage: {label:'누적 피해등록건수', field:'누적피해고사목', colors:ORRD, unit:'본',
+    state:b=> b.누적피해고사목==null ? 'nodata' : (b.누적피해고사목===0 ? 'zero' : 'ranked'),
+    note:'2016.5~2022.4 누적 피해고사목 등록건수(원자료 기준). 발생 확률이 아니라 과거 누적량입니다.'},
+  area: {label:'소나무류 면적', field:'원본_소나무류면적_ha', colors:BLUES, unit:'ha',
+    state:b=> b.자료없음_산림 ? 'nodata' : (b.실측0_소나무 ? 'zero' : (b.원본_소나무류면적_ha==null ? 'nodata' : 'ranked')),
+    note:'임업통계 기준 특정 시점 자료입니다. 짙은 회색은 산림 자료 자체가 없는 지역, 옅은 회색은 산림은 있으나 소나무류가 0으로 실측된 지역입니다.'},
+  burden: {label:'100ha당 누적 피해부담', field:'누적피해부담_100ha', colors:ORRD, unit:'/100ha',
+    state:b=>{
+      if(b.누적피해고사목===0) return 'zero';
+      if(b.소나무류면적_ha==null || isNaN(b.누적피해부담_100ha)) return 'nodata';
+      if(!b.부담순위_사용가능) return 'below';
+      return 'ranked';
+    },
+    note:'과거 누적 피해량을 소나무류 면적으로 표준화한 값입니다. 발생 확률·위험도가 아닙니다.'},
+  repeat: {label:'반복관측비율', field:'반복관측격자비율(%)', colors:YLGN, unit:'%',
+    state:b=>{
+      if(b['반복관측격자비율(%)']==null) return 'nodata';
+      if(!b.반복비율_표본충분) return 'below';
+      return 'ranked';
+    },
+    note:'분모는 시군구 전체 면적이 아니라 "과거 한 번이라도 피해가 관측된 격자"입니다.'},
+};
+let curLayer = 'burden';
+
+document.getElementById('maptoggle').innerHTML = Object.entries(LAYERS).map(([k,v])=>
+  `<button class="mtbtn ${k===curLayer?'on':''}" data-k="${k}">${v.label}</button>`).join('');
+
+mapMain = L.map('mapMain',{scrollWheelZoom:false}).setView([36.3,127.8],7);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:12}).addTo(mapMain);
+
+function layerVals(k){
+  const Ldef = LAYERS[k];
+  return D.sggBurden.filter(b=>Ldef.state(b)==='ranked').map(b=>b[Ldef.field]);
+}
+function styleFor(b, k){
+  const Ldef = LAYERS[k];
+  if(!b) return {fillColor:COL_NODATA, weight:.5, color:'#bbb', fillOpacity:.5};
+  const st = Ldef.state(b);
+  if(st==='nodata') return {fillColor:COL_NODATA, weight:.5, color:'#bbb', fillOpacity:.5};
+  if(st==='zero')   return {fillColor:COL_ZERO,   weight:.5, color:'#ccc', fillOpacity:.6};
+  if(st==='below')  return {fillColor:COL_BELOW,  weight:1,  color:'#aaa', fillOpacity:.6, dashArray:'2,2'};
+  const vals = layerVals(k);
+  return {fillColor: quantileColor(b[Ldef.field], vals, Ldef.colors), weight:.5, color:'#999', fillOpacity:.85};
+}
+const STATE_LABEL = {
+  nodata:'자료없음 (계산 불가)',
+  zero:'실측값 0 (관측기간 내 미발생 등 · 자료없음 아님)',
+  below:'표본 부족 — 순위에서는 제외, 실측값 참고',
+};
+function tooltipMain(b, k){
+  if(!b) return '자료없음 (원자료 미등장)';
+  const Ldef = LAYERS[k];
+  const st = Ldef.state(b);
+  let lines = [`<b>${b.시도명} ${b.시군구명}</b>`];
+  if(k==='area'){
+    if(st==='nodata') lines.push('산림 자료 없음');
+    else lines.push(`소나무류 면적: ${fmt(Math.round(b.원본_소나무류면적_ha))}ha`,
+                    st==='zero' ? '(산림은 있으나 소나무류 0으로 실측)' : `산림면적: ${fmt(Math.round(b.원본_산림면적_ha))}ha`);
+  } else {
+    const v = b[Ldef.field];
+    if(st==='nodata') lines.push(`${Ldef.label}: 자료없음`);
+    else lines.push(`${Ldef.label}: ${typeof v==='number'?v.toFixed(1):v}${Ldef.unit}`, STATE_LABEL[st]);
+  }
+  return lines.join('<br>');
+}
+const geoMain = L.geoJSON(CH1_GEOJSON,{style:f=>styleFor(burdenMap[resolveSggCode(f.properties.sgg_cd)],curLayer), onEachFeature:(f,l)=>{
+    l.bindTooltip('', {className:'gu-tooltip', sticky:true});
+    l.on({mouseover:e=>e.target.setStyle({weight:2,color:'#222'}), mouseout:e=>l.setStyle(styleFor(burdenMap[resolveSggCode(f.properties.sgg_cd)],curLayer))});
+  }}).addTo(mapMain);
+
+function renderMain(){
+  const Ldef = LAYERS[curLayer];
+  geoMain.eachLayer(l=>{
+    const b = burdenMap[resolveSggCode(l.feature.properties.sgg_cd)];
+    l.setStyle(styleFor(b, curLayer));
+    l.setTooltipContent(tooltipMain(b, curLayer));
+  });
+  document.querySelectorAll('.mtbtn').forEach(b=>b.classList.toggle('on', b.dataset.k===curLayer));
+
+  const counts = {nodata:0,zero:0,below:0,ranked:0};
+  D.sggBurden.forEach(b=>counts[Ldef.state(b)]++);
+  document.getElementById('legMain').innerHTML = `<b>${Ldef.label}</b>` +
+    Ldef.colors.map((c,i)=>`<div class="legend-row"><span class="legend-sw" style="background:${c}"></span>${i===0?'낮음':i===Ldef.colors.length-1?'높음':''}</div>`).join('') +
+    `<div class="legend-row"><span class="legend-sw" style="background:${COL_BELOW};border:1px dashed #999"></span>표본부족·순위제외 (${counts.below}개)</div>` +
+    `<div class="legend-row"><span class="legend-sw" style="background:${COL_ZERO}"></span>실측 0 (${counts.zero}개)</div>` +
+    `<div class="legend-row"><span class="legend-sw" style="background:${COL_NODATA}"></span>자료없음 (${counts.nodata}개)</div>` +
+    `<div class="legend-cap">${Ldef.note}</div>`;
+  document.getElementById('mapMain-note').innerHTML =
+    `${Ldef.note} &nbsp;·&nbsp; 순위 대상 <b>${counts.ranked}개</b> / 표본부족(순위제외) ${counts.below}개 / 실측 0 ${counts.zero}개 / 자료없음 ${counts.nodata}개 (전체 180개 기준)<br><b>지도 표시 범위</b> — 행정경계 자료가 확보된 174개 분석단위만 지도에 표시됩니다. 경계 미확보 6개 시군구(군위군·과천시·의왕시·청주시 상당구·증평군·여수시)도 지표 산정과 순위표에는 모두 포함했습니다.`;
+
+  const rows = D.sggBurden.filter(b=>Ldef.state(b)==='ranked').sort((a,b)=>b[Ldef.field]-a[Ldef.field]).slice(0,10);
+  document.getElementById('top10-tbl').innerHTML =
+    `<tr><th>순위</th><th>시군구</th><th class="num">${Ldef.label}</th></tr>` +
+    rows.map((r,i)=>`<tr><td><span class="rk">${i+1}</span></td><td>${r.시도명} ${r.시군구명}</td>
+      <td class="num"><b>${(r[Ldef.field]).toLocaleString('ko-KR',{maximumFractionDigits:1})}${Ldef.unit}</b></td></tr>`).join('');
+}
+document.querySelectorAll('.mtbtn').forEach(b=>b.addEventListener('click', ()=>{ curLayer=b.dataset.k; renderMain(); }));
+renderMain();
+
+// ── 3-3. 100m 격자 관측유형 구성 변화(당해 전체=100% 누적) + 전년 유지율(보조) ──
+const GDy = D.gridDynamics100m;
+const GC = D.gridComposition100m;
+const cycLbl = GC.map(r=>{
+  const y1=r.관리주기명.split('~')[0].split('.')[0]; return y1+'/'+(+y1+1).toString().slice(2);
+});
+const DOMDEF = {'신규관측':'직전 연도 미관측 → 현재 관측','연속관측':'직전 연도와 현재 연도 모두 관측','공백 후 재관측':'과거 이력은 있으나 직전 연도 미관측 → 재관측'};
+const pctLabelPlugin = {
+  id:'pctLabel',
+  afterDatasetsDraw(chart){
+    const ctx = chart.ctx;
+    chart.data.datasets.forEach((ds,dsIdx)=>{
+      if(chart.getDatasetMeta(dsIdx).hidden) return;
+      chart.getDatasetMeta(dsIdx).data.forEach((bar,i)=>{
+        const val = ds.data[i];
+        if(val==null || val<8) return;
+        ctx.save();
+        ctx.fillStyle = '#fff';
+        ctx.font = '500 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(val.toFixed(0)+'%', (bar.x+bar.base)/2, bar.y);
+        ctx.restore();
+      });
+    });
+  }
+};
+new Chart(document.getElementById('c_gridComp').getContext('2d'),{type:'bar',data:{
+  labels: cycLbl,
+  datasets:[
+    {label:'신규관측', data: GC.map(r=>r['신규%']), backgroundColor:'#2a78d6', cnt: GC.map(r=>r.신규발생)},
+    {label:'연속관측', data: GC.map(r=>r['지속%']), backgroundColor:'#1baf7a', cnt: GC.map(r=>r.지속발생)},
+    {label:'공백 후 재관측', data: GC.map(r=>r['재발%']), backgroundColor:'#eda100', cnt: GC.map(r=>r.재발)},
+  ]},
+  options:{indexAxis:'y',
+    plugins:{
+      legend:{position:'top',labels:{boxWidth:11,font:{size:10}}},
+      tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label} ${ctx.raw.toFixed(1)}%(${fmt(ctx.dataset.cnt[ctx.dataIndex])}개) — ${DOMDEF[ctx.dataset.label]}`}}
+    },
+    scales:{x:{stacked:true,max:100,ticks:{callback:v=>v+'%'},title:{display:true,text:'당해 전체 격자 대비 구성비'}}, y:{stacked:true}}
+  },
+  plugins:[pctLabelPlugin]
+});
+new Chart(document.getElementById('c_retainRate').getContext('2d'),{type:'line',data:{
+  labels: cycLbl,
+  datasets:[{data: GDy.map(r=>r['지속률(%)']), borderColor:'#1baf7a', backgroundColor:'#1baf7a22', fill:false, tension:.2,
+    pointRadius: cycLbl.map((_,i)=> i===cycLbl.length-1 ? 5 : 3),
+    pointBackgroundColor: cycLbl.map((_,i)=> i===cycLbl.length-1 ? '#0b3300' : '#1baf7a')}]},
+  options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw==null?'해당없음(첫 조사연도)':`전년 대비 유지 ${ctx.raw.toFixed(1)}%`}}},
+  scales:{y:{title:{display:true,text:'%'},min:0,max:100}}}
+});
+const retainLastIdx = GDy.length-1;
+document.getElementById('retain-latest-year').textContent = cycLbl[retainLastIdx];
+document.getElementById('retain-latest-val').textContent = GDy[retainLastIdx]['지속률(%)']!=null ? GDy[retainLastIdx]['지속률(%)'].toFixed(1)+'%' : '–';
+
+const gcFirst = GC[0], gcLast = GC[GC.length-1];
+document.getElementById('gridcomp-concl').innerHTML =
+  `<div class="lbl">해석</div>${cycLbl[0]}에는 신규 관측 격자가 <b>${gcFirst['신규%'].toFixed(0)}%</b>로 대부분이었지만, ${cycLbl[cycLbl.length-1]}에는 신규 <b>${gcLast['신규%'].toFixed(0)}%</b>·연속 <b>${gcLast['지속%'].toFixed(0)}%</b>·공백 후 재관측 <b>${gcLast['재발%'].toFixed(0)}%</b>로 나뉘며, 기존 발생지의 연속·재관측 비중이 커지는 반복 발생 구조로 바뀌었습니다.`;
+
+
+// ── 3-4. 복합지표 교차표 (TOP 7 = 산림청 특별방제구역 지정 개수와 동일 규모) ──
+const CROSS_CAP = 7;
+document.getElementById('cross-total-note').textContent = `총 ${D.crossMetric.length}개 `;
+const crossRows = [...D.crossMetric].sort((a,b)=> b.누적피해고사목-a.누적피해고사목).slice(0, CROSS_CAP);
+document.getElementById('cross-tbl').innerHTML =
+  '<tr><th>시군구</th><th>누적규모</th><th>100ha당부담</th><th>반복관측률</th><th>장기지속격자</th></tr>' +
+  crossRows.map(r=>`<tr><td><b>${r.시도명} ${r.시군구명}</b></td>
+    <td><span class="lvl ${r.배지_누적규모}">${r.배지_누적규모||'–'}</span></td>
+    <td><span class="lvl ${r.배지_100ha당부담}">${r.배지_100ha당부담||'–'}</span></td>
+    <td><span class="lvl ${r.배지_반복관측률}">${r.배지_반복관측률||'–'}</span></td>
+    <td><span class="lvl ${r.배지_장기지속}">${r.배지_장기지속||'–'}</span></td></tr>`).join('');
+
+// ── 3-5. 산점도 + 잔차분석 ─────────────────────────────────────────────────
+const outlierNames = D.residual.over.slice(0,8).map(r=>r.시군구명);
+const outlierPts = D.scatterAreaVsDamage.filter(r=>outlierNames.includes(r.시군구명));
+const scatterAnnotatePlugin = {
+  id:'scatterAnnotate',
+  beforeDatasetsDraw(chart){
+    if(!outlierPts.length) return;
+    const xs = chart.scales.x, ys = chart.scales.y;
+    const px = outlierPts.map(r=>xs.getPixelForValue(r.원본_소나무류면적_ha));
+    const py = outlierPts.map(r=>ys.getPixelForValue(r.누적피해고사목));
+    const cx = px.reduce((a,b)=>a+b,0)/px.length, cy = py.reduce((a,b)=>a+b,0)/py.length;
+    const ctx = chart.ctx;
+    ctx.save();
+    ctx.fillStyle = 'rgba(27,175,122,0.13)';
+    ctx.beginPath(); ctx.arc(cx,cy,60,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  },
+  afterDatasetsDraw(chart){
+    if(!outlierPts.length) return;
+    const xs = chart.scales.x, ys = chart.scales.y;
+    const px = outlierPts.map(r=>xs.getPixelForValue(r.원본_소나무류면적_ha));
+    const py = outlierPts.map(r=>ys.getPixelForValue(r.누적피해고사목));
+    const cx = px.reduce((a,b)=>a+b,0)/px.length, cy = py.reduce((a,b)=>a+b,0)/py.length;
+    const ctx = chart.ctx;
+    ctx.save();
+    ctx.fillStyle = '#0f6e56'; ctx.font = '600 11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('숲 면적 대비 피해가 집중된 지역', cx, Math.max(cy-78, 12));
+    ctx.restore();
+  }
+};
+new Chart(document.getElementById('c_scatter').getContext('2d'),{type:'scatter',data:{
+  datasets:[{label:'시군구', data: D.scatterAreaVsDamage.map(r=>({x:r.원본_소나무류면적_ha, y:r.누적피해고사목, nm:r.시도명+' '+r.시군구명})),
+    backgroundColor:'#2d7016aa', pointRadius:4}]},
+  options:{plugins:{legend:{display:false},tooltip:{callbacks:{
+    label:ctx=>`${ctx.raw.nm}: 면적 ${fmt(Math.round(ctx.raw.x))}ha, 누적피해 ${fmt(ctx.raw.y)}본`}}},
+  scales:{x:{type:'logarithmic',title:{display:true,text:'소나무 숲 면적 (커질수록 →)'}},
+          y:{type:'logarithmic',title:{display:true,text:'누적 피해 (커질수록 ↑)'}}}},
+  plugins:[scatterAnnotatePlugin]
+});
+document.getElementById('scatter-note').innerHTML =
+  '가로·세로 눈금 한 칸마다 값이 <b>10배씩</b> 커집니다(작은 지역과 큰 지역을 한 그래프에 담기 위한 표현입니다). 점들이 오른쪽 위로 가지런히 올라가지 않고 넓게 흩어져 있다는 것 자체가 "숲이 넓으면 피해도 크다"는 예상이 잘 들어맞지 않는다는 뜻입니다. 초록 원으로 표시한 지역은 숲 면적에 비해 피해가 유독 큰 곳입니다.';
+
+document.getElementById('residual-summary').innerHTML =
+  `소나무류 <b>면적만으로 설명되는 부분은 매우 적습니다</b> (로그-로그 회귀 R² ≈ <b>${(D.residual.r2*100).toFixed(0)}%</b>, n=${D.residual.n}개 시군구).
+  즉 지역별 피해량 차이의 대부분은 면적 외 다른 요인(관리 이력, 확산 경로, 기후 조건 등)에서 비롯됩니다.`;
+new Chart(document.getElementById('c_resid_over').getContext('2d'),{type:'bar',data:{
+  labels: D.residual.over.slice(0,6).map(r=>r.시군구명),
+  datasets:[{data: D.residual.over.slice(0,6).map(r=>r['실측예측비']), backgroundColor:'#e34948'}]},
+  options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{
+    label:ctx=>`실측÷예측 = ${ctx.raw.toFixed(0)}배`}}}, scales:{x:{type:'logarithmic'}}}
+});
+
+// ═══════════════════════ 모달 ═══════════════════════
+new Chart(document.getElementById('c_verify').getContext('2d'),{data:{
+  labels: D.verify.map(r=>r.관리주기명),
+  datasets:[
+    {type:'bar', label:'공식 발생본수', data: D.verify.map(r=>r.공식_피해고사목/10000), backgroundColor:'#2a78d680'},
+    {type:'bar', label:'원자료 피해고사목', data: D.verify.map(r=>r.원자료_피해고사목/10000), backgroundColor:'#1baf7a99'},
+    {type:'line', label:'포함률(%)', data: D.verify.map(r=>r['포함률(%)']), yAxisID:'y1',
+     borderColor:'#e34948', pointBackgroundColor:'#e34948', borderWidth:2, pointRadius:4},
+  ]},
+  options:{plugins:{
+    legend:{position:'top',labels:{boxWidth:11,font:{size:10}}}
+  },
+  scales:{x:{ticks:{font:{size:9}}}, y:{title:{display:true,text:'만본'}},
+  y1:{position:'right',min:0,max:110,grid:{drawOnChartArea:false},title:{display:true,text:'포함률 %'}}}}
+});
+const maxerr = Math.max(...D.verify.filter(r=>r.분석사용==='사용').map(r=>Math.abs(r['오차율(%)'])));
+const excl = D.verify.filter(r=>r.분석사용==='분석제외').map(r=>r.관리주기명+`(포함률 ${r['포함률(%)'].toFixed(1)}%)`).join(', ');
+document.getElementById('verify-note').innerHTML =
+  `지역 세부 분석에는 공식통계와 최대 오차 <b>${maxerr.toFixed(2)}%</b> 이내로 검증된 2016.5~2022.4 원자료만 사용했습니다. 제외: ${excl}.`;
+
+const MD = D.monthDist;
+const monthOrder = [5,6,7,8,9,10,11,12,1,2,3,4];
+const monthTotal = monthOrder.map(m=>{
+  const row = MD.find(r=>r.조사월===m);
+  return row ? cyc.reduce((s,c)=>s+(row[c]||0),0) : 0;
+});
+new Chart(document.getElementById('c_month').getContext('2d'),{type:'bar',data:{
+  labels: monthOrder.map(m=>m+'월'),
+  datasets:[{data: monthTotal.map(v=>v/10000), backgroundColor: monthOrder.map(m=>[5,6,7,8,9].includes(m)?'#1baf7a':'#2a78d6')}]},
+  options:{plugins:{legend:{display:false}}, scales:{y:{title:{display:true,text:'만건'}}}}
+});
+</script>
+</body>
+</html>
