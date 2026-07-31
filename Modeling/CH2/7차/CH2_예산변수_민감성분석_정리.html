@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CH2 예산변수 민감성 분석 정리</title>
+  <style>
+    :root {
+      --ink: #17201a;
+      --muted: #5f6b64;
+      --line: #d9e2dc;
+      --bg: #f7f9f6;
+      --panel: #ffffff;
+      --green: #0d7a42;
+      --blue: #155fa0;
+      --amber: #a86500;
+      --red: #b3261e;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 40px));
+      margin: 36px auto 56px;
+    }
+
+    header {
+      margin-bottom: 24px;
+      border-bottom: 3px solid var(--green);
+      padding-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 21px;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .green { background: var(--green); }
+    .blue { background: var(--blue); }
+    .amber { background: var(--amber); }
+    .red { background: var(--red); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #eef4f0;
+      font-weight: 700;
+    }
+
+    .num {
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    li + li {
+      margin-top: 5px;
+    }
+
+    code {
+      padding: 1px 4px;
+      border-radius: 4px;
+      background: #edf2ef;
+      font-family: Consolas, "D2Coding", monospace;
+      font-size: 0.95em;
+    }
+
+    .quote {
+      border-left: 4px solid var(--green);
+      background: #f2f7f4;
+      padding: 13px 15px;
+      color: #24372c;
+    }
+
+    .warning {
+      border-left: 4px solid var(--amber);
+      background: #fff8ed;
+      padding: 13px 15px;
+    }
+
+    .compact td:first-child {
+      width: 170px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 760px) {
+      main {
+        width: min(100% - 24px, 1120px);
+        margin-top: 22px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      table {
+        font-size: 13px;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>CH2 예산변수 민감성 분석 정리</h1>
+      <p class="subtitle">재선충명시 예산 vs 산림병해충포괄 예산 | 보고서·대시보드 반영 기준</p>
+    </header>
+
+    <section class="grid">
+      <article class="card">
+        <span class="badge green">최종 판단</span>
+        <h2>재선충명시 예산을 본사양으로 유지</h2>
+        <p>
+          산림병해충포괄 예산은 예측 AUC를 일부 높였지만, 재선충병 대응자원 배분이라는
+          핵심 정책해석을 약화시켰다. 따라서 본 연구는 정책 해석 단위가 명확한
+          재선충명시 예산을 기준 사양으로 사용한다.
+        </p>
+      </article>
+
+      <article class="card">
+        <span class="badge amber">심사위원 질문</span>
+        <h2>AUC가 더 높은 포괄 예산을 왜 안 쓰는가?</h2>
+        <p>
+          본 연구의 목적은 단순 예측성능 극대화가 아니라
+          "재선충병 위험 대비 재선충병 대응자원 배분의 정합성"을 평가하는 것이다.
+          포괄 예산은 재선충병 외 병해충 예산이 섞여 정책 신호가 희석된다.
+        </p>
+      </article>
+
+      <article class="card full">
+        <h2>1. 핵심 결과 비교</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>지표</th>
+              <th>재선충명시 예산<br>본사양</th>
+              <th>산림병해충포괄 예산<br>민감성 분석</th>
+              <th>해석</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>훈련 AUC</td>
+              <td class="num">0.581</td>
+              <td class="num">0.623</td>
+              <td>포괄 예산에서 소폭 상승</td>
+            </tr>
+            <tr>
+              <td>홀드아웃 AUC</td>
+              <td class="num">0.564</td>
+              <td class="num">0.614</td>
+              <td>포괄 예산에서 소폭 상승</td>
+            </tr>
+            <tr>
+              <td>훈련 within 계수</td>
+              <td class="num">-0.450<br>(p=0.101)</td>
+              <td class="num">-0.173<br>(p=0.493)</td>
+              <td>포괄 예산에서 유의성 약화</td>
+            </tr>
+            <tr>
+              <td>배분갭 회귀 β</td>
+              <td class="num">+1.185<br>(p=0.016)</td>
+              <td class="num">-0.430<br>(p=0.108)</td>
+              <td>부호 반전 및 유의성 상실</td>
+            </tr>
+            <tr>
+              <td>배분갭 R²</td>
+              <td class="num">2.39%</td>
+              <td class="num">0.60%</td>
+              <td>설명력 약 4분의 1 수준으로 감소</td>
+            </tr>
+            <tr>
+              <td>취약성지수 1위</td>
+              <td>완도군<br>(1.233)</td>
+              <td>통영시<br>(1.288), 완도군 5위</td>
+              <td>상위 지역 순위 재편</td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="card full">
+        <h2>2. 2×3 정책유형 매트릭스 변화</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>유형</th>
+              <th>재선충명시 예산<br>부족 / 적정 / 과다</th>
+              <th>산림병해충포괄 예산<br>부족 / 적정 / 과다</th>
+              <th>변화 포인트</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>노출도-우세형</td>
+              <td class="num">20 / 29 / 23</td>
+              <td class="num">31 / 31 / 10</td>
+              <td>과다 분류 감소, 부족 분류 증가</td>
+            </tr>
+            <tr>
+              <td>복합형</td>
+              <td class="num">16 / 20 / 27</td>
+              <td class="num">17 / 27 / 19</td>
+              <td>적정 분류 증가</td>
+            </tr>
+            <tr>
+              <td>인위적확산-우세형</td>
+              <td class="num">38 / 25 / 24</td>
+              <td class="num">26 / 16 / 45</td>
+              <td>과다 분류가 크게 증가</td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="card">
+        <span class="badge blue">보고서 반영</span>
+        <h2>넣어야 할 내용</h2>
+        <ul>
+          <li>예산변수 민감성 분석을 별도 표로 추가</li>
+          <li>"96.6% 동일" 문구는 삭제 또는 교체</li>
+          <li>재선충명시 예산 채택 사유를 정책질문 기준으로 설명</li>
+          <li>포괄 예산은 대체 사양 검토 결과로 보고</li>
+          <li>방제법인·반출금지구역은 후순위 보조 검토로 분리</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <span class="badge red">대시보드 반영</span>
+        <h2>넣지 말아야 할 내용</h2>
+        <ul>
+          <li>상세 회귀표 전체</li>
+          <li>2×3 매트릭스의 모든 비교표</li>
+          <li>예산 사양별 기술적 논쟁</li>
+          <li>방제법인·반출금지구역 세부 변수 목록</li>
+        </ul>
+      </article>
+
+      <article class="card full">
+        <h2>3. 보고서 권장 문구</h2>
+        <div class="quote">
+          본 연구는 재선충병 위험과 대응자원 배분의 정합성을 평가하기 위해
+          재선충명시 예산을 기준 사양으로 사용하였다. 산림병해충포괄 예산을
+          대체 사양으로 적용한 민감성 분석에서는 예측 AUC가 일부 상승했으나,
+          배분갭 회귀계수의 방향성이 반전되고 유의성이 사라졌다. 이는 포괄 예산이
+          재선충병 직접 대응자원뿐 아니라 기타 산림병해충 대응예산을 포함하여
+          정책 신호를 희석하기 때문으로 해석된다. 따라서 본 연구는 예측성능만을
+          기준으로 사양을 선택하지 않고, 정책 해석 단위가 명확한 재선충명시 예산을
+          본사양으로 유지하였다.
+        </div>
+      </article>
+
+      <article class="card full">
+        <h2>4. 대시보드용 짧은 문구</h2>
+        <div class="quote">
+          예산변수 민감성 분석 결과, 산림병해충포괄 예산은 예측성능은 일부 높였으나
+          재선충병 대응자원 배분 해석을 약화시켜 본 지수는 재선충명시 예산을 기준으로 산정했다.
+        </div>
+      </article>
+
+      <article class="card full">
+        <h2>5. 시간 격차 피드백 대응</h2>
+        <table class="compact">
+          <tbody>
+            <tr>
+              <td>CH2/CH3</td>
+              <td>
+                2016~2023년 패널자료 기반의 중장기 구조취약성 지표로 방어 가능.
+                단, 2026년 현재 피해목 수를 직접 예측하는 모형이 아니라는 점을 명시해야 한다.
+              </td>
+            </tr>
+            <tr>
+              <td>CH4</td>
+              <td>
+                인력·일수·비용 산정은 최신 피해 규모와 직접 연결되므로 시간 격차가 더 민감하다.
+                기준연도 경고문 또는 참고 스케일업치를 별도로 제시하는 것이 필요하다.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="warning" style="margin-top: 12px;">
+          권장 문구: 본 지수는 2026년 단기 피해 규모를 직접 예측하는 모형이 아니라,
+          2016~2023년 패널자료를 기반으로 시군구별 구조적 취약성을 비교하기 위한
+          중장기 위험진단 지표이다.
+        </div>
+      </article>
+
+      <article class="card full">
+        <h2>6. 최종 한 줄 결론</h2>
+        <div class="quote">
+          포괄 예산은 검토했지만 재선충병 대응자원 배분이라는 연구질문에는 신호가 희석되므로,
+          재선충명시 예산을 본사양으로 유지하고 나머지 보조 변수는 보고서의 민감성 분석으로만 제시한다.
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
