@@ -3,7 +3,7 @@
                  "version":  "CH4_v4_execution_assets",
                  "generated_at":  "2026-07-31 14:47:54",
                  "source_input":  "Modeling/CH4/1차/data/ch4_input_data.json",
-                 "source_budget_panel":  "Modeling/CH2/6차/CH2_전체병합패널_5도메인_2016_2023_최종보정4.csv",
+                 "source_budget_panel":  "CH2 7차 최종판 데이터 기준(원자료 경로: Modeling/CH2/7차/CH2_전체병합패널_5도메인_2016_2023_최종보정4.csv)",
                  "n_sgg":  222,
                  "budget_rule":  "재선충명시 예산을 공식 기준으로 우선 사용하고, 0/결측이면 산림병해충 포괄 예산을 참고 fallback으로 표시",
                  "area_rule":  "pine_area_ha_reference는 소나무류 면적 참고값이며 실제 방제면적 treatment_area_ha와 분리",

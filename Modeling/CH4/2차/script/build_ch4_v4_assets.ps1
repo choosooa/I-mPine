@@ -7,7 +7,7 @@ $OutData = Join-Path $OutRoot "data"
 $OutScript = Join-Path $OutRoot "script"
 $InputJson = Join-Path $Root "Modeling\CH4\1차\data\ch4_input_data.json"
 $TreeJson = Join-Path $Root "Modeling\CH4\1차\data\ch4_treecount_latest_cycle.json"
-$PanelCsv = Join-Path $Root "Modeling\CH2\6차\CH2_전체병합패널_5도메인_2016_2023_최종보정4.csv"
+$PanelCsv = Join-Path $Root "Modeling\CH2\7차\CH2_전체병합패널_5도메인_2016_2023_최종보정4.csv"
 $Ch3Html = Join-Path $Root "ch3\ImPine_ver4\ImPine\ch3\ch3.html"
 
 New-Item -ItemType Directory -Force -Path $OutRoot, $OutData, $OutScript | Out-Null
@@ -135,7 +135,7 @@ $outObj = [pscustomobject]@{
     version = "CH4_v4_execution_assets"
     generated_at = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
     source_input = "Modeling/CH4/1차/data/ch4_input_data.json"
-    source_budget_panel = "Modeling/CH2/6차/CH2_전체병합패널_5도메인_2016_2023_최종보정4.csv"
+    source_budget_panel = "CH2 7차 최종판 데이터 기준(원자료 경로: Modeling/CH2/7차/CH2_전체병합패널_5도메인_2016_2023_최종보정4.csv)"
     n_sgg = $v4Rows.Count
     budget_rule = "재선충명시 예산을 공식 기준으로 우선 사용하고, 0/결측이면 산림병해충 포괄 예산을 참고 fallback으로 표시"
     area_rule = "pine_area_ha_reference는 소나무류 면적 참고값이며 실제 방제면적 treatment_area_ha와 분리"
@@ -219,7 +219,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th{background:#f0f5ea;t
       </div>
     </div>
     <div>
-      <div class="recobox" id="recobox"><div class="l">추천 방제방법</div><div class="v" id="reco-name">-</div><div class="why" id="reco-why"></div></div>
+      <div class="recobox" id="recobox"><div class="l">조건 내 최소비용 방식</div><div class="v" id="reco-name">-</div><div class="why" id="reco-why"></div></div>
       <div class="krow" id="kpi-row"></div>
       <div class="card"><div class="ct">예산·데이터 신뢰도</div><table id="budget-table"></table></div>
       <div class="card"><div class="ct">방제방법 비교</div><table id="compare-table"></table><div class="notice">단가·작업량은 D등급 추정치입니다. 인건비 20만원/인/일은 C등급 근사 실측 참고치로만 병기합니다.</div></div>
@@ -303,8 +303,20 @@ function render(){
   document.getElementById('v-workers').textContent = `${fmt(ctx.workers)}명`;
   document.getElementById('v-distance').textContent = `${fmt(ctx.distance)} km`;
   document.getElementById('v-days').textContent = `${fmt(ctx.days)}일`;
-  document.getElementById('v-budget-mode').textContent = els.budgetMode.options[els.budgetMode.selectedIndex].textContent;
-  document.getElementById('region-note').innerHTML = `<b>${r.시도명} ${r.시군구명}</b> · CH3 우선순위 ${r.priority_rank}위(${r.grade}) · 정책 ${r.recommended_policy}<br>treeCount 원자료 기준 ${fmt(r.treeCount_reference)}본, 2026 전국배율 참고 ${fmt(r.treeCount_scaled_current)}본 · 소나무류 면적 참고 ${fmt(r.pine_area_ha_reference)}ha`;
+  const budgetFallback = els.budgetMode.value === 'primary' && r.budget_primary_mode === 'broad_reference_fallback';
+  document.getElementById('v-budget-mode').textContent = els.budgetMode.options[els.budgetMode.selectedIndex].textContent + (budgetFallback ? ' (포괄 예산 대체 적용중)' : '');
+  const missingParts = [];
+  if(r.treeCount_reference==null) missingParts.push('treeCount');
+  if(r.pine_area_ha_reference==null) missingParts.push('pine_area');
+  const missingNote = missingParts.length
+    ? `<br><b style="color:#a33">⚠ 결측(${missingParts.join('·')}):</b> ch1_data_available 플래그(${r.ch1_data_available})와 무관하게 이 항목의 원자료가 없어 화면 기본값(${DATA.defaults.treeCount}본/${DATA.defaults.treatment_area_ha}ha)으로 대체됩니다 — 최신 지자체 자료 확인 대상입니다.`
+    : '';
+  const budgetNote = r.budget_primary_mode === 'broad_reference_fallback'
+    ? `<br><b style="color:#9a5b00">ⓘ 예산:</b> 재선충명시 전용예산이 0이라 산림병해충 포괄 예산(${moneyMan(r.budget_won_broad)})을 참고 기준으로 대신 사용 중입니다.`
+    : '';
+  const daysNote = `<br><span style="color:var(--mu2)">목표 작업일수 근거: ${r.targetDays_basis || '-'} · 재발위험확률 ${fmt((r.재발위험확률||0)*100)}%의 역할: ${r.recurrence_probability_role || '-'}</span>`;
+  document.getElementById('region-note').innerHTML = `<b>${r.시도명} ${r.시군구명}</b> · CH3 우선순위 ${r.priority_rank}위(${r.grade}) · 정책 ${r.recommended_policy}<br>treeCount 원자료 기준 ${fmt(r.treeCount_reference)}본, 2026 전국배율 참고 ${fmt(r.treeCount_scaled_current)}본 · 소나무류 면적 참고 ${fmt(r.pine_area_ha_reference)}ha`
+    + missingNote + budgetNote + daysNote;
   const results = DATA.methods.map(m => calc(m, ctx));
   const feasible = results.filter(x=>x.feasible).sort((a,b)=>a.totalCost-b.totalCost);
   const best = feasible[0];
